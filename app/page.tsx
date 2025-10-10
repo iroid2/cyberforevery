@@ -273,7 +273,7 @@ export default function ComingSoonPage() {
         </div>
       </section> */}
 
-      <ContactForm />
+      {/* <ContactForm /> */}
 
       <MarqueeBanner />
       <Footer />

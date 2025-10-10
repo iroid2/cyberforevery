@@ -1,4 +1,6 @@
-"use client"
+"use client";
+
+import { Loader, LoaderPinwheel } from "lucide-react";
 
 export function MarqueeBanner() {
   const messages = [
@@ -9,7 +11,7 @@ export function MarqueeBanner() {
     "MAKING DIGITAL SAFETY ACCESSIBLE",
     "EMPOWERING COMMUNITIES",
     "SECURE • EDUCATE • EMPOWER",
-  ]
+  ];
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 overflow-hidden bg-[#BFFF00] py-4">
@@ -18,12 +20,12 @@ export function MarqueeBanner() {
         {[...messages, ...messages, ...messages].map((message, index) => (
           <span
             key={index}
-            className="mx-8 font-sans text-sm font-bold uppercase tracking-wider text-black md:text-base"
+            className="mx-8 font-sans text-sm flex font-bold uppercase tracking-wider text-black md:text-base"
           >
-            {message}
+            {message} <Loader className="animate duration-75" />
           </span>
         ))}
       </div>
     </div>
-  )
+  );
 }
