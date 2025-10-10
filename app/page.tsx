@@ -64,7 +64,7 @@ export default function ComingSoonPage() {
       <section className="relative z-10 flex min-h-[calc(100vh-120px)] flex-col items-center justify-center px-6 text-center">
         <div className="mx-auto max-w-4xl">
           <h1 className="mb-6 font-sans text-5xl font-bold leading-tight tracking-tight text-foreground md:text-6xl lg:text-7xl">
-            Cybersecurity Made Simple for Everyone
+            Cybersecurity Made
             <br />
             <span className="text-primary">Simple</span> for Everyone
           </h1>
