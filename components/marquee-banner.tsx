@@ -3,9 +3,7 @@
 import { LoaderPinwheel } from "lucide-react";
 
 export function MarqueeBanner() {
-  const messages = [
-    "To create a world where every individual — regardless of age, background, or profession — understands how to stay safe and confident in the digital",
-  ];
+  const messages = ["SITE UNDER DEVELOPMENT", "THANK YOU FOR VISITING"];
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 overflow-hidden bg-[#BFFF00] py-4">

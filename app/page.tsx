@@ -70,8 +70,9 @@ export default function ComingSoonPage() {
           </h1>
 
           <p className="mx-auto mb-10 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-            Empowering individuals, schools, churches, and communities with
-            accessible cybersecurity education and awareness training.
+            To create a world where every individual — regardless of age,
+            background, or profession — understands how to stay safe and
+            confident in the digital
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
