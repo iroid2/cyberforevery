@@ -72,7 +72,7 @@ export default function ComingSoonPage() {
           <p className="mx-auto mb-10 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
             To create a world where every individual — regardless of age,
             background, or profession — understands how to stay safe and
-            confident in the digital
+            confident in the digital world.
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
