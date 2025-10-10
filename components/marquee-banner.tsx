@@ -4,13 +4,8 @@ import { LoaderPinwheel } from "lucide-react";
 
 export function MarqueeBanner() {
   const messages = [
-    "SITE UNDER DEVELOPMENT",
+    "THIS WEBSITE IS CURRENTLY UNDER DEVELOPMENT",
     "THANK YOU FOR VISITING",
-    "COMING SOON",
-    "CYBERSECURITY FOR EVERYONE",
-    "MAKING DIGITAL SAFETY ACCESSIBLE",
-    "EMPOWERING COMMUNITIES",
-    "SECURE • EDUCATE • EMPOWER",
   ];
 
   return (
