@@ -1,9 +1,18 @@
-import { Shield, ChevronDown, ArrowRight, Clock, Zap, Lock, CheckCircle, Target } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { MarqueeBanner } from "@/components/marquee-banner"
-import { Footer } from "@/components/footer"
-import { ServiceCard } from "@/components/service-card"
-import { ContactForm } from "@/components/contact-form"
+import {
+  Shield,
+  ChevronDown,
+  ArrowRight,
+  Clock,
+  Zap,
+  Lock,
+  CheckCircle,
+  Target,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MarqueeBanner } from "@/components/marquee-banner";
+import { Footer } from "@/components/footer";
+import { ServiceCard } from "@/components/service-card";
+import { ContactForm } from "@/components/contact-form";
 
 export default function ComingSoonPage() {
   return (
@@ -14,10 +23,15 @@ export default function ComingSoonPage() {
         <nav className="flex w-full max-w-4xl items-center justify-between rounded-full bg-card px-6 py-4 shadow-2xl">
           <div className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-card-foreground" />
-            <span className="font-sans text-base font-semibold text-card-foreground">cyber4every1</span>
+            <span className="font-sans text-base font-semibold text-card-foreground">
+              cyber4every1
+            </span>
           </div>
           <div className="hidden items-center gap-8 md:flex">
-            <a href="/" className="text-sm font-medium text-card-foreground transition-colors">
+            <a
+              href="/"
+              className="text-sm font-medium text-card-foreground transition-colors"
+            >
               Home
             </a>
             <a
@@ -41,7 +55,7 @@ export default function ComingSoonPage() {
               size="sm"
               className="rounded-full bg-card-foreground px-6 text-sm font-medium text-card hover:bg-card-foreground/90"
             >
-              Signup
+              Get in Touch
             </Button>
           </div>
         </nav>
@@ -56,8 +70,8 @@ export default function ComingSoonPage() {
           </h1>
 
           <p className="mx-auto mb-10 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-            Empowering individuals, schools, churches, and communities with accessible cybersecurity education and
-            awareness training.
+            Empowering individuals, schools, churches, and communities with
+            accessible cybersecurity education and awareness training.
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -106,9 +120,12 @@ export default function ComingSoonPage() {
       <section className="relative z-10 px-6 py-24 md:py-32">
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 text-center">
-            <p className="mb-4 text-sm font-semibold uppercase tracking-wider text-primary">About Us</p>
+            <p className="mb-4 text-sm font-semibold uppercase tracking-wider text-primary">
+              About Us
+            </p>
             <h2 className="mb-6 font-sans text-4xl font-bold text-foreground md:text-5xl lg:text-6xl">
-              Making Cybersecurity <span className="text-primary">Accessible</span> to All
+              Making Cybersecurity{" "}
+              <span className="text-primary">Accessible</span> to All
             </h2>
           </div>
 
@@ -126,11 +143,14 @@ export default function ComingSoonPage() {
             {/* Right Side - Content */}
             <div className="flex flex-col justify-center space-y-8">
               <div>
-                <h3 className="mb-4 text-3xl font-bold text-foreground">Who We Are</h3>
+                <h3 className="mb-4 text-3xl font-bold text-foreground">
+                  Who We Are
+                </h3>
                 <p className="text-lg leading-relaxed text-muted-foreground">
-                  At CyberSecurity For Everyone LLC, we bridge the gap between technology and people by delivering
-                  clear, engaging, and inclusive cybersecurity education that empowers communities to recognize and
-                  defend against digital threats.
+                  At CyberSecurity For Everyone LLC, we bridge the gap between
+                  technology and people by delivering clear, engaging, and
+                  inclusive cybersecurity education that empowers communities to
+                  recognize and defend against digital threats.
                 </p>
               </div>
 
@@ -140,9 +160,12 @@ export default function ComingSoonPage() {
                     <Target className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h4 className="mb-2 text-xl font-bold text-foreground">Our Mission</h4>
+                    <h4 className="mb-2 text-xl font-bold text-foreground">
+                      Our Mission
+                    </h4>
                     <p className="text-muted-foreground">
-                      Empowering communities through accessible cybersecurity education and awareness training.
+                      Empowering communities through accessible cybersecurity
+                      education and awareness training.
                     </p>
                   </div>
                 </div>
@@ -152,9 +175,12 @@ export default function ComingSoonPage() {
                     <Shield className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h4 className="mb-2 text-xl font-bold text-foreground">Our Vision</h4>
+                    <h4 className="mb-2 text-xl font-bold text-foreground">
+                      Our Vision
+                    </h4>
                     <p className="text-muted-foreground">
-                      A world where everyone understands how to stay safe and confident in the digital world.
+                      A world where everyone understands how to stay safe and
+                      confident in the digital world.
                     </p>
                   </div>
                 </div>
@@ -164,9 +190,12 @@ export default function ComingSoonPage() {
                     <CheckCircle className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h4 className="mb-2 text-xl font-bold text-foreground">Our Approach</h4>
+                    <h4 className="mb-2 text-xl font-bold text-foreground">
+                      Our Approach
+                    </h4>
                     <p className="text-muted-foreground">
-                      Simple, practical education that removes technical barriers and empowers everyday people.
+                      Simple, practical education that removes technical
+                      barriers and empowers everyday people.
                     </p>
                   </div>
                 </div>
@@ -185,7 +214,7 @@ export default function ComingSoonPage() {
         </div>
       </section>
 
-      <section id="services" className="relative z-10 px-6 py-24">
+      {/* <section id="services" className="relative z-10 px-6 py-24">
         <div className="mx-auto max-w-7xl">
           <div className="mb-20 text-center">
             <h2 className="mb-4 font-sans text-4xl font-bold text-foreground md:text-5xl lg:text-6xl">
@@ -242,12 +271,12 @@ export default function ComingSoonPage() {
             />
           </div>
         </div>
-      </section>
+      </section> */}
 
       <ContactForm />
 
       <MarqueeBanner />
       <Footer />
     </main>
-  )
+  );
 }
