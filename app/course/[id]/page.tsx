@@ -15,7 +15,7 @@ export default function CourseDetailPage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-headline font-black text-foreground mb-4 uppercase">System Error</h1>
+          <h1 className="text-4xl font-headline font-black text-foreground mb-5 uppercase">System Error</h1>
           <p className="text-muted mb-8 uppercase tracking-widest">// DATA_NOT_FOUND</p>
           <Link href="/" className="text-primary font-bold hover:underline">Return to Terminal</Link>
         </div>
