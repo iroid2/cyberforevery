@@ -1,11 +1,10 @@
 import { PrismaClient, UserRole } from "@prisma/client";
 import { sendAdminPromotionEmail } from "../lib/emails/actions";
 
-// The standard PrismaClient constructor automatically picks up DATABASE_URL from .env
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🚀 [Seed] Starting platform initialization...");
+  console.log("[Seed] Starting platform initialization...");
 
   const users = [
     {
@@ -47,30 +46,76 @@ async function main() {
   ];
 
   for (const user of users) {
-    const upsertedUser = await prisma.user.upsert({
+    await prisma.user.upsert({
       where: { email: user.email },
-      update: { role: user.role }, // Ensure role is updated to SUPER_ADMIN if promoted
+      update: { role: user.role },
       create: user,
     });
-    console.log(`✅ [Seed] User Synced: ${user.name} (${user.role})`);
-    
-    // If it's the target admin, send the promotion email
+
+    console.log(`[Seed] User synced: ${user.name} (${user.role})`);
+
     if (user.email === "iradtu22@gmail.com") {
       try {
         await sendAdminPromotionEmail(user.email, user.name || "Admin");
-        console.log(`📧 [Seed] Promotion email dispatched to ${user.email}`);
-      } catch (e) {
-        console.error(`❌ [Seed] Email dispatch failed for ${user.email}:`, e);
+        console.log(`[Seed] Promotion email dispatched to ${user.email}`);
+      } catch (error) {
+        console.error(`[Seed] Email dispatch failed for ${user.email}:`, error);
       }
     }
   }
 
-  console.log("🏁 [Seed] Command executed successfully.");
+  const starterCourses = [
+    {
+      title: "Intro to Cybersecurity",
+      slug: "intro-to-cybersecurity",
+      description: "Foundational cybersecurity track available online and in-person.",
+    },
+    {
+      title: "Intro to Computer Hardware",
+      slug: "intro-to-computer-hardware",
+      description: "Hands-on hardware fundamentals available online and in-person.",
+    },
+    {
+      title: "Intro to Networking",
+      slug: "intro-to-networking",
+      description: "Networking essentials for beginners delivered online and in-person.",
+    },
+    {
+      title: "Intro to AI & Current Trends",
+      slug: "intro-to-ai-current-trends",
+      description: "Beginner-friendly AI and trends course available online and in-person.",
+    },
+    {
+      title: "Intro to Web Development",
+      slug: "intro-to-web-development",
+      description: "Web development fundamentals offered as an online-only course.",
+    },
+    {
+      title: "Intro to Graphic Design + AI",
+      slug: "intro-to-graphic-design-ai",
+      description: "Graphic design and AI creativity course offered online only.",
+    },
+  ];
+
+  for (const course of starterCourses) {
+    await prisma.course.upsert({
+      where: { slug: course.slug },
+      update: {
+        title: course.title,
+        description: course.description,
+      },
+      create: course,
+    });
+
+    console.log(`[Seed] Course synced: ${course.title}`);
+  }
+
+  console.log("[Seed] Command executed successfully.");
 }
 
 main()
-  .catch((e) => {
-    console.error("🔥 [Seed] Global Failure:", e);
+  .catch((error) => {
+    console.error("[Seed] Global failure:", error);
     process.exit(1);
   })
   .finally(async () => {

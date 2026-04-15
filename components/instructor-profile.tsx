@@ -9,7 +9,7 @@ export function InstructorProfile() {
             <img 
               alt="Ivan Zziwa - Chief Mentor" 
               className="absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" 
-              src="/ivan.png"
+              src="/placeholder-user.jpg"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-transparent to-surface hidden lg:block"></div>
           </div>

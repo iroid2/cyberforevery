@@ -3,23 +3,11 @@ import Credentials from "next-auth/providers/credentials";
 import Facebook from "next-auth/providers/facebook";
 import Google from "next-auth/providers/google";
 import LinkedIn from "next-auth/providers/linkedin";
-
-const dashboardAccess: Record<string, string[]> = {
-  "/dashboard/admin/users": ["SUPER_ADMIN"],
-  "/dashboard/admin/settings": ["SUPER_ADMIN"],
-  "/dashboard/bootcamp/cohorts": ["SUPER_ADMIN", "ADMIN_STAFF"],
-  "/dashboard/bootcamp/enrollments": ["SUPER_ADMIN", "ADMIN_STAFF"],
-  "/dashboard/instructor/roster": ["INSTRUCTOR", "SUPER_ADMIN"],
-  "/dashboard/instructor/attendance": ["INSTRUCTOR", "SUPER_ADMIN"],
-  "/dashboard/instructor/grading": ["INSTRUCTOR", "SUPER_ADMIN"],
-  "/dashboard/student/schedule": ["STUDENT", "PARENT"],
-  "/dashboard/student/tasks": ["STUDENT"],
-  "/dashboard/student/progress": ["STUDENT", "PARENT"],
-  "/dashboard/finance/billing": ["SUPER_ADMIN", "PARENT"],
-  "/dashboard/finance/revenue": ["SUPER_ADMIN"],
-  "/dashboard/messages": ["SUPER_ADMIN", "ADMIN_STAFF", "INSTRUCTOR", "PARENT"],
-  "/dashboard/help": ["SUPER_ADMIN", "INSTRUCTOR", "ADMIN_STAFF", "PARENT", "STUDENT", "GUEST"],
-};
+import {
+  canAccessProtectedRoute,
+  getProtectedRouteByHref,
+  normalizeDashboardPath,
+} from "@/lib/config/protected-routes";
 
 export const providers = [
   Google({
@@ -52,7 +40,8 @@ const authConfig = {
   providers,
   callbacks: {
     authorized({ auth, request }) {
-      const { pathname, origin } = request.nextUrl;
+      const pathname = normalizeDashboardPath(request.nextUrl.pathname);
+      const origin = request.nextUrl.origin;
 
       if (!pathname.startsWith("/dashboard")) {
         return true;
@@ -66,10 +55,14 @@ const authConfig = {
         return true;
       }
 
-      const allowedRoles = dashboardAccess[pathname];
       const role = (auth.user as { role?: string }).role;
+      const protectedRoute = getProtectedRouteByHref(pathname);
 
-      if (!allowedRoles || (role && allowedRoles.includes(role))) {
+      if (!protectedRoute) {
+        return Response.redirect(new URL("/dashboard", origin));
+      }
+
+      if (canAccessProtectedRoute(pathname, role)) {
         return true;
       }
 

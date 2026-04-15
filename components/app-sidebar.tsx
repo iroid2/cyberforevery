@@ -3,25 +3,12 @@
 import * as React from "react"
 import {
   AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
   GalleryVerticalEnd,
-  LayoutDashboard,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-  ShieldCheck,
-  GraduationCap,
-  Users,
 } from "lucide-react"
 
 import { getRoutesByGroup, UserRoleType } from "@/lib/config/routes"
 
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
 import {
@@ -47,12 +34,11 @@ export function AppSidebar({
 }: { 
   user: { name: string; email: string; avatar?: string; role: UserRoleType } 
 } & React.ComponentProps<typeof Sidebar>) {
-  
   // Dynamically get routes grouped for the specific role
   const routeGroups = getRoutesByGroup(user.role)
   
   // Transform groups into the structure NavMain expects
-  const navMain = Object.entries(routeGroups).map(([groupTitle, groupRoutes]) => ({
+  const navMain = Array.from(routeGroups.entries()).map(([groupTitle, groupRoutes]) => ({
     title: groupTitle,
     url: "#",
     icon: AudioWaveform, // Group icon
@@ -63,16 +49,19 @@ export function AppSidebar({
   }))
 
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+    <Sidebar
+      collapsible="icon"
+      className="border-r border-[#c6c5d4]/40 bg-[#f2f4f6] text-slate-900"
+      {...props}
+    >
+      <SidebarHeader className="bg-[#f2f4f6] px-4 pt-6">
         <TeamSwitcher teams={teams} />
       </SidebarHeader>
-      <SidebarContent>
-        {/* We map each role-specific group to a NavMain section */}
+      <SidebarContent className="bg-[#f2f4f6] px-2">
         <NavMain items={navMain} />
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={user} />
+      <SidebarFooter className="bg-[#f2f4f6] px-2 pb-4">
+        <NavUser user={{ ...user, avatar: user.avatar ?? "" }} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

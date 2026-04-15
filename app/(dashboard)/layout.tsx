@@ -26,7 +26,7 @@ export default async function DashboardLayout({
   };
 
   return (
-    <div className="[font-family:Arial,sans-serif]">
+    <div className="[font-family:Arial,sans-serif] bg-[#f7f9fb] text-[#191c1e] min-h-screen">
       <SidebarProvider>
         <AppSidebar user={user} />
         <SidebarInset>

@@ -1,4 +1,5 @@
 import { auth } from "@/auth"
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { getRoutesByRole, UserRoleType } from "@/lib/config/routes"
@@ -12,6 +13,11 @@ export default async function Page() {
 
   const role = (session.user as any)?.role as UserRoleType || UserRoleType.GUEST;
   const availableRoutes = getRoutesByRole(role).filter((route) => route.href !== "/dashboard");
+
+  if (role === UserRoleType.SUPER_ADMIN) {
+    return <SuperAdminDashboard session={session} availableRoutes={availableRoutes} />;
+  }
+
   const roleHome = getRoleHome(role);
   const summaryCards = getSummaryCards(role);
   const recentActivity = getRecentActivity(role);
@@ -19,10 +25,11 @@ export default async function Page() {
 
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 border-b">
+      <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
         <div className="flex items-center gap-2 px-4">
           <h1 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">// DASHBOARD_OVERVIEW</h1>
         </div>
+        <AnimatedThemeToggler className="rounded-full border border-border bg-background p-2 text-foreground transition hover:border-primary hover:text-primary" />
       </header>
       <div className="flex flex-1 flex-col gap-6 p-8">
         <div className="max-w-4xl">
@@ -183,6 +190,298 @@ export default async function Page() {
   )
 }
 
+function SuperAdminDashboard({
+  session,
+  availableRoutes,
+}: {
+  session: {
+    user?: {
+      name?: string | null;
+    } | null;
+  };
+  availableRoutes: ReturnType<typeof getRoutesByRole>;
+}) {
+  const userActivity = [
+    { name: "Marcus Chen", email: "marcus.c@edu.com", role: "Student", cohort: "Spring 2024", status: "Active", initials: "MC" },
+    { name: "Elena Rodriguez", email: "elena.r@staff.com", role: "Staff", cohort: "Editorial Dept.", status: "Active", initials: "ER" },
+    { name: "Sarah Miller", email: "sarah@parent.net", role: "Parent", cohort: "-", status: "Pending", initials: "SM" },
+  ];
+  const activeCurations = [
+    { title: "Advance Editorial", badge: "Cohort A-24", learners: "84 Students", progress: 68, stage: "Completion" },
+    { title: "Strategic Curation", badge: "Cohort B-24", learners: "52 Students", progress: 45, stage: "Completion" },
+    { title: "Network Intelligence", badge: "New", learners: "128 Pre-enrolled", progress: 92, stage: "Preparation" },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#f7f9fb] text-[#191c1e]">
+      <header className="sticky top-0 z-20 border-b border-[#c6c5d4]/30 bg-white/85 backdrop-blur-xl">
+        <div className="flex h-16 items-center justify-between px-8">
+          <div className="flex items-center gap-8">
+            <span className="text-xl font-extrabold text-[#1a237e]">Editorial Intelligence</span>
+            <nav className="hidden md:flex gap-6 text-sm">
+              <span className="border-b-2 border-[#1a237e] pb-1 font-semibold text-[#1a237e]">Dashboard</span>
+              <span className="font-medium text-slate-500">Courses</span>
+              <span className="font-medium text-slate-500">Cohorts</span>
+            </nav>
+          </div>
+          <div className="flex items-center gap-3">
+            <AnimatedThemeToggler className="rounded-full border border-[#c6c5d4]/40 bg-white p-2 text-slate-600 transition hover:border-[#1a237e]/30 hover:text-[#1a237e]" />
+            <button className="rounded-full p-2 text-slate-600 transition hover:bg-slate-100">
+              <span className="material-symbols-outlined">notifications</span>
+            </button>
+            <button className="rounded-full p-2 text-slate-600 transition hover:bg-slate-100">
+              <span className="material-symbols-outlined">settings</span>
+            </button>
+            <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[#c6c5d4]/40 bg-[#eceef0] text-sm font-bold text-slate-700">
+              {getInitials(session?.user?.name || "Admin")}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="px-8 py-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+            <div>
+              <h1 className="text-4xl font-extrabold tracking-tight text-[#191c1e]">Platform Intelligence</h1>
+              <p className="mt-2 text-lg text-[#454652]">
+                Central command for {session?.user?.name || "Ivan"} • Real-time platform synchronization
+              </p>
+            </div>
+            <div className="flex items-center gap-2 rounded-xl bg-[#eceef0] p-1">
+              <button className="rounded-lg bg-white px-4 py-2 text-sm font-semibold shadow-sm">Real-time</button>
+              <button className="rounded-lg px-4 py-2 text-sm font-medium text-[#454652]">7 Days</button>
+              <button className="rounded-lg px-4 py-2 text-sm font-medium text-[#454652]">30 Days</button>
+            </div>
+          </div>
+
+          <div className="mb-10 grid grid-cols-1 gap-6 md:grid-cols-4">
+            <div className="relative overflow-hidden rounded-[1.5rem] bg-[#000666] p-8 text-white md:col-span-2">
+              <div className="relative z-10">
+                <div className="flex items-start justify-between">
+                  <span className="material-symbols-outlined rounded-full bg-white/20 p-3">payments</span>
+                  <div className="text-right">
+                    <span className="text-xs font-bold uppercase tracking-[0.2em] text-white/70">Stripe Integration</span>
+                    <p className="text-xs font-medium text-white/80">Live connection active</p>
+                  </div>
+                </div>
+                <div className="mt-8">
+                  <h3 className="text-sm font-medium text-white/75">Total Platform Revenue</h3>
+                  <div className="mt-2 text-5xl font-extrabold tracking-tight">$142,850.00</div>
+                  <div className="mt-4 flex items-center gap-2 text-sm">
+                    <span className="inline-flex items-center gap-1 rounded-lg bg-white/15 px-2 py-1 font-semibold text-green-200">
+                      <span className="material-symbols-outlined text-sm">trending_up</span>
+                      12.4%
+                    </span>
+                    <span className="text-white/60">vs previous month</span>
+                  </div>
+                </div>
+              </div>
+              <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
+            </div>
+
+            <div className="flex flex-col justify-between rounded-[1.5rem] border border-[#c6c5d4]/20 bg-white p-8">
+              <div>
+                <span className="material-symbols-outlined rounded-full bg-[#e0e0ff] p-3 text-[#1a237e]">school</span>
+                <h3 className="mt-6 text-sm font-semibold text-[#454652]">Active Enrollments</h3>
+                <div className="mt-2 text-4xl font-extrabold tracking-tight">1,204</div>
+              </div>
+              <div className="mt-6">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#e0e3e5]">
+                  <div className="h-full w-4/5 bg-[#4c56af]" />
+                </div>
+                <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#454652]">
+                  80% of capacity reached
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col justify-between rounded-[1.5rem] bg-[#1d00a4] p-8 text-white">
+              <div>
+                <span className="material-symbols-outlined rounded-full bg-white/20 p-3">auto_graph</span>
+                <h3 className="mt-6 text-sm font-semibold text-white/80">Student Retention</h3>
+                <div className="mt-2 text-4xl font-extrabold tracking-tight">94.2%</div>
+              </div>
+              <p className="mt-6 text-xs font-medium text-white/75">Top 5% of EdTech benchmarks</p>
+            </div>
+          </div>
+
+          <div className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="rounded-xl border border-[#c6c5d4]/20 bg-white p-8 lg:col-span-2">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-xl font-bold tracking-tight">Recent User Activity</h2>
+                <div className="flex gap-2">
+                  <button className="rounded-lg p-2 transition hover:bg-[#eceef0]">
+                    <span className="material-symbols-outlined text-[#454652]">filter_list</span>
+                  </button>
+                  <button className="rounded-lg bg-[#eceef0] px-4 py-2 text-sm font-bold text-[#191c1e]">View All</button>
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-[#c6c5d4]/20 text-left">
+                      <th className="pb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#454652]">User</th>
+                      <th className="pb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#454652]">Role</th>
+                      <th className="pb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#454652]">Cohort</th>
+                      <th className="pb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#454652]">Status</th>
+                      <th className="pb-4" />
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#c6c5d4]/15">
+                    {userActivity.map((item) => (
+                      <tr key={item.email}>
+                        <td className="py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#eceef0] text-sm font-bold text-[#454652]">
+                              {item.initials}
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-[#191c1e]">{item.name}</p>
+                              <p className="text-xs text-[#454652]">{item.email}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 text-sm font-medium">{item.role}</td>
+                        <td className="py-4 text-sm">{item.cohort}</td>
+                        <td className="py-4">
+                          <span className={item.status === "Active"
+                            ? "inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-bold text-green-800"
+                            : "inline-flex rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800"}>
+                            {item.status}
+                          </span>
+                        </td>
+                        <td className="py-4 text-right">
+                          <span className="material-symbols-outlined cursor-pointer text-[#454652]">more_vert</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="rounded-xl bg-[#5865F2] p-8 text-white">
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined rounded-lg bg-white/20 p-2">forum</span>
+                  <h3 className="font-bold">Discord Integration</h3>
+                </div>
+                <div className="mt-4 flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-green-400" />
+                  <span className="text-sm font-medium">Connected to #main-campus</span>
+                </div>
+                <div className="mt-6 grid grid-cols-2 gap-4">
+                  <div className="rounded-lg bg-white/10 p-3 text-center">
+                    <p className="text-xs text-white/70">Active Now</p>
+                    <p className="font-bold">142</p>
+                  </div>
+                  <div className="rounded-lg bg-white/10 p-3 text-center">
+                    <p className="text-xs text-white/70">New Roles</p>
+                    <p className="font-bold">12</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-[#c6c5d4]/20 bg-[#f2f4f6] p-8">
+                <h3 className="flex items-center gap-2 font-bold text-[#191c1e]">
+                  <span className="material-symbols-outlined text-[#1a237e]">tune</span>
+                  Platform Status
+                </h3>
+                <div className="mt-5 space-y-4">
+                  {[
+                    { label: "Course Registrations", enabled: true },
+                    { label: "Email Automations", enabled: true },
+                    { label: "Maintenance Mode", enabled: false },
+                  ].map((toggle) => (
+                    <div key={toggle.label} className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-[#454652]">{toggle.label}</span>
+                      <div className={toggle.enabled ? "flex h-5 w-10 items-center rounded-full bg-[#4c56af] px-1" : "flex h-5 w-10 items-center rounded-full bg-[#d8dadc] px-1"}>
+                        <div className={toggle.enabled ? "ml-auto h-3 w-3 rounded-full bg-white" : "h-3 w-3 rounded-full bg-white"} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button className="mt-6 w-full rounded-lg border border-[#1a237e]/20 py-2.5 text-sm font-bold text-[#1a237e] transition hover:bg-white">
+                  System Health Report
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-2xl font-extrabold tracking-tight">Active Curations</h2>
+              <button className="flex items-center gap-1 text-sm font-bold text-[#1a237e] transition hover:gap-2">
+                Management Portal
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              {activeCurations.map((card, index) => (
+                <div key={card.title} className="overflow-hidden rounded-xl border border-[#c6c5d4]/20 bg-white transition hover:shadow-xl hover:shadow-[#1a237e]/5">
+                  <div className={index === 0 ? "h-32 bg-gradient-to-br from-[#d5e3fc] to-[#e2dfff]" : index === 1 ? "h-32 bg-gradient-to-br from-[#eceef0] to-[#d5e3fc]" : "h-32 bg-gradient-to-br from-[#e0e0ff] to-[#d5e3fc]"} />
+                  <div className="p-6">
+                    <div className="mb-4 flex items-center justify-between">
+                      <span className="rounded px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#1a237e] bg-[#e0e0ff]">
+                        {card.badge}
+                      </span>
+                      <span className="text-xs font-semibold text-[#454652]">{card.learners}</span>
+                    </div>
+                    <h3 className="text-lg font-bold text-[#191c1e]">{card.title}</h3>
+                    <div className="mt-4 space-y-3">
+                      <div className="flex justify-between text-xs font-bold">
+                        <span className="text-[#454652]">{card.stage}</span>
+                        <span className="text-[#1a237e]">{card.progress}%</span>
+                      </div>
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#e0e3e5]">
+                        <div className="h-full bg-[#4c56af]" style={{ width: `${card.progress}%` }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {availableRoutes.length > 0 && (
+            <div className="mt-10 rounded-xl border border-[#c6c5d4]/20 bg-white p-6">
+              <div className="mb-5 flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#454652]">Admin Navigation</p>
+                  <h3 className="mt-2 text-xl font-bold text-[#191c1e]">Available workspaces</h3>
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-3">
+                {availableRoutes.map((route) => (
+                  <Link
+                    key={route.href}
+                    href={route.href}
+                    className="rounded-xl border border-[#c6c5d4]/20 bg-[#f7f9fb] p-5 transition hover:border-[#1a237e]/30 hover:bg-[#eef2ff]"
+                  >
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#454652]">{route.group || "Navigation"}</p>
+                    <h4 className="mt-3 text-lg font-bold text-[#191c1e]">{route.title}</h4>
+                    <p className="mt-2 text-xs font-semibold text-[#1a237e]">{route.href}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || "")
+    .join("");
+}
+
 function getSummaryCards(role: UserRoleType) {
   switch (role) {
     case UserRoleType.SUPER_ADMIN:
@@ -312,31 +611,31 @@ function getRoleHome(role: UserRoleType) {
       return {
         title: "System oversight and platform control",
         description: "Monitor users, revenue, operations, and system-wide administration from a single command layer.",
-        href: "/dashboard/admin/users",
+        href: "/dashboard/user-management",
       };
     case UserRoleType.INSTRUCTOR:
       return {
         title: "Classroom operations and learner tracking",
         description: "Jump into your roster, manage attendance, and review learner progress from your teaching workspace.",
-        href: "/dashboard/instructor/roster",
+        href: "/dashboard/roster",
       };
     case UserRoleType.ADMIN_STAFF:
       return {
         title: "Enrollment and cohort coordination",
         description: "Manage cohorts, review enrollments, and keep bootcamp operations moving smoothly.",
-        href: "/dashboard/bootcamp/cohorts",
+        href: "/dashboard/cohorts",
       };
     case UserRoleType.STUDENT:
       return {
         title: "Learning schedule and mission progress",
         description: "Access your upcoming sessions, assignments, and progress checkpoints from one learner dashboard.",
-        href: "/dashboard/student/schedule",
+        href: "/dashboard/schedule",
       };
     case UserRoleType.PARENT:
       return {
         title: "Family schedule and payment tracking",
         description: "View student schedules, enrollment status, and billing actions from your parent portal.",
-        href: "/dashboard/student/schedule",
+        href: "/dashboard/schedule",
       };
     default:
       return {

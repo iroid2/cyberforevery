@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import Image from "next/image";
 import { useState } from "react";
+
+const rotationOffsets = [-6, 3, 8, -4];
 
 const AnimatedTestimonialsDemo = () => {
   const [active, setActive] = useState(testimonials[0]);
@@ -24,10 +25,6 @@ const AnimatedTestimonialsDemo = () => {
     return testimonials[index] === active;
   };
 
-  const randomRotateY = () => {
-    return Math.floor(Math.random() * 21) - 10;
-  };
-
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto py-24 px-6 relative z-10">
@@ -39,13 +36,13 @@ const AnimatedTestimonialsDemo = () => {
                   opacity: 0,
                   scale: 0.9,
                   z: -100,
-                  rotateY: randomRotateY(),
+                  rotateY: rotationOffsets[index % rotationOffsets.length],
                 }}
                 animate={{
                   opacity: isActive(index) ? 1 : 0.7,
                   scale: isActive(index) ? 1 : 0.95,
                   z: isActive(index) ? 0 : -100,
-                  rotate: isActive(index) ? 0 : randomRotateY(),
+                  rotate: isActive(index) ? 0 : rotationOffsets[index % rotationOffsets.length],
                   zIndex: isActive(index)
                     ? 999
                     : testimonials.length + 2 - index,
@@ -55,7 +52,7 @@ const AnimatedTestimonialsDemo = () => {
                   opacity: 0,
                   scale: 0.9,
                   z: 100,
-                  rotate: randomRotateY(),
+                  rotate: rotationOffsets[index % rotationOffsets.length],
                 }}
                 transition={{
                   duration: 0.4,
