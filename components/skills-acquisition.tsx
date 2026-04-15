@@ -3,23 +3,23 @@ import React from "react";
 const skills = [
   {
     icon: "lock_open",
-    title: "Ethical Hacking",
-    description: "Understand the adversary. Learn vulnerability assessment and penetration testing protocols.",
+    title: "Online Safety",
+    description: "Learn how to spot scams, create super-strong passwords, and protect your digital life.",
   },
   {
     icon: "psychology",
-    title: "AI Defense",
-    description: "Leverage LLMs and automated scripts to identify patterns and stop threats in milliseconds.",
+    title: "Tech Detectives",
+    description: "Discover how computers think, build simple tech projects, and stay smart online.",
   },
   {
-    icon: "terminal",
-    title: "Network Ops",
-    description: "Master the terminal. Configure secure firewalls and monitor live traffic flows.",
+    icon: "videogame_asset",
+    title: "Game Coding",
+    description: "Build your first arcade games using block coding and simple logic. No typing required!",
   },
   {
     icon: "encrypted",
-    title: "Cryptography",
-    description: "The math of secrets. Deep dive into modern encryption standards and blockchain security.",
+    title: "Secret Codes",
+    description: "Learn the magic of cryptography! Send secret messages and understand how computers talk.",
   },
 ];
 
@@ -34,7 +34,7 @@ export function SkillsAcquisition() {
             </span>
             <h2 className="text-4xl md:text-6xl font-black text-foreground font-headline leading-none uppercase">
               Build your <br />
-              <span className="text-muted">Digital Legacy</span>
+              <span className="text-muted">Tech Skills</span>
             </h2>
           </div>
           <div className="flex flex-col gap-12">

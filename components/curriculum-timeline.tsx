@@ -3,43 +3,43 @@ import React from "react";
 const curriculum = [
   {
     week: "01",
-    title: "Foundations & Setup",
+    title: "Welcome to Tech Camp",
     status: "ACTIVE",
     items: [
-      "Introduction to Cybersecurity & AI",
-      "Tool setup: VS Code, GitHub, ChatGPT",
-      "How computers and the internet work",
-      "IP addresses, DNS, and Router networking",
+      "Say hello! Introduction to computers",
+      "Setting up our fun coding tools",
+      "How the internet actually works",
+      "Finding our way around the keyboard",
     ],
   },
   {
     week: "02",
-    title: "Cyber Safety",
+    title: "Digital Defenders",
     items: [
-      "Passwords, Auth & Multi-factor security",
-      "Phishing, scams, and threat identification",
-      "How to avoid common online threats",
-      "Digital footprint management",
+      "Password Power-Ups!",
+      "Spotting tricky online scams",
+      "How to avoid bad links and downloads",
+      "Being a good friend on the internet",
     ],
   },
   {
     week: "03",
-    title: "AI in Action",
+    title: "Game Builders",
     items: [
-      "Using AI tools responsibly and effectively",
-      "AI risks, deepfakes, and misinformation",
-      "Digital ethics in the age of intelligence",
-      "Automating security tasks with AI",
+      "Making our characters move",
+      "Keeping score and adding sounds",
+      "Adding cool game backgrounds",
+      "Testing the game with friends",
     ],
   },
   {
     week: "04",
-    title: "Build & Present",
+    title: "Showcase Party",
     items: [
-      "Final Capstone Project work session",
-      "Demo Day: Presenting to the class",
-      "Building your security portfolio",
-      "Career guidance & next steps",
+      "Finishing our big final games",
+      "Demo Day: Showing off to parents!",
+      "Getting your Tech Ninja certificate",
+      "Planning your next big invention",
     ],
   },
 ];
@@ -49,7 +49,7 @@ export function CurriculumTimeline() {
     <section className="py-24 px-6 bg-background">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-4xl md:text-6xl font-black text-foreground font-headline mb-20 text-center uppercase tracking-tighter">
-          Bootcamp <span className="text-primary">Timeline</span>
+          Camp <span className="text-primary">Timeline</span>
         </h2>
         <div className="grid md:grid-cols-2 gap-12">
           {curriculum.map((week, index) => (

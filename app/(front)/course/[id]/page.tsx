@@ -15,9 +15,9 @@ export default function CourseDetailPage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-headline font-black text-foreground mb-5 uppercase">System Error</h1>
-          <p className="text-muted mb-8 uppercase tracking-widest">// DATA_NOT_FOUND</p>
-          <Link href="/" className="text-primary font-bold hover:underline">Return to Terminal</Link>
+          <h1 className="text-4xl font-headline font-black text-foreground mb-5 uppercase">Oops! Page Not Found</h1>
+          <p className="text-muted mb-8 uppercase tracking-widest">// 404_ERROR - DATA MISSING</p>
+          <Link href="/" className="text-primary font-bold hover:underline">Return to Base</Link>
         </div>
       </div>
     );
@@ -33,11 +33,11 @@ export default function CourseDetailPage() {
           <div className="lg:col-span-8">
             <div className="inline-flex items-center gap-2 mb-6 text-primary font-headline tracking-[0.2em] text-xs md:text-sm font-bold uppercase">
               <span className="w-2 h-2 bg-primary block"></span>
-              {course.level} // Educational Path
+              {course.level} // Training Level
             </div>
             <h1 className="font-headline text-5xl md:text-8xl font-black tracking-tighter leading-[0.85] mb-8 uppercase">
               {course.title.split(":")[0]} <br/>
-              <span className="text-primary italic">{course.title.split(":")[1] || "MODULE"}</span>
+              <span className="text-primary italic">{course.title.split(":")[1] || "ADVENTURE"}</span>
             </h1>
             <p className="text-lg md:text-xl text-muted max-w-2xl leading-relaxed">
               {course.description}
@@ -45,14 +45,14 @@ export default function CourseDetailPage() {
           </div>
           <div className="lg:col-span-4 flex flex-col gap-4">
             <div className="bg-surface p-6 rounded-lg border-l-4 border-primary">
-              <div className="text-[10px] font-headline uppercase tracking-widest text-muted mb-2 tracking-[0.3em] font-bold">// COURSE_VALUATION</div>
+              <div className="text-[10px] font-headline uppercase tracking-widest text-muted mb-2 tracking-[0.3em] font-bold">// COURSE_FEE</div>
               <div className="text-3xl font-black font-headline text-foreground uppercase tracking-tight">{course.price}</div>
             </div>
             <Link 
               href="/checkout"
               className="w-full bg-primary text-primary-foreground font-headline font-black py-6 rounded-full text-lg tracking-widest uppercase hover:scale-[1.02] text-center transition-all shadow-[0_15px_30px_-10px_rgba(191,255,0,0.4)] active:scale-95"
             >
-              Initialize Deployment
+              Start Your Adventure
             </Link>
           </div>
         </section>
@@ -60,7 +60,7 @@ export default function CourseDetailPage() {
         {/* Curriculum Bento Grid */}
         <section className="max-w-7xl mx-auto px-6 md:px-8 mb-24 md:mb-32">
           <h2 className="font-headline text-3xl md:text-4xl font-bold mb-12 flex items-center gap-4 uppercase tracking-tight">
-            <span className="text-primary text-lg font-black">//</span> 01. CURRICULUM_PAYLOAD
+            <span className="text-primary text-lg font-black">//</span> 01. YOUR_MISSION
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             {course.curriculum.map((week, index) => (
@@ -95,7 +95,7 @@ export default function CourseDetailPage() {
                         ${index === 3 ? "text-primary-foreground/90" : "text-foreground/80"}`}>
                         <span className={`material-symbols-outlined text-lg
                           ${index === 3 ? "text-primary-foreground" : "text-primary"}`}>
-                          terminal
+                          code
                         </span> 
                         {item}
                       </li>
@@ -111,7 +111,7 @@ export default function CourseDetailPage() {
         <section className="max-w-7xl mx-auto px-6 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24 items-center">
           <div>
             <h2 className="font-headline text-3xl md:text-4xl font-bold mb-12 flex items-center gap-4 uppercase tracking-tight text-foreground">
-              <span className="text-primary text-lg font-black">//</span> 02. SYSTEM_UPGRADES
+              <span className="text-primary text-lg font-black">//</span> 02. LEVEL_UP_SKILLS
             </h2>
             <div className="space-y-8">
               {course.outcomes.map((outcome, index) => (
@@ -120,7 +120,7 @@ export default function CourseDetailPage() {
                     <span className="material-symbols-outlined text-primary">check_circle</span>
                   </div>
                   <div>
-                    <h4 className="text-lg font-bold mb-2 uppercase tracking-tight text-foreground">MODULE_OUTCOME_{index + 1}</h4>
+                    <h4 className="text-lg font-bold mb-2 uppercase tracking-tight text-foreground">ACHIEVEMENT_{index + 1}</h4>
                     <p className="text-muted text-sm leading-relaxed">{outcome}</p>
                   </div>
                 </div>
@@ -140,7 +140,7 @@ export default function CourseDetailPage() {
                 </div>
                 <div>
                   <h4 className="font-headline text-2xl font-black uppercase tracking-tight text-foreground">{course.instructor.name.replace(" ", "_").toUpperCase()}</h4>
-                  <div className="text-primary font-headline text-[10px] md:text-xs tracking-widest font-bold uppercase">{course.instructor.role} // MENTOR</div>
+                  <div className="text-primary font-headline text-[10px] md:text-xs tracking-widest font-bold uppercase">{course.instructor.role} // GUIDE</div>
                 </div>
               </div>
               <p className="text-muted italic leading-relaxed mb-8 text-sm md:text-base">
@@ -161,6 +161,28 @@ export default function CourseDetailPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* System Gallery */}
+        <section className="max-w-7xl mx-auto px-6 md:px-8 mt-24 md:mt-32">
+          <h2 className="font-headline text-3xl md:text-4xl font-bold mb-12 flex items-center gap-4 uppercase tracking-tight text-foreground">
+            <span className="text-primary text-lg font-black">//</span> 03. MISSION_GALLERY
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {course.gallery?.map((imgUrl, idx) => (
+              <div key={idx} className="relative group overflow-hidden rounded-lg border border-border aspect-video bg-surface">
+                <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 mix-blend-overlay"></div>
+                <img 
+                  src={imgUrl} 
+                  alt={`${course.title} gallery ${idx + 1}`} 
+                  className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+                />
+                <div className="absolute top-4 right-4 bg-background/80 backdrop-blur-sm border border-border text-primary font-headline text-[10px] font-bold px-2 py-1 uppercase tracking-widest z-20">
+                  IMG_{String(idx + 1).padStart(2, '0')}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       </main>

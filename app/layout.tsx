@@ -14,6 +14,8 @@ export const metadata: Metadata = {
 }
 
 import { ThemeProvider } from "@/components/theme-provider"
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { Toaster } from "sonner"
 
 export default function RootLayout({
   children,
@@ -39,8 +41,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
-          <Analytics />
+          <TooltipProvider>
+            <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+            <Toaster position="top-center" richColors />
+            <Analytics />
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

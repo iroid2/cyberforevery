@@ -4,6 +4,9 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { enrollStudent } from "@/app/actions/enroll";
+import { toast } from "sonner";
+import { CheckCircle2, Rocket, ArrowRight, ShieldCheck } from "lucide-react";
 
 const formSchema = z.object({
   // Section 1: Parent
@@ -57,6 +60,8 @@ type FormData = z.infer<typeof formSchema>;
 
 export function EnrollmentForm() {
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const totalSteps = 8;
 
   const {
@@ -82,11 +87,69 @@ export function EnrollmentForm() {
 
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
-  const onSubmit = (data: FormData) => {
-    console.log("Form Submitted:", data);
-    alert("Enrollment Initialized! Redirecting to checkout...");
-    window.location.href = "https://stripe.com"; // Placeholder
+  const onSubmit = async (data: FormData) => {
+    setIsSubmitting(true);
+    try {
+      const result = await enrollStudent(data as any);
+      
+      if (result.success) {
+        setIsSuccess(true);
+        toast.success("ENROLLMENT_SYNCHRONIZED // WELCOME TO THE MISSION");
+      } else {
+        toast.error(`ERROR: ${result.error}`);
+      }
+    } catch (error) {
+      toast.error("SYSTEM_MALFUNCTION // PLEASE RETRY");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  if (isSuccess) {
+    return (
+      <div className="bg-surface/40 backdrop-blur-xl border border-border rounded-2xl md:rounded-[2rem] p-12 text-center shadow-2xl animate-in fade-in zoom-in duration-500">
+        <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-8 border-2 border-primary/50">
+          <CheckCircle2 className="w-10 h-10 text-primary" />
+        </div>
+        <h2 className="text-4xl md:text-5xl font-black text-foreground font-headline uppercase tracking-tighter mb-4">
+          MISSION <span className="text-primary italic">ACCEPTED</span>
+        </h2>
+        <p className="text-muted text-lg max-w-xl mx-auto mb-12">
+          Your enrollment dossier has been successfully uploaded to the central Command Terminal. 
+          We have dispatched an onboarding pack to your email.
+        </p>
+
+        <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-12">
+          <div className="p-6 bg-surface/40 border border-border rounded-xl text-left">
+            <div className="flex items-center gap-3 mb-3">
+              <ShieldCheck className="w-5 h-5 text-primary" />
+              <h4 className="font-bold text-foreground text-sm uppercase">Secure Identity</h4>
+            </div>
+            <p className="text-xs text-muted leading-relaxed italic">
+              A temporary parent account has been created. Check your email for access credentials and mission briefing.
+            </p>
+          </div>
+          <div className="p-6 bg-surface/40 border border-border rounded-xl text-left">
+            <div className="flex items-center gap-3 mb-3">
+              <Rocket className="w-5 h-5 text-primary" />
+              <h4 className="font-bold text-foreground text-sm uppercase">Next Objective</h4>
+            </div>
+            <p className="text-xs text-muted leading-relaxed">
+              Login to your student portal to complete technical diagnostics and finalize your payment to unlock full access.
+            </p>
+          </div>
+        </div>
+
+        <button 
+          onClick={() => window.location.href = "/login"}
+          className="group px-12 py-5 bg-primary text-primary-foreground rounded-full font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(191,255,0,0.5)] flex items-center gap-3 mx-auto"
+        >
+          Access Command Center
+          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+        </button>
+      </div>
+    );
+  }
 
   const renderStep = () => {
     switch (step) {
@@ -314,9 +377,11 @@ export function EnrollmentForm() {
           ) : (
             <button
               type="submit"
-              className="px-8 md:px-12 py-3 md:py-4 bg-primary text-primary-foreground rounded-full font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(191,255,0,0.5)] text-xs md:text-base"
+              disabled={isSubmitting}
+              className="px-8 md:px-12 py-3 md:py-4 bg-primary text-primary-foreground rounded-full font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(191,255,0,0.5)] text-xs md:text-base flex items-center gap-3"
             >
-              Initialize Enrollment
+              {isSubmitting ? "SYNCING..." : "Initialize Enrollment"}
+              {!isSubmitting && <Rocket className="w-4 h-4 md:w-5 md:h-5" />}
             </button>
           )}
         </div>

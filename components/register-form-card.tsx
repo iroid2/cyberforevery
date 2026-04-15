@@ -1,52 +1,102 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import { registerParent } from "@/app/actions/register";
+import { useRouter } from "next/navigation";
+import { SocialAuth } from "@/components/social-auth";
 
 export function RegisterFormCard() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    const formData = new FormData(e.currentTarget);
+    const result = await registerParent(formData);
+
+    if (result?.error) {
+      setError(result.error);
+      setLoading(false);
+    } else {
+      setSuccess(true);
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+    }
+  };
+
+  if (success) {
+    return (
+      <div className="w-full max-w-md mx-auto lg:ml-auto">
+        <div className="bg-surface/60 backdrop-blur-xl rounded-lg p-10 shadow-2xl border border-primary/50 text-center">
+          <div className="text-primary mb-4">
+            <span className="material-symbols-outlined text-6xl">check_circle</span>
+          </div>
+          <h2 className="text-2xl font-bold uppercase tracking-tighter mb-2">ENROLLMENT SUCCESSFUL</h2>
+          <p className="text-muted text-sm uppercase font-headline tracking-widest">// REDIRECTING_TO_AUTH</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-md mx-auto lg:ml-auto">
       <div className="bg-surface/60 backdrop-blur-xl rounded-lg p-10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.6)] relative overflow-hidden group border border-border">
-        {/* Terminal Style Accent */}
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-transparent opacity-50"></div>
         <div className="flex justify-between items-start mb-8">
           <div>
-            <h2 className="font-headline text-3xl font-bold text-foreground tracking-tight uppercase">REGISTRATION</h2>
+            <h2 className="font-headline text-3xl font-bold text-foreground tracking-tight uppercase tracking-tighter">REGISTRATION</h2>
             <p className="text-muted text-xs font-headline tracking-widest uppercase mt-1">// PARENT_GATEWAY</p>
           </div>
           <div className="text-primary">
             <span className="material-symbols-outlined text-4xl material-fill">shield_person</span>
           </div>
         </div>
-        <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
+
+        {error && (
+          <div className="bg-destructive/20 border border-destructive/50 text-destructive text-[10px] p-3 rounded mb-6 font-headline tracking-widest">
+            [ERROR]: {error}
+          </div>
+        )}
+
+        <form className="space-y-8" onSubmit={handleSubmit}>
           <div className="space-y-6">
-            {/* Parent Name */}
             <div className="group/input">
               <label className="block text-[10px] font-bold text-muted uppercase tracking-[0.2em] mb-2 group-focus-within/input:text-primary transition-colors">
                 Parent Name
               </label>
               <input 
-                className="w-full bg-transparent border-0 border-b border-border px-0 py-3 text-foreground placeholder:text-foreground/20 focus:ring-0 focus:border-primary transition-all duration-300 font-headline tracking-wide uppercase" 
+                name="name"
+                required
+                className="w-full bg-transparent border-0 border-b border-border px-0 py-3 text-foreground placeholder:text-foreground/20 focus:ring-0 focus:border-primary transition-all duration-300 font-headline tracking-wide" 
                 placeholder="ALEXANDER VANCE" 
                 type="text"
               />
             </div>
-            {/* Email */}
             <div className="group/input">
               <label className="block text-[10px] font-bold text-muted uppercase tracking-[0.2em] mb-2 group-focus-within/input:text-primary transition-colors">
                 Email Address
               </label>
               <input 
-                className="w-full bg-transparent border-0 border-b border-border px-0 py-3 text-foreground placeholder:text-foreground/20 focus:ring-0 focus:border-primary transition-all duration-300 font-headline tracking-wide uppercase" 
+                name="email"
+                required
+                className="w-full bg-transparent border-0 border-b border-border px-0 py-3 text-foreground placeholder:text-foreground/20 focus:ring-0 focus:border-primary transition-all duration-300 font-headline tracking-wide" 
                 placeholder="GUARDIAN@TERMINAL.IO" 
                 type="email"
               />
             </div>
-            {/* Password */}
             <div className="group/input">
               <label className="block text-[10px] font-bold text-muted uppercase tracking-[0.2em] mb-2 group-focus-within/input:text-primary transition-colors">
                 Secure Password
               </label>
               <input 
+                name="password"
+                required
                 className="w-full bg-transparent border-0 border-b border-border px-0 py-3 text-foreground placeholder:text-foreground/20 focus:ring-0 focus:border-primary transition-all duration-300 font-headline tracking-wide" 
                 placeholder="••••••••••••" 
                 type="password"
@@ -54,10 +104,11 @@ export function RegisterFormCard() {
             </div>
           </div>
           <button 
+            disabled={loading}
             className="w-full py-5 bg-primary text-primary-foreground font-headline font-black uppercase tracking-widest rounded-full hover:shadow-[0_0_20px_2px_rgba(191,255,0,0.3)] transition-all duration-300 active:scale-[0.98]" 
             type="submit"
           >
-            Create Parent Account
+            {loading ? "PROCESSING..." : "Create Parent Account"}
           </button>
           <div className="pt-4 text-center">
             <p className="text-xs text-muted tracking-wide">
@@ -66,8 +117,9 @@ export function RegisterFormCard() {
             </p>
           </div>
         </form>
+
+        <SocialAuth />
       </div>
-      {/* Footnote Card */}
       <div className="mt-8 flex items-center justify-between px-2 opacity-50 hover:opacity-100 transition-opacity">
         <span className="text-[9px] font-headline text-muted uppercase tracking-[0.3em]">SEC_LEVEL: 04 // ENCRYPTED</span>
         <span className="text-[9px] font-headline text-muted uppercase tracking-[0.3em]">VERSION: 2.0.4-CYBER</span>

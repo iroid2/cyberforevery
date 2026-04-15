@@ -20,12 +20,12 @@ export function Hero() {
           </span>
           Cohort 04 Now Open
         </div>
-        <h1 className="font-headline text-4xl sm:text-6xl md:text-8xl font-black text-foreground leading-[0.9] mb-8 tracking-tighter uppercase text-center">
-          CYBERSECURITY & <br />
-          <span className="text-primary">AI BOOTCAMP</span>
+        <h1 className="text-4xl sm:text-6xl md:text-8xl font-black text-foreground leading-[0.9] mb-8 tracking-tighter uppercase text-center">
+          KIDS CODING & <br />
+          <span className="text-primary">CYBER CAMP</span>
         </h1>
         <p className="text-muted text-base md:text-xl max-w-2xl mx-auto mb-12 font-medium leading-relaxed">
-          Master the frontier of digital defense. Learn to secure systems and leverage artificial intelligence for high-velocity threat detection in 4 intensive weeks.
+          Start your journey into the world of technology. Learn to code your own games, stay safe online, and discover how computers really work in 4 fun-filled weeks!
         </p>
         <div className="flex flex-col md:flex-row gap-6 justify-center">
           <Link 

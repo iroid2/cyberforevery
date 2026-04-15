@@ -9,7 +9,7 @@ export function InstructorProfile() {
             <img 
               alt="Ivan Zziwa - Chief Mentor" 
               className="absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhLL6Xrq4LvbFOi72yi1sIf4Xt1qGF0veU3cOlDOxhmmaRHKpZ8OaN3FlLgubRr-lyLYV2f61tlClWz63PGkHS0nEcbuis09eg3ZUgVqybcHyeucyxQgFjbO1bZ2yK89cJ5o9Y3AFMUspJnLTO-mwtjR7ngyWzEzvgzy_EabOfM6K95Rla8KgAfr0nTxW7DsdtQkKG9HpSSk5Dm_dsrW2Oh6r478ZEYVBkifU6f_S7T0iwU9mqQGiiKvPlMO10V-6i_Q3D4HBTjA"
+              src="/ivan.png"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-transparent to-surface hidden lg:block"></div>
           </div>

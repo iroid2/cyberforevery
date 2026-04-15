@@ -8,7 +8,9 @@ import { Courses } from "@/components/courses";
 import { CurriculumTimeline } from "@/components/curriculum-timeline";
 import { InstructorProfile } from "@/components/instructor-profile";
 import { RegisterCTA } from "@/components/register-cta";
-import { MainFooter } from "@/components/main-footer";
+import { FAQSection } from "@/components/faq-section";
+import AnimatedTestimonialsDemo from "@/components/animated-testimonials";
+import AnimatedWaveFooter from "@/components/animated-wave-footer";
 
 export default function LandingPage() {
   return (
@@ -29,9 +31,13 @@ export default function LandingPage() {
       
       <InstructorProfile />
       
+      <AnimatedTestimonialsDemo />
+      
+      <FAQSection />
+
       <RegisterCTA />
       
-      <MainFooter />
+      <AnimatedWaveFooter />
     </main>
   );
 }

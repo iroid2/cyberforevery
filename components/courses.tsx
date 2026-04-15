@@ -7,11 +7,11 @@ export function Courses() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-16">
           <span className="text-primary font-bold uppercase tracking-[0.3em] text-xs block mb-4">
-            // EDUCATIONAL_ROADMAP
+            // TRAINING_SCHEDULE
           </span>
           <h2 className="text-4xl md:text-6xl font-black text-foreground font-headline leading-none uppercase">
-            Active <br />
-            <span className="text-primary italic">Learning Paths</span>
+            Available <br />
+            <span className="text-primary italic">Adventures</span>
           </h2>
         </div>
 

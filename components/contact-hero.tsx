@@ -6,7 +6,7 @@ export function ContactHero() {
       <div className="flex flex-col md:flex-row items-baseline gap-4 md:gap-12">
         <h1 className="text-6xl md:text-8xl font-black font-headline text-foreground uppercase leading-none">
           CONNECT <br />
-          <span className="text-transparent" style={{ WebkitTextStroke: "1px var(--primary)" }}>CORE_NODE</span>
+          <span className="text-transparent" style={{ WebkitTextStroke: "1px var(--primary)" }}>cyber4everyone</span>
         </h1>
         <div className="max-w-md">
           <div className="flex items-center gap-2 text-primary mb-4">
