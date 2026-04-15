@@ -26,11 +26,13 @@ export default async function DashboardLayout({
   };
 
   return (
-    <SidebarProvider>
-      <AppSidebar user={user} />
-      <SidebarInset>
-        {children}
-      </SidebarInset>
-    </SidebarProvider>
+    <div className="[font-family:Arial,sans-serif]">
+      <SidebarProvider>
+        <AppSidebar user={user} />
+        <SidebarInset>
+          {children}
+        </SidebarInset>
+      </SidebarProvider>
+    </div>
   );
 }

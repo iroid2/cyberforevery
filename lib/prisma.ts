@@ -3,45 +3,36 @@ import { PrismaNeon } from "@prisma/adapter-neon";
 import { Pool, neonConfig } from "@neondatabase/serverless";
 
 /**
- * DEFINITIVE Prisma 7 + Neon configuration.
- * Optimized for Vercel builds by using dynamic Node.js imports.
+ * Prisma 6 + Neon Serverless Singleton
+ * Stable configuration for Next.js 16 + Auth.js v5.
  */
+
+// Setup WebSocket for Node.js environment
+if (typeof window === "undefined") {
+  try {
+    const ws = require("ws");
+    neonConfig.webSocketConstructor = ws;
+  } catch (e) {}
+}
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient | undefined };
 
-function createPrismaClient() {
+function createPrismaClient(): PrismaClient {
   const connectionString = process.env.DATABASE_URL;
-  
-  if (!connectionString && typeof window === "undefined") {
-    // Only attempt to load dotenv in standalone scripts
+
+  if (!connectionString) {
+    // Try loading dotenv for standalone scripts
     try {
       require("dotenv").config();
     } catch (e) {}
   }
 
-  // Neon WebSocket setup (Node.js only)
-  if (typeof window === "undefined") {
-    try {
-      // Dynamic require avoids Vercel build-time module resolution errors for 'ws'
-      const ws = require("ws");
-      neonConfig.webSocketConstructor = ws;
-    } catch (e) {
-      console.warn("⚠️ [Prisma] WebSocket constructor not found. Falling back to HTTP.");
-    }
-  }
+  const url = process.env.DATABASE_URL || "";
 
-  const pool = new Pool({ 
-    connectionString: process.env.DATABASE_URL || "", 
-    connectionTimeoutMillis: 15000,
-    max: 10 
-  });
-  
+  const pool = new Pool({ connectionString: url });
   const adapter = new PrismaNeon(pool);
 
-  return new PrismaClient({
-    adapter,
-    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-  });
+  return new PrismaClient({ adapter } as any);
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
