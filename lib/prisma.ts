@@ -1,16 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { Pool, neonConfig } from "@neondatabase/serverless";
-import ws from "ws";
 
 /**
- * HIGH-STABILITY PRISMA SINGLETON
- * Optimized for Prisma 7 + Neon + Next.js Server Actions.
+ * DEFINITIVE Prisma 7 + Neon configuration.
+ * Optimized for Vercel builds by using dynamic Node.js imports.
  */
-
-if (typeof window === "undefined") {
-  neonConfig.webSocketConstructor = ws;
-}
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient | undefined };
 
@@ -18,17 +13,27 @@ function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL;
   
   if (!connectionString && typeof window === "undefined") {
+    // Only attempt to load dotenv in standalone scripts
     try {
       require("dotenv").config();
     } catch (e) {}
   }
 
-  // Create a robust pool with extended timeouts to prevent P2028 transaction errors
+  // Neon WebSocket setup (Node.js only)
+  if (typeof window === "undefined") {
+    try {
+      // Dynamic require avoids Vercel build-time module resolution errors for 'ws'
+      const ws = require("ws");
+      neonConfig.webSocketConstructor = ws;
+    } catch (e) {
+      console.warn("⚠️ [Prisma] WebSocket constructor not found. Falling back to HTTP.");
+    }
+  }
+
   const pool = new Pool({ 
-    connectionString: process.env.DATABASE_URL || "",
-    max: 10,
-    connectionTimeoutMillis: 15000, // 15s to establish connection
-    idleTimeoutMillis: 30000        // 30s before closing idle connections
+    connectionString: process.env.DATABASE_URL || "", 
+    connectionTimeoutMillis: 15000,
+    max: 10 
   });
   
   const adapter = new PrismaNeon(pool);
