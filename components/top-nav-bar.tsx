@@ -8,27 +8,31 @@ export function TopNavBar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [
-    { name: "Home", href: "/" },
+    { name: "Curriculum", href: "#curriculum" },
     { name: "Bootcamp", href: "/bootcamp" },
-    { name: "Pricing", href: "#" },
-    { name: "About", href: "#" },
+    { name: "Mentors", href: "#mentors" },
+    { name: "Pricing", href: "#pricing" },
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 mt-6 mx-auto w-[95%] max-w-7xl px-4">
-      <div className="flex justify-between items-center px-6 md:px-8 py-4 rounded-full bg-background/60 backdrop-blur-xl shadow-[0_20px_60px_-10px_rgba(0,0,0,0.4)] border border-border">
-        <Link href="/" className="text-lg md:text-2xl font-black tracking-tighter text-foreground font-headline uppercase shrink-0">
+    <nav className="fixed left-0 right-0 top-0 z-50 mx-auto mt-6 w-[92%] max-w-7xl px-2">
+      <div className="flex items-center justify-between rounded-full border border-white/5 bg-neutral-900/70 px-6 py-3 shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl md:px-8">
+        <Link
+          href="/"
+          className="shrink-0 font-['Space_Grotesk'] text-xl font-black italic tracking-tighter text-white md:text-2xl"
+        >
           cyber4every1
         </Link>
-        
-        {/* Desktop Links */}
-        <div className="hidden lg:flex items-center gap-8 font-headline uppercase tracking-tight text-xs lg:text-sm">
+
+        <div className="hidden items-center gap-8 font-['Space_Grotesk'] text-sm font-bold uppercase tracking-tight md:flex">
           {navLinks.map((link) => (
-            <Link 
+            <Link
               key={link.name}
               href={link.href}
-              className={`transition-all hover:text-primary hover:scale-105 duration-300 ${
-                link.name === "Bootcamp" ? "text-primary font-bold" : "text-foreground/70 font-medium"
+              className={`transition-all duration-300 ${
+                link.name === "Curriculum"
+                  ? "flex items-center gap-2 text-[#BFFF00] before:h-1.5 before:w-1.5 before:rounded-full before:bg-[#BFFF00] before:content-['']"
+                  : "text-neutral-400 hover:text-[#BFFF00]"
               }`}
             >
               {link.name}
@@ -37,24 +41,23 @@ export function TopNavBar() {
         </div>
 
         <div className="flex items-center gap-2 md:gap-4">
-          <div className="hidden sm:flex items-center gap-2 md:gap-4">
-            <AnimatedThemeToggler className="text-foreground/70 hover:text-primary transition-colors p-2" />
-            
-            <button className="hidden md:block text-foreground/70 font-headline uppercase tracking-tight text-xs font-bold hover:text-foreground px-4 py-2 transition-colors">
+          <div className="hidden items-center gap-2 sm:flex md:gap-4">
+            <AnimatedThemeToggler className="rounded-full border border-white/10 p-2 text-neutral-300 transition hover:border-[#BFFF00]/50 hover:text-[#BFFF00]" />
+
+            <button className="hidden px-4 py-2 font-['Space_Grotesk'] text-xs font-bold uppercase tracking-tight text-neutral-400 transition hover:text-white md:block">
               Login
             </button>
-            
-            <Link 
+
+            <Link
               href="/enroll"
-              className="bg-primary text-primary-foreground font-headline tracking-tight uppercase px-4 md:px-6 py-2.5 rounded-full font-bold text-xs hover:scale-105 hover:shadow-[0_0_20px_rgba(191,255,0,0.3)] transition-all active:scale-95 duration-200"
+              className="rounded-full bg-[#BFFF00] px-4 py-2.5 font-['Inter'] text-xs font-bold tracking-tight text-[#263500] transition-all duration-200 hover:shadow-[0_0_15px_rgba(191,255,0,0.4)] active:scale-95 md:px-6"
             >
-              Get Started
+              Apply Now
             </Link>
           </div>
-          
-          {/* Mobile Toggle */}
-          <button 
-            className="lg:hidden text-foreground/70 hover:text-primary transition-colors ml-2 p-2"
+
+          <button
+            className="ml-2 rounded-full border border-white/10 p-2 text-neutral-300 transition hover:border-[#BFFF00]/50 hover:text-[#BFFF00] md:hidden"
             onClick={() => setIsOpen(!isOpen)}
           >
             <span className="material-symbols-outlined text-2xl">
@@ -64,33 +67,32 @@ export function TopNavBar() {
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
       {isOpen && (
-        <div className="lg:hidden mt-4 mx-2 p-6 rounded-3xl bg-surface/95 backdrop-blur-xl border border-border shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="flex flex-col gap-6 font-headline uppercase tracking-widest text-xs font-black text-center">
+        <div className="mx-2 mt-4 animate-in slide-in-from-top-4 rounded-[2rem] border border-white/10 bg-neutral-900/95 p-6 shadow-2xl backdrop-blur-xl duration-300 md:hidden">
+          <div className="flex flex-col gap-6 text-center font-['Space_Grotesk'] text-xs font-black uppercase tracking-widest">
             {navLinks.map((link) => (
-              <Link 
+              <Link
                 key={link.name}
                 href={link.href}
-                className="text-foreground/80 hover:text-primary border-b border-border pb-2"
+                className="border-b border-white/10 pb-2 text-neutral-300 hover:text-[#BFFF00]"
                 onClick={() => setIsOpen(false)}
               >
                 {link.name}
               </Link>
             ))}
             <div className="flex flex-col gap-6 pt-2">
-              <div className="flex justify-center border-b border-border pb-4">
-                <AnimatedThemeToggler className="text-foreground/70 hover:text-primary transition-colors p-2" />
+              <div className="flex justify-center border-b border-white/10 pb-4">
+                <AnimatedThemeToggler className="rounded-full border border-white/10 p-2 text-neutral-300 transition hover:border-[#BFFF00]/50 hover:text-[#BFFF00]" />
               </div>
-              <button className="text-foreground/80 hover:text-primary uppercase text-xs font-black">
+              <button className="text-xs font-black uppercase text-neutral-300 hover:text-[#BFFF00]">
                 Login
               </button>
-              <Link 
-                href="/enroll" 
-                className="bg-primary text-primary-foreground py-4 rounded-full text-xs font-bold tracking-widest uppercase shadow-[0_10px_20px_rgba(191,255,0,0.2)]"
+              <Link
+                href="/enroll"
+                className="rounded-full bg-[#BFFF00] py-4 text-xs font-bold uppercase tracking-widest text-[#263500] shadow-[0_10px_20px_rgba(191,255,0,0.2)]"
                 onClick={() => setIsOpen(false)}
               >
-                Get Started
+                Apply Now
               </Link>
             </div>
           </div>

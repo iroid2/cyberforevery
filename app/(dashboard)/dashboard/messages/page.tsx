@@ -1,4 +1,10 @@
-import { DashboardPageShell, DashboardSection, PlaceholderGrid } from "@/components/dashboard/dashboard-page-shell";
+import {
+  HighlightCards,
+  InsightPanels,
+  RichTableCard,
+  SettingsPanel,
+} from "@/components/dashboard/dashboard-content-blocks";
+import { DashboardPageShell, DashboardSection } from "@/components/dashboard/dashboard-page-shell";
 
 export default function MessagesPage() {
   return (
@@ -23,18 +29,52 @@ export default function MessagesPage() {
         { title: "Announcement drafted", detail: "A new cohort reminder message was prepared for review.", time: "2h ago" },
       ]}
     >
-      <DashboardSection
-        title="Communication workspace"
-        description="This route can later support full threaded messaging, announcements, and quick-reply templates."
-      >
-        <PlaceholderGrid
-          items={[
-            { meta: "Urgent", title: "Attendance clarification request", detail: "One guardian asked for support around a missed session and make-up plan." },
-            { meta: "Operations", title: "Billing update discussion", detail: "Staff are coordinating a payment reminder for a pending invoice group." },
-            { meta: "Instruction", title: "Learner progress follow-up", detail: "An instructor flagged a learner needing extra encouragement this week." },
-            { meta: "Announcements", title: "Upcoming cohort reminder", detail: "Reserve this area for scheduled notices and broadcast drafts." },
-          ]}
-        />
+      <DashboardSection title="Inbox workspace" description="Messages now has a fuller communication layout with thread status, urgency, and announcement settings.">
+        <div className="space-y-6">
+          <HighlightCards items={[
+            { label: "Fast replies", value: "91%", detail: "Most family and learner messages still receive a same-day first response.", tone: "emerald" },
+            { label: "Urgent queue", value: "4", detail: "These threads touch attendance, billing, or a learner support concern.", tone: "rose" },
+            { label: "Announcements", value: "3", detail: "Broadcast drafts are waiting on final review before sending.", tone: "indigo" },
+            { label: "Family follow-up", value: "7", detail: "Guardians still waiting on a clear response or next action.", tone: "amber" },
+          ]} />
+
+          <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
+            <RichTableCard
+              title="Active threads"
+              description="A realistic thread list covering guardian, staff, and learner conversations."
+              columns={[
+                { key: "thread", label: "Thread" },
+                { key: "owner", label: "Owner" },
+                { key: "channel", label: "Channel" },
+                { key: "last", label: "Last update" },
+                { key: "status", label: "Status" },
+              ]}
+              rows={[
+                { thread: "Attendance clarification request", owner: "Guardian", channel: "Inbox", last: "6m ago", status: "status:Review" },
+                { thread: "Billing update discussion", owner: "Operations", channel: "Internal", last: "38m ago", status: "status:Healthy" },
+                { thread: "Learner progress follow-up", owner: "Instructor", channel: "Inbox", last: "1h ago", status: "status:Pending" },
+                { thread: "Cohort reminder announcement", owner: "Admin", channel: "Broadcast", last: "2h ago", status: "status:Healthy" },
+              ]}
+            />
+
+            <SettingsPanel
+              title="Communication settings"
+              description="Controls for thread handling and outbound notices."
+              items={[
+                { label: "Urgent routing", value: "High-priority threads route to ops and support leads.", enabled: true },
+                { label: "Broadcast drafting", value: "Admins can draft notices before final approval.", enabled: true },
+                { label: "Auto-resolve inactive threads", value: "Disabled so nothing closes without review.", enabled: false },
+                { label: "Guardian copy on learner alerts", value: "Family contacts are included on key support messages.", enabled: true },
+              ]}
+            />
+          </div>
+
+          <InsightPanels title="Communication insights" items={[
+            { title: "Families ask about logistics most", subtitle: "Schedules, attendance, and billing still dominate incoming guardian threads.", meta: "Pattern", tone: "amber" },
+            { title: "Internal notes are moving faster", subtitle: "Staff-to-staff communication is resolving with less friction than before.", meta: "Ops", tone: "emerald" },
+            { title: "Announcements are a strong lever", subtitle: "Broadcast reminders reduce repeated one-off questions when timed well.", meta: "Strategy", tone: "indigo" },
+          ]} />
+        </div>
       </DashboardSection>
     </DashboardPageShell>
   );

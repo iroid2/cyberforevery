@@ -219,9 +219,9 @@ function SuperAdminDashboard({
           <div className="flex items-center gap-8">
             <span className="text-xl font-extrabold text-[#1a237e]">Editorial Intelligence</span>
             <nav className="hidden md:flex gap-6 text-sm">
-              <span className="border-b-2 border-[#1a237e] pb-1 font-semibold text-[#1a237e]">Dashboard</span>
-              <span className="font-medium text-slate-500">Courses</span>
-              <span className="font-medium text-slate-500">Cohorts</span>
+              <Link href="/dashboard" className="border-b-2 border-[#1a237e] pb-1 font-semibold text-[#1a237e]">Dashboard</Link>
+              <Link href="/dashboard/user-management" className="font-medium text-slate-500 transition hover:text-[#1a237e]">User Management</Link>
+              <Link href="/dashboard/cohorts" className="font-medium text-slate-500 transition hover:text-[#1a237e]">Cohorts</Link>
             </nav>
           </div>
           <div className="flex items-center gap-3">
@@ -248,10 +248,12 @@ function SuperAdminDashboard({
                 Central command for {session?.user?.name || "Ivan"} • Real-time platform synchronization
               </p>
             </div>
-            <div className="flex items-center gap-2 rounded-xl bg-[#eceef0] p-1">
+            <div className="flex flex-wrap items-center gap-2 rounded-xl bg-[#eceef0] p-1">
               <button className="rounded-lg bg-white px-4 py-2 text-sm font-semibold shadow-sm">Real-time</button>
               <button className="rounded-lg px-4 py-2 text-sm font-medium text-[#454652]">7 Days</button>
               <button className="rounded-lg px-4 py-2 text-sm font-medium text-[#454652]">30 Days</button>
+              <Link href="/dashboard/user-management" className="rounded-lg bg-[#1a237e] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90">Open Users</Link>
+              <Link href="/dashboard/cohorts" className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-[#1a237e] transition hover:bg-[#eef2ff]">Open Cohorts</Link>
             </div>
           </div>
 
@@ -645,3 +647,4 @@ function getRoleHome(role: UserRoleType) {
       };
   }
 }
+

@@ -1,4 +1,10 @@
-import { DashboardPageShell, DashboardSection, PlaceholderGrid } from "@/components/dashboard/dashboard-page-shell";
+import {
+  HighlightCards,
+  InsightPanels,
+  RichTableCard,
+  SettingsPanel,
+} from "@/components/dashboard/dashboard-content-blocks";
+import { DashboardPageShell, DashboardSection } from "@/components/dashboard/dashboard-page-shell";
 
 export default function ProfilePage() {
   return (
@@ -23,18 +29,52 @@ export default function ProfilePage() {
         { title: "Security recommendation issued", detail: "A stronger password and backup method were suggested for this account.", time: "5h ago" },
       ]}
     >
-      <DashboardSection
-        title="Account profile workspace"
-        description="This route can later host editable forms, security controls, and role-specific personal settings."
-      >
-        <PlaceholderGrid
-          items={[
-            { meta: "Identity", title: "Personal details", detail: "Name, role, email, and account metadata will live here." },
-            { meta: "Preferences", title: "Communication controls", detail: "Choose reminders, weekly updates, guardian summaries, and product alerts." },
-            { meta: "Security", title: "Account protection", detail: "Manage sessions, password updates, and recovery preferences." },
-            { meta: "Personal", title: "Role-specific options", detail: "Reserve this area for learner, family, instructor, or admin-specific settings." },
-          ]}
-        />
+      <DashboardSection title="Account workspace" description="Profile now has a richer personal dashboard treatment instead of a plain placeholder panel.">
+        <div className="space-y-6">
+          <HighlightCards items={[
+            { label: "Identity", value: "Verified", detail: "Primary account details look healthy and up to date.", tone: "emerald" },
+            { label: "Notifications", value: "Weekly", detail: "Summary and event reminders are the active communication mode.", tone: "indigo" },
+            { label: "Security", value: "Strong", detail: "Session posture and account setup are above the recommended baseline.", tone: "emerald" },
+            { label: "Next step", value: "2 items", detail: "A few small profile updates could still improve account readiness.", tone: "amber" },
+          ]} />
+
+          <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
+            <RichTableCard
+              title="Account details"
+              description="A structured profile view with identity and access details."
+              columns={[
+                { key: "field", label: "Field" },
+                { key: "value", label: "Value" },
+                { key: "source", label: "Source" },
+                { key: "updated", label: "Updated" },
+                { key: "status", label: "Status" },
+              ]}
+              rows={[
+                { field: "Display name", value: "Ivan Admin", source: "Profile", updated: "Today", status: "status:Healthy" },
+                { field: "Primary email", value: "admin@demo.com", source: "Auth", updated: "Today", status: "status:Healthy" },
+                { field: "Role visibility", value: "Super Admin", source: "Access", updated: "Yesterday", status: "status:Healthy" },
+                { field: "Backup contact", value: "Not added", source: "Profile", updated: "Pending", status: "status:Review" },
+              ]}
+            />
+
+            <SettingsPanel
+              title="Preference toggles"
+              description="A compact account control area for communication and security behavior."
+              items={[
+                { label: "Weekly summary emails", value: "Receive a digest of platform movement and pending actions.", enabled: true },
+                { label: "Security alerts", value: "Get notified when sensitive account changes occur.", enabled: true },
+                { label: "Dark mode sync", value: "Theme preference can follow your local device setting.", enabled: true },
+                { label: "Public profile card", value: "Disabled so account details stay private by default.", enabled: false },
+              ]}
+            />
+          </div>
+
+          <InsightPanels title="Profile insights" items={[
+            { title: "Account looks strong", subtitle: "The main profile has good identity coverage and very few missing fields.", meta: "Health", tone: "emerald" },
+            { title: "Backup details still matter", subtitle: "Adding a recovery path and secondary contact would reduce future admin friction.", meta: "Security", tone: "amber" },
+            { title: "Personal settings should stay simple", subtitle: "The cleanest profile experiences surface only the most useful controls first.", meta: "UX", tone: "indigo" },
+          ]} />
+        </div>
       </DashboardSection>
     </DashboardPageShell>
   );

@@ -80,10 +80,10 @@ export default function AnimatedWaveFooter() {
           <div>
             <h3 className="mb-4 text-lg font-bold font-headline uppercase text-primary tracking-widest">Comm Relay</h3>
             <address className="space-y-2 text-sm not-italic text-muted">
-              <p>Sector 7G, Neon Avenue</p>
+              <p>Chicago, Illinois</p>
               <p>Cyber City, CC 10101</p>
-              <p>PING: (555) 010-1101</p>
-              <p>DATA: hello@cyberforevery.com</p>
+              <p>call : +1 (312) 468-3844 </p>
+              <p>Email: ivan@cyberforevery.com</p>
             </address>
           </div>
           <div>
