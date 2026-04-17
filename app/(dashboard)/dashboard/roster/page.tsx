@@ -1,3 +1,6 @@
+import { UserRole } from "@prisma/client";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import {
   HighlightCards,
   InsightPanels,
@@ -5,48 +8,58 @@ import {
   SettingsPanel,
 } from "@/components/dashboard/dashboard-content-blocks";
 import { DashboardPageShell, DashboardSection } from "@/components/dashboard/dashboard-page-shell";
+import { getRosterDashboardData } from "@/lib/services/enrollments";
 
-export default function RosterPage() {
+export default async function RosterPage() {
+  const session = await auth();
+  const role = (session?.user as { role?: UserRole } | undefined)?.role;
+  const userId = session?.user?.id;
+
+  if (!session?.user || !userId || (role !== UserRole.INSTRUCTOR && role !== UserRole.SUPER_ADMIN)) {
+    redirect("/dashboard");
+  }
+
+  const data = await getRosterDashboardData(userId, role);
+
+  if (!data) {
+    redirect("/dashboard");
+  }
+
   return (
     <DashboardPageShell
       eyebrow="Roster"
       title="Learner roster and classroom assignment view"
-      description="Give instructors and admins a clear picture of assigned learners, attendance readiness, and classroom grouping."
+      description="Give instructors and platform admins a live view of assigned learners, classroom grouping, and support readiness."
       stats={[
-        { label: "Assigned learners", value: "64", note: "Learners currently allocated to your visible teaching groups." },
-        { label: "Active groups", value: "05", note: "Classes with active sessions, roster ownership, and published materials." },
-        { label: "Needs attention", value: "06", note: "Learners with attendance, progress, or communication flags." },
-        { label: "Average readiness", value: "89%", note: "Weighted readiness across onboarding, attendance, and content access." },
+        { label: "Assigned learners", value: String(data.stats.assignedLearners).padStart(2, "0"), note: "Learners currently mapped into the visible teaching groups." },
+        { label: "Active groups", value: String(data.stats.activeGroups).padStart(2, "0"), note: "Cohorts currently represented in this roster view." },
+        { label: "Needs attention", value: String(data.stats.needsAttention).padStart(2, "0"), note: "Learners flagged as review or at-risk based on current lifecycle data." },
+        { label: "Average readiness", value: `${data.stats.averageReadiness}%`, note: "Combined lifecycle readiness pulled from attendance, assignments, and scores." },
       ]}
       actions={[
-        { label: "Open class grouping" },
-        { label: "Review learner notes" },
-        { label: "Message guardians" },
+        { label: "Open attendance", href: "/dashboard/attendance" },
+        { label: "Review certificates", href: "/dashboard/certificates" },
       ]}
-      feed={[
-        { title: "Roster synced", detail: "Latest cohort assignments were refreshed into the instructor workspace.", time: "11m ago" },
-        { title: "Progress flag raised", detail: "One learner dropped below the expected completion threshold.", time: "55m ago" },
-        { title: "Guardian note added", detail: "A parent submitted a scheduling request for an upcoming session.", time: "2h ago" },
-      ]}
+      feed={data.feed}
     >
       <DashboardSection
         title="Classroom roster"
-        description="Instructors now get a fuller roster layout with student health, guardian context, and support signals."
+        description="This roster is now driven by real enrollments and learner lifecycle status instead of placeholder classroom cards."
       >
         <div className="space-y-6">
           <HighlightCards
             items={[
-              { label: "On track", value: "52", detail: "Learners consistently meeting attendance, assignment, and preparation expectations.", tone: "emerald" },
-              { label: "Watchlist", value: "6", detail: "Students needing intervention because of repeated lateness or low completion.", tone: "amber" },
-              { label: "Guardian touchpoints", value: "11", detail: "Recent family notes still open for instructor or operations follow-up.", tone: "indigo" },
-              { label: "Urgent support", value: "2", detail: "Immediate mentor attention is recommended for these learners this week.", tone: "rose" },
+              { label: "On track", value: String(data.stats.onTrack), detail: "Learners currently healthy or already certified in the visible cohort set.", tone: "emerald" },
+              { label: "Watchlist", value: String(data.stats.watchlist), detail: "Learners whose onboarding, attendance, or progress still needs monitoring.", tone: "amber" },
+              { label: "Guardian touchpoints", value: String(data.stats.guardianTouchpoints), detail: "Active learner records that may still need parent-facing follow-up.", tone: "indigo" },
+              { label: "Urgent support", value: String(data.stats.urgentSupport), detail: "At-risk learners who need intervention before they fall further behind.", tone: "rose" },
             ]}
           />
 
           <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
             <RichTableCard
               title="Assigned learners"
-              description="A realistic classroom view with learner readiness and support status."
+              description="Live learner roster linked to enrollments, guardians, and lifecycle completion data."
               columns={[
                 { key: "learner", label: "Learner" },
                 { key: "group", label: "Group" },
@@ -54,22 +67,23 @@ export default function RosterPage() {
                 { key: "progress", label: "Progress" },
                 { key: "status", label: "Status" },
               ]}
-              rows={[
-                { learner: "Marcus Chen", group: "Cybersecurity Foundations", guardian: "Sarah Chen", progress: "progress:92%", status: "status:Healthy" },
-                { learner: "Naomi A.", group: "Networking Lab", guardian: "Joel A.", progress: "progress:76%", status: "status:Review" },
-                { learner: "Isaac T.", group: "AI Trends Workshop", guardian: "Tina T.", progress: "progress:84%", status: "status:Healthy" },
-                { learner: "Riley K.", group: "Web Development Flex", guardian: "Parent follow-up", progress: "progress:48%", status: "status:At risk" },
-              ]}
+              rows={data.learners.map((learner) => ({
+                learner: learner.learner,
+                group: learner.group,
+                guardian: learner.guardian,
+                progress: `progress:${learner.progress}%`,
+                status: `status:${learner.status}`,
+              }))}
             />
 
             <SettingsPanel
               title="Support actions"
-              description="A quick operational checklist for active roster care."
+              description="Operational assumptions now reflected by the real learner roster."
               items={[
-                { label: "Guardian digest", value: "Weekly summaries are still enabled for roster-linked parents.", enabled: true },
-                { label: "Mentor escalation", value: "Instructors can send at-risk learners into support review.", enabled: true },
-                { label: "Auto-group balancing", value: "Manual balancing is still preferred for small cohorts.", enabled: false },
-                { label: "Session note carryover", value: "Previous learner notes remain visible across future classes.", enabled: true },
+                { label: "Lifecycle visibility", value: "Instructors can see who is active, at risk, or already certified from one place.", enabled: true },
+                { label: "Guardian linkage", value: "Every roster learner is connected to a parent or guardian account in the current dataset.", enabled: true },
+                { label: "Certificate awareness", value: "Certified learners remain visible in the roster so alumni outcomes stay measurable.", enabled: true },
+                { label: "Manual balancing", value: "Cohort assignment is still intentionally human-controlled.", enabled: false },
               ]}
             />
           </div>
@@ -77,9 +91,9 @@ export default function RosterPage() {
           <InsightPanels
             title="Instruction insights"
             items={[
-              { title: "Cybersecurity cohort is steady", subtitle: "Most learners are keeping pace, making it a stable anchor cohort for instructor planning.", meta: "Healthy", tone: "emerald" },
-              { title: "Networking group needs one intervention", subtitle: "Absence patterns and unfinished lab work are starting to cluster around the same learner.", meta: "Support", tone: "amber" },
-              { title: "Family communication is improving", subtitle: "Guardian responses are arriving faster since recent dashboard and onboarding updates.", meta: "Comms", tone: "indigo" },
+              { title: "Readiness is now measurable", subtitle: "The roster combines assignment completion, attendance, and performance into one teaching-friendly readiness view.", meta: "Health", tone: "emerald" },
+              { title: "At-risk learners stand out early", subtitle: "Risk flags now travel with the learner record instead of hiding inside attendance or grading pages alone.", meta: "Support", tone: "amber" },
+              { title: "Certification closes the loop", subtitle: "Instructors and admins can now see who progressed all the way from active learner to verified completion.", meta: "Outcome", tone: "indigo" },
             ]}
           />
         </div>

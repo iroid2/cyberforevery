@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { Pool, neonConfig } from "@neondatabase/serverless";
+import { assertServerEnv } from "@/lib/env";
 
 /**
  * Prisma 6 + Neon Serverless Singleton
@@ -18,6 +19,7 @@ if (typeof window === "undefined") {
 const globalForPrisma = global as unknown as { prisma: PrismaClient | undefined };
 
 function createPrismaClient(): PrismaClient {
+  assertServerEnv();
   const connectionString = process.env.DATABASE_URL;
 
   if (!connectionString) {

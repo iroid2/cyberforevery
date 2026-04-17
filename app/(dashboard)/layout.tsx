@@ -4,6 +4,7 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar";
+import { normalizeUserRole } from "@/lib/config/routes";
 import { redirect } from "next/navigation";
 
 export default async function DashboardLayout({
@@ -22,7 +23,7 @@ export default async function DashboardLayout({
     name: session.user?.name || "Member",
     email: session.user?.email || "",
     avatar: session.user?.image || "",
-    role: (session.user as any)?.role || "GUEST",
+    role: normalizeUserRole((session.user as any)?.role),
   };
 
   return (

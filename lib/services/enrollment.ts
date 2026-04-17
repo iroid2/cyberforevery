@@ -1,105 +1,79 @@
 import { prisma } from "@/lib/prisma";
-import { UserRole, EnrollmentStatus, PaymentStatus, Prisma } from "@prisma/client";
+import { EnrollmentStatus, PaymentStatus, Prisma, UserRole } from "@prisma/client";
 import { sendAdminEnrollmentNotification, sendOnboardingFlow } from "@/lib/emails/actions";
+import { issuePasswordSetupToken } from "@/lib/account-setup";
+import { enrollmentSchema, type EnrollmentInput } from "@/lib/validation/enrollment";
 
-export interface EnrollmentData {
-  parentFullName: string;
-  parentEmail: string;
-  parentPhone: string;
-  relationship: string;
-  preferredContact: string;
-  cityState: string;
-  studentFirstName: string;
-  studentLastName: string;
-  studentDob: string;
-  studentAge: string;
-  studentGender?: string;
-  currentGrade: string;
-  schoolName: string;
-  techExperience: string;
-  bootcampTrack: string;
-  formatPreference: string;
-  cohortId?: string;
-  sessionPreference: string;
-  hasComputer: string;
-  operatingSystem: string;
-  hasInternet: string;
-  hasEmail: string;
-  emergencyName: string;
-  emergencyPhone: string;
-  emergencyRelation: string;
-  accommodations?: string;
-  medicalConditions?: string;
-  studentGoal: string;
-  parentExpectation: string;
-  referralSource: string;
-  planSelection: string;
-  promoCode?: string;
-}
+export type EnrollmentData = EnrollmentInput;
 
 export async function processEnrollment(data: EnrollmentData) {
-  console.log(`[Service] Processing enrollment for student ${data.studentFirstName} via parent ${data.parentEmail}`);
+  const parsed = enrollmentSchema.parse(data);
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || "http://localhost:3000";
+
+  console.log(`[Service] Processing enrollment for student ${parsed.studentFirstName} via parent ${parsed.parentEmail}`);
 
   const result = await prisma.$transaction(async (tx) => {
-    const cohort = await resolveEnrollmentCohort(tx, data);
+    const cohort = await resolveEnrollmentCohort(tx, parsed);
 
     let parent = await tx.user.findUnique({
-      where: { email: data.parentEmail.toLowerCase() },
+      where: { email: parsed.parentEmail },
     });
+
+    let requiresPasswordSetup = false;
 
     if (!parent) {
       console.log("[Service] Registering new parent account...");
       parent = await tx.user.create({
         data: {
-          name: data.parentFullName,
-          email: data.parentEmail.toLowerCase(),
-          password: "password123",
+          name: parsed.parentFullName,
+          email: parsed.parentEmail,
           role: UserRole.PARENT,
         },
       });
+      requiresPasswordSetup = true;
     }
 
     const student = await tx.student.create({
       data: {
-        firstName: data.studentFirstName,
-        lastName: data.studentLastName,
-        dob: data.studentDob ? new Date(data.studentDob) : null,
-        age: parseInt(data.studentAge),
-        gender: data.studentGender,
-        grade: data.currentGrade,
-        school: data.schoolName,
+        firstName: parsed.studentFirstName,
+        lastName: parsed.studentLastName,
+        dob: parsed.studentDob,
+        age: parsed.studentAge,
+        gender: parsed.studentGender,
+        grade: parsed.currentGrade,
+        school: parsed.schoolName,
         parentId: parent.id,
         additionalInfo: {
-          parentPhone: data.parentPhone,
-          relationship: data.relationship,
-          preferredContact: data.preferredContact,
-          cityState: data.cityState,
-          techExperience: data.techExperience,
-          formatPreference: data.formatPreference,
-          sessionPreference: data.sessionPreference,
+          parentPhone: parsed.parentPhone,
+          relationship: parsed.relationship,
+          preferredContact: parsed.preferredContact,
+          cityState: parsed.cityState,
+          techExperience: parsed.techExperience,
+          formatPreference: parsed.formatPreference,
+          sessionPreference: parsed.sessionPreference,
           techAccess: {
-            hasComputer: data.hasComputer,
-            operatingSystem: data.operatingSystem,
-            hasInternet: data.hasInternet,
-            hasEmail: data.hasEmail,
+            hasComputer: parsed.hasComputer,
+            operatingSystem: parsed.operatingSystem,
+            hasInternet: parsed.hasInternet,
+            hasEmail: parsed.hasEmail,
           },
           emergency: {
-            name: data.emergencyName,
-            phone: data.emergencyPhone,
-            relation: data.emergencyRelation,
+            name: parsed.emergencyName,
+            phone: parsed.emergencyPhone,
+            relation: parsed.emergencyRelation,
           },
           needs: {
-            accommodations: data.accommodations,
-            medicalConditions: data.medicalConditions,
+            accommodations: parsed.accommodations,
+            medicalConditions: parsed.medicalConditions,
           },
           intent: {
-            studentGoal: data.studentGoal,
-            parentExpectation: data.parentExpectation,
-            referralSource: data.referralSource,
+            studentGoal: parsed.studentGoal,
+            parentExpectation: parsed.parentExpectation,
+            referralSource: parsed.referralSource,
           },
           selection: {
-            plan: data.planSelection,
-            promo: data.promoCode,
+            plan: parsed.planSelection,
+            promo: parsed.promoCode,
           },
         },
       },
@@ -119,6 +93,9 @@ export async function processEnrollment(data: EnrollmentData) {
       studentId: student.id,
       enrollmentId: enrollment.id,
       cohortId: cohort.id,
+      parentEmail: parent.email ?? parsed.parentEmail,
+      parentName: parent.name ?? parsed.parentFullName,
+      requiresPasswordSetup,
     };
   }, {
     maxWait: 15000,
@@ -127,9 +104,20 @@ export async function processEnrollment(data: EnrollmentData) {
 
   console.log("[Service] Dispatching enrollment notifications...");
   try {
-    const onboardingResult = await sendOnboardingFlow(data.parentEmail, data.parentFullName);
+    let setupUrl: string | null = null;
+
+    if (result.requiresPasswordSetup && result.parentEmail) {
+      const token = await issuePasswordSetupToken(result.parentEmail);
+      setupUrl = `${appUrl}/set-password?token=${token.rawToken}`;
+    }
+
+    const onboardingResult = await sendOnboardingFlow(result.parentEmail, result.parentName, {
+      setupUrl,
+    });
     const adminResult = await sendAdminEnrollmentNotification({
-      ...data,
+      ...parsed,
+      requiresPasswordSetup: result.requiresPasswordSetup,
+      setupUrlIssued: Boolean(setupUrl),
     });
 
     if (!onboardingResult.success || !adminResult.success) {
@@ -190,7 +178,7 @@ async function resolveEnrollmentCohort(tx: EnrollmentTx, data: EnrollmentData) {
     return existingCohort;
   }
 
-  const startDate = getFallbackCohortStartDate(data.cohortId ?? data.bootcampTrack);
+  const startDate = getFallbackCohortStartDate(data.cohortDate ?? data.cohortId ?? data.bootcampTrack);
   const endDate = new Date(startDate);
   endDate.setUTCDate(endDate.getUTCDate() + 14);
 

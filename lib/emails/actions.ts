@@ -7,6 +7,11 @@ type EmailResult = {
   error?: string;
 };
 
+type OnboardingFlowOptions = {
+  setupUrl?: string | null;
+  dashboardUrl?: string | null;
+};
+
 function getEmailErrorMessage(error: unknown) {
   if (error instanceof Error) {
     return error.message;
@@ -88,7 +93,11 @@ export async function sendAdminEnrollmentNotification(data: Record<string, unkno
   });
 }
 
-export async function sendAdminPromotionEmail(email: string, name: string) {
+export async function sendAdminPromotionEmail(
+  email: string,
+  name: string,
+  setupUrl?: string | null,
+) {
   console.log(`[Emails] Sending admin promotion email to ${email}`);
 
   return sendEmailWithLogging("Admin promotion email", {
@@ -101,6 +110,7 @@ export async function sendAdminPromotionEmail(email: string, name: string) {
         <p>Agent <strong>${name}</strong>,</p>
         <p>Your security clearance has been upgraded to <span style="color: #bfff00;">SUPER_ADMIN</span>.</p>
         <p>You now have full access to the Command Dashboard, Finance Reports, and User Management systems.</p>
+        ${setupUrl ? `<p>Use this secure setup link to finish configuring your account:</p><p><a href="${setupUrl}" style="color:#bfff00;">${setupUrl}</a></p>` : ""}
         <div style="margin-top: 30px; padding: 20px; background-color: #111; border-radius: 8px;">
           <p style="font-size: 12px; color: #555;">SECURITY_LEVEL: OMEGA // ACCESS_KEY: ENABLED</p>
         </div>
@@ -110,14 +120,18 @@ export async function sendAdminPromotionEmail(email: string, name: string) {
   });
 }
 
-export async function sendOnboardingFlow(email: string, name: string) {
+export async function sendOnboardingFlow(
+  email: string,
+  name: string,
+  options: OnboardingFlowOptions = {},
+) {
   console.log(`[Emails] Triggering onboarding flow for ${email}`);
 
   return sendEmailWithLogging("Onboarding flow", {
     from: DEFAULT_FROM,
     to: [email],
     subject: "WELCOME TO THE MISSION // Cyber4Every1",
-    html: getOnboardingEmailHtml(name),
+    html: getOnboardingEmailHtml(name, options),
   });
 }
 

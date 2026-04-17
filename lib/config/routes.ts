@@ -39,6 +39,7 @@ const routeIcons: Record<string, any> = {
   "/dashboard/schedule": Calendar,
   "/dashboard/assignments": BookOpen,
   "/dashboard/progress": FileBadge,
+  "/dashboard/certificates": GraduationCap,
   "/dashboard/billing": CreditCard,
   "/dashboard/revenue": GraduationCap,
   "/dashboard/messages": MessageSquare,
@@ -55,11 +56,24 @@ export const getRouteByHref = (href: string) => {
   return routes.find((route) => route.href === href);
 };
 
-export const getRoutesByRole = (role: UserRoleType) => {
-  return routes.filter((route) => route.roles?.includes(role));
+export const normalizeUserRole = (role?: UserRoleType | string | null): UserRoleType => {
+  if (!role) {
+    return UserRoleType.GUEST;
+  }
+
+  const normalizedRole = String(role).toUpperCase();
+  const matchedRole = Object.values(UserRoleType).find((value) => value === normalizedRole);
+
+  return matchedRole ?? UserRoleType.GUEST;
 };
 
-export const getRoutesByGroup = (role: UserRoleType) => {
+export const getRoutesByRole = (role?: UserRoleType | string | null) => {
+  const normalizedRole = normalizeUserRole(role);
+
+  return routes.filter((route) => route.roles?.includes(normalizedRole));
+};
+
+export const getRoutesByGroup = (role?: UserRoleType | string | null) => {
   const userRoutes = getRoutesByRole(role);
   const groups = new Map<string, Route[]>();
 
@@ -74,6 +88,8 @@ export const getRoutesByGroup = (role: UserRoleType) => {
   return groups;
 };
 
-export const hasRouteAccess = (route: Route, role: UserRoleType) => {
-  return route.roles?.includes(role) ?? false;
+export const hasRouteAccess = (route: Route, role?: UserRoleType | string | null) => {
+  const normalizedRole = normalizeUserRole(role);
+
+  return route.roles?.includes(normalizedRole) ?? false;
 };

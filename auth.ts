@@ -7,6 +7,8 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { UserRole } from "@prisma/client";
 import authConfig from "@/auth.config";
 import { prisma } from "@/lib/prisma";
+import { hashPassword, needsPasswordRehash, verifyPassword } from "@/lib/security/password";
+import { checkRateLimit } from "@/lib/security/rate-limit";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
@@ -36,12 +38,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         try {
+          const normalizedEmail = String(credentials.email).toLowerCase();
+          const rateLimit = checkRateLimit(`login:${normalizedEmail}`, 10, 60_000);
+
+          if (!rateLimit.allowed) {
+            return null;
+          }
+
           const user = await prisma.user.findUnique({
-            where: { email: String(credentials.email).toLowerCase() },
+            where: { email: normalizedEmail },
           });
 
-          if (!user || user.password !== credentials.password) {
+          const isValidPassword = await verifyPassword(String(credentials.password), user?.password);
+
+          if (!user || !isValidPassword) {
             return null;
+          }
+
+          if (needsPasswordRehash(user.password)) {
+            const password = await hashPassword(String(credentials.password));
+            await prisma.user.update({
+              where: { id: user.id },
+              data: { password },
+            });
           }
 
           return {

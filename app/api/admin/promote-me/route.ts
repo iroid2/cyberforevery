@@ -2,17 +2,38 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 import { auth } from "@/auth";
+import { issuePasswordSetupToken } from "@/lib/account-setup";
+import { sendAdminPromotionEmail } from "@/lib/emails/actions";
 
-/**
- * TEMPORARY: Emergency Promotion Route
- * Only works if the user is logged in or if we bypass for the initial admin.
- */
-export async function GET() {
+export async function POST(req: Request) {
   try {
-    // For this specific setup, we'll promote the target email iradtu22@gmail.com
-    const targetEmail = "iradtu22@gmail.com";
-    
-    console.log(`🚀 [Admin] Emergency promotion triggered for ${targetEmail}`);
+    const session = await auth();
+    const requesterRole = (session?.user as { role?: UserRole } | undefined)?.role;
+
+    if (!session?.user || requesterRole !== UserRole.SUPER_ADMIN) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Forbidden",
+        },
+        { status: 403 },
+      );
+    }
+
+    const body = await req.json();
+    const targetEmail = String(body?.email || "").trim().toLowerCase();
+
+    if (!targetEmail) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Target email is required",
+        },
+        { status: 400 },
+      );
+    }
+
+    console.log("[Admin] Promotion triggered for", targetEmail);
 
     const user = await prisma.user.upsert({
       where: { email: targetEmail },
@@ -20,22 +41,30 @@ export async function GET() {
       create: {
         email: targetEmail,
         name: "Director Admin",
-        password: "password123",
         role: UserRole.SUPER_ADMIN,
       },
     });
 
+    const token = await issuePasswordSetupToken(targetEmail);
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || "http://localhost:3000";
+    const setupUrl = `${appUrl}/set-password?token=${token.rawToken}`;
+
+    await sendAdminPromotionEmail(user.email ?? targetEmail, user.name ?? "Admin", setupUrl);
+
     return NextResponse.json({
       success: true,
       message: `User ${user.email} has been promoted to SUPER_ADMIN.`,
-      role: user.role
+      role: user.role,
+      setupUrl,
     });
-
   } catch (error: any) {
-    console.error("❌ [Admin] Promotion failed:", error);
-    return NextResponse.json({
-      success: false,
-      error: error.message
-    }, { status: 500 });
+    console.error("[Admin] Promotion failed:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error.message,
+      },
+      { status: 500 },
+    );
   }
 }

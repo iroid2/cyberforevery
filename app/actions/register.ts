@@ -3,15 +3,22 @@
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 import { sendOnboardingFlow } from "@/lib/emails/actions";
+import { hashPassword } from "@/lib/security/password";
+import { registerParentSchema } from "@/lib/validation/auth";
 
 export async function registerParent(formData: FormData) {
-  const name = formData.get("name") as string;
-  const email = (formData.get("email") as string).toLowerCase();
-  const password = formData.get("password") as string;
+  const parsed = registerParentSchema.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
 
-  if (!name || !email || !password) {
-    return { error: "Missing required fields" };
+  if (!parsed.success) {
+    const fieldError = Object.values(parsed.error.flatten().fieldErrors)[0]?.[0];
+    return { error: fieldError ?? "Missing required fields" };
   }
+
+  const { name, email, password } = parsed.data;
 
   try {
     const existingUser = await prisma.user.findUnique({
@@ -22,18 +29,18 @@ export async function registerParent(formData: FormData) {
       return { error: "This email is already registered." };
     }
 
-    // In a real app, we would hash the password here.
-    const user = await prisma.user.create({
+    const hashedPassword = await hashPassword(password);
+
+    await prisma.user.create({
       data: {
         name,
         email,
-        password, // TODO: Hash password
+        password: hashedPassword,
         role: UserRole.PARENT,
       },
     });
 
-    // Trigger Onboarding Flow (Async - don't block response)
-    sendOnboardingFlow(email, name);
+    void sendOnboardingFlow(email, name);
 
     return { success: true };
   } catch (error) {

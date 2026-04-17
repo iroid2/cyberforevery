@@ -1,3 +1,6 @@
+import { UserRole } from "@prisma/client";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import {
   HighlightCards,
   InsightPanels,
@@ -5,48 +8,58 @@ import {
   SettingsPanel,
 } from "@/components/dashboard/dashboard-content-blocks";
 import { DashboardPageShell, DashboardSection } from "@/components/dashboard/dashboard-page-shell";
+import { getAttendanceDashboardData } from "@/lib/services/enrollments";
 
-export default function AttendancePage() {
+export default async function AttendancePage() {
+  const session = await auth();
+  const role = (session?.user as { role?: UserRole } | undefined)?.role;
+  const userId = session?.user?.id;
+
+  if (!session?.user || !userId || (role !== UserRole.INSTRUCTOR && role !== UserRole.SUPER_ADMIN)) {
+    redirect("/dashboard");
+  }
+
+  const data = await getAttendanceDashboardData(userId, role);
+
+  if (!data) {
+    redirect("/dashboard");
+  }
+
   return (
     <DashboardPageShell
       eyebrow="Attendance"
       title="Attendance tracking and session health"
-      description="Monitor presence, absence trends, and intervention needs across all scheduled learning sessions."
+      description="Monitor real session attendance, spot emerging intervention needs, and connect attendance directly to learner progress."
       stats={[
-        { label: "Attendance rate", value: "94%", note: "Average attendance across the visible session range this month." },
-        { label: "Sessions today", value: "05", note: "Today's live and virtual sessions requiring attendance capture." },
-        { label: "Late arrivals", value: "07", note: "Learners flagged for arriving outside the normal session tolerance." },
-        { label: "Interventions", value: "03", note: "Attendance-related follow-ups recommended this week." },
+        { label: "Attendance rate", value: `${data.stats.attendanceRate}%`, note: "Average attendance across the visible sessions in the database." },
+        { label: "Sessions tracked", value: String(data.stats.sessionsToday).padStart(2, "0"), note: "Sessions currently visible to this role." },
+        { label: "Late arrivals", value: String(data.stats.lateArrivals).padStart(2, "0"), note: "Late arrival tracking has not been modeled yet, so this remains zero for now." },
+        { label: "Interventions", value: String(data.stats.interventions).padStart(2, "0"), note: "Sessions whose attendance outcomes suggest extra support or follow-up." },
       ]}
       actions={[
-        { label: "Open today's register" },
-        { label: "Download attendance report" },
-        { label: "Review absence alerts" },
+        { label: "Open roster", href: "/dashboard/roster" },
+        { label: "Review progress", href: "/dashboard/progress" },
       ]}
-      feed={[
-        { title: "Morning register submitted", detail: "Attendance for the primary cybersecurity class was confirmed successfully.", time: "14m ago" },
-        { title: "Absence alert triggered", detail: "A learner crossed the threshold for repeated missed sessions.", time: "1h ago" },
-        { title: "Guardian follow-up queued", detail: "One parent message was prepared for a recurring attendance pattern.", time: "4h ago" },
-      ]}
+      feed={data.feed}
     >
       <DashboardSection
         title="Daily register board"
-        description="This route now reflects a richer attendance experience with session rows, interventions, and operational toggles."
+        description="This attendance workspace is now fed by real session and learner attendance records instead of dummy register rows."
       >
         <div className="space-y-6">
           <HighlightCards
             items={[
-              { label: "Present today", value: "82", detail: "Total learners marked present across the current active register window.", tone: "emerald" },
-              { label: "Absent", value: "5", detail: "These sessions need confirmation, excuse handling, or guardian follow-up.", tone: "amber" },
-              { label: "Late trend", value: "3 Days", detail: "One learner has recorded repeated late arrivals in the same week.", tone: "rose" },
-              { label: "Manual checks", value: "4", detail: "Four attendance records were adjusted by staff after register review.", tone: "indigo" },
+              { label: "Present", value: String(data.stats.presentToday), detail: "Attendance entries marked present across visible sessions.", tone: "emerald" },
+              { label: "Absent", value: String(data.stats.absent), detail: "Recorded absences that may need a guardian or staff follow-up.", tone: "amber" },
+              { label: "Review trend", value: String(data.stats.lateTrend), detail: "Sessions hovering in the middle band and worth watching closely.", tone: "rose" },
+              { label: "Manual checks", value: String(data.stats.manualChecks), detail: "No extra adjustment workflow is stored yet, so this remains zero for now.", tone: "indigo" },
             ]}
           />
 
           <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
             <RichTableCard
               title="Session register"
-              description="A daily snapshot of attendance outcomes across visible sessions."
+              description="Live attendance snapshot across the sessions visible to this instructor or admin."
               columns={[
                 { key: "session", label: "Session" },
                 { key: "coach", label: "Coach" },
@@ -54,22 +67,23 @@ export default function AttendancePage() {
                 { key: "late", label: "Late" },
                 { key: "status", label: "Status" },
               ]}
-              rows={[
-                { session: "Cybersecurity Morning", coach: "Elena Rodriguez", present: "17 / 20", late: "2", status: "status:Healthy" },
-                { session: "Networking Lab", coach: "David O.", present: "12 / 14", late: "1", status: "status:Review" },
-                { session: "AI Trends Workshop", coach: "Grace Atwine", present: "11 / 11", late: "0", status: "status:Healthy" },
-                { session: "Web Development Flex", coach: "Mentor Team", present: "8 / 12", late: "3", status: "status:At risk" },
-              ]}
+              rows={data.sessions.map((session) => ({
+                session: session.session,
+                coach: session.coach,
+                present: session.presentLabel,
+                late: session.late,
+                status: `status:${session.status}`,
+              }))}
             />
 
             <SettingsPanel
               title="Attendance controls"
-              description="Options affecting capture, follow-up, and alert behavior."
+              description="The current state of the attendance workflow in the live backend."
               items={[
-                { label: "Guardian absence alerts", value: "Parents are notified after repeated missed sessions.", enabled: true },
-                { label: "Late arrival grace window", value: "Currently set to a 10-minute tolerance.", enabled: true },
-                { label: "Bulk auto-marking", value: "Disabled so instructors can confirm final register accuracy.", enabled: false },
-                { label: "Weekly intervention digest", value: "Staff receive a summary of emerging attendance concerns.", enabled: true },
+                { label: "Session-linked tracking", value: "Attendance is now tied directly to real camp sessions and enrolled learners.", enabled: true },
+                { label: "Progress weighting", value: "Attendance contributes to learner progress and certificate eligibility checks.", enabled: true },
+                { label: "Intervention visibility", value: "Low-attendance sessions now help surface review and at-risk learners earlier.", enabled: true },
+                { label: "Late arrival workflow", value: "A dedicated lateness model has not been added yet.", enabled: false },
               ]}
             />
           </div>
@@ -77,9 +91,9 @@ export default function AttendancePage() {
           <InsightPanels
             title="Attendance insights"
             items={[
-              { title: "Morning cohorts are strongest", subtitle: "Earlier sessions continue to outperform evening groups on punctuality and full attendance.", meta: "Trend", tone: "emerald" },
-              { title: "Flex learners need tighter reminders", subtitle: "Self-paced formats benefit most from calendar nudges and direct family follow-up.", meta: "Intervention", tone: "amber" },
-              { title: "Manual edits remain low", subtitle: "Register correction volume suggests instructors are capturing sessions consistently.", meta: "Quality", tone: "indigo" },
+              { title: "Attendance is now a real input", subtitle: "The dashboard is no longer guessing. It reads from actual attendance rows attached to each session.", meta: "Data", tone: "emerald" },
+              { title: "Certificate readiness depends on this", subtitle: "Attendance now matters beyond reporting because it feeds the completion thresholds used for certificate issuance.", meta: "Outcome", tone: "indigo" },
+              { title: "The next layer is per-session editing", subtitle: "What remains here is a proper mark-attendance action for instructors to update the register from the page itself.", meta: "Next", tone: "amber" },
             ]}
           />
         </div>

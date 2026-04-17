@@ -1,3 +1,6 @@
+import { UserRole } from "@prisma/client";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import {
   HighlightCards,
   InsightPanels,
@@ -5,48 +8,53 @@ import {
   SettingsPanel,
 } from "@/components/dashboard/dashboard-content-blocks";
 import { DashboardPageShell, DashboardSection } from "@/components/dashboard/dashboard-page-shell";
+import { getEnrollmentDashboardData } from "@/lib/services/enrollments";
 
-export default function EnrollmentsPage() {
+export default async function EnrollmentsPage() {
+  const session = await auth();
+  const role = (session?.user as { role?: UserRole } | undefined)?.role;
+
+  if (!session?.user || (role !== UserRole.SUPER_ADMIN && role !== UserRole.ADMIN_STAFF)) {
+    redirect("/dashboard");
+  }
+
+  const data = await getEnrollmentDashboardData();
+
   return (
     <DashboardPageShell
       eyebrow="Enrollments"
       title="Enrollment review and conversion tracking"
-      description="Monitor pending applications, approvals, payment readiness, and onboarding progress across all learner records."
+      description="Monitor real enrollment status, payment readiness, onboarding progress, and learner risk across the admissions pipeline."
       stats={[
-        { label: "Pending enrollments", value: "31", note: "Applications still waiting for manual review, payment, or cohort assignment." },
-        { label: "Approved today", value: "12", note: "Learners cleared by operations in the current review cycle." },
-        { label: "Conversion rate", value: "68%", note: "Dummy pipeline conversion from form start to successful enrollment." },
-        { label: "Needs follow-up", value: "09", note: "Applications with missing info, payment blockers, or schedule conflicts." },
+        { label: "Pending enrollments", value: String(data.stats.pending).padStart(2, "0"), note: "Applications still waiting for payment or manual approval." },
+        { label: "Approved", value: String(data.stats.approved).padStart(2, "0"), note: "Learners currently accepted into a cohort." },
+        { label: "Conversion rate", value: `${data.stats.conversionRate}%`, note: "Accepted and completed enrollments across the current visible dataset." },
+        { label: "Needs follow-up", value: String(data.stats.needsFollowUp).padStart(2, "0"), note: "Records blocked by payment, onboarding, or learner support steps." },
       ]}
       actions={[
-        { label: "Open review queue" },
-        { label: "Export pending records" },
-        { label: "Trigger reminder emails" },
+        { label: "View certificates", href: "/dashboard/certificates" },
+        { label: "Check cohort operations", href: "/dashboard/cohorts" },
       ]}
-      feed={[
-        { title: "Payment reminder sent", detail: "Twelve pending applications received an automated billing reminder.", time: "7m ago" },
-        { title: "Enrollment approved", detail: "Operations approved a family application for the next cybersecurity cohort.", time: "43m ago" },
-        { title: "Cohort assignment created", detail: "Three approved learners were mapped into the July online intake.", time: "2h ago" },
-      ]}
+      feed={data.feed}
     >
       <DashboardSection
         title="Conversion desk"
-        description="This is now a designed review page with realistic dummy data for queue ownership, payment blockers, and approval pacing."
+        description="This page is now wired to live enrollment, onboarding, payment, and certificate records instead of placeholder queue data."
       >
         <div className="space-y-6">
           <HighlightCards
             items={[
-              { label: "Paid and ready", value: "18", detail: "These learners can move straight into onboarding and cohort assignment.", tone: "emerald" },
-              { label: "Missing info", value: "6", detail: "Applications needing emergency contacts, device details, or guardian confirmation.", tone: "amber" },
-              { label: "Manual review", value: "4", detail: "Staff should check fit, schedule choice, or financial support flags.", tone: "indigo" },
-              { label: "At-risk", value: "3", detail: "These applications have stalled long enough to need immediate follow-up.", tone: "rose" },
+              { label: "Paid and ready", value: String(data.stats.paidReady), detail: "Accepted learners whose billing is complete and can move through onboarding.", tone: "emerald" },
+              { label: "Missing info", value: String(data.stats.missingInfo), detail: "Enrollments with checklist gaps like consent, profile setup, or tech verification.", tone: "amber" },
+              { label: "Manual review", value: String(data.stats.manualReview), detail: "Records that are paid but still waiting on an admissions decision.", tone: "indigo" },
+              { label: "At-risk", value: String(data.stats.atRisk), detail: "Enrolled learners already flagged for intervention after onboarding.", tone: "rose" },
             ]}
           />
 
           <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
             <RichTableCard
               title="Enrollment queue"
-              description="A realistic admissions queue for review, billing, and operations handoff."
+              description="Live queue built from current enrollment records, including guardian, track, stage, and operational status."
               columns={[
                 { key: "student", label: "Student" },
                 { key: "track", label: "Track" },
@@ -54,22 +62,17 @@ export default function EnrollmentsPage() {
                 { key: "stage", label: "Stage" },
                 { key: "status", label: "Status" },
               ]}
-              rows={[
-                { student: "Ava N.", track: "Computer Hardware", guardian: "gogebydek@mailinator.com", stage: "Awaiting payment", status: "status:Pending" },
-                { student: "Micah O.", track: "Cybersecurity", guardian: "family.portal@demo.com", stage: "Approved and mapped", status: "status:Healthy" },
-                { student: "Ruth K.", track: "Networking", guardian: "guardian@demo.com", stage: "Manual review", status: "status:Review" },
-                { student: "Jonah T.", track: "Graphic Design + AI", guardian: "jonah.parent@demo.com", stage: "Reminder sent", status: "status:Overdue" },
-              ]}
+              rows={data.queueRows}
             />
 
             <SettingsPanel
               title="Workflow toggles"
-              description="Operational choices affecting the current admissions flow."
+              description="Current operating assumptions reflected by the live backend flow."
               items={[
-                { label: "Auto-create starter cohorts", value: "Fresh intake records can create fallback cohorts automatically.", enabled: true },
-                { label: "Onboarding email dispatch", value: "Enabled after successful enrollment persistence.", enabled: true },
-                { label: "Finance hold on incomplete records", value: "Prevent billing actions if guardian data is incomplete.", enabled: false },
-                { label: "Manual approval gate", value: "Staff can still intervene before final learner activation.", enabled: true },
+                { label: "Onboarding checklists", value: "Every seeded enrollment now carries first-class onboarding state and checklist records.", enabled: true },
+                { label: "Payment readiness", value: "Billing state is tracked on enrollments and linked payment records.", enabled: true },
+                { label: "Learner risk flags", value: "Risk level can now surface at-risk learners early in the funnel and active cohort journey.", enabled: true },
+                { label: "Certificate handoff", value: "Completion can now transition into certificate issuance once eligibility is met.", enabled: true },
               ]}
             />
           </div>
@@ -77,9 +80,24 @@ export default function EnrollmentsPage() {
           <InsightPanels
             title="Queue insights"
             items={[
-              { title: "Hardware demand is rising", subtitle: "The newest forms are clustering around computer hardware and networking tracks.", meta: "Trend", tone: "indigo" },
-              { title: "Payment friction is the main blocker", subtitle: "Most incomplete applications are otherwise ready for approval and cohort assignment.", meta: "Billing", tone: "amber" },
-              { title: "Reminder timing matters", subtitle: "Applications convert faster when finance nudges go out within the first 24 hours.", meta: "Ops", tone: "emerald" },
+              {
+                title: "Onboarding is now visible in admissions",
+                subtitle: "Operations can tell the difference between paid-but-not-started, in-progress, active, and certified learners from one queue.",
+                meta: "Lifecycle",
+                tone: "indigo",
+              },
+              {
+                title: "Incomplete checklist items are the cleanest next action",
+                subtitle: "Missing consent, profile details, or tech readiness stand out immediately instead of hiding in free-form notes.",
+                meta: "Ops",
+                tone: "amber",
+              },
+              {
+                title: "Certification is part of the same learner story now",
+                subtitle: "The admissions view can see which enrollments have fully progressed into completion and issued credentials.",
+                meta: "Outcome",
+                tone: "emerald",
+              },
             ]}
           />
         </div>

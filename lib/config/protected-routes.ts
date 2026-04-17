@@ -20,6 +20,7 @@ export const protectedRoutes: ProtectedRoute[] = [
     title: "Dashboard",
     href: "/dashboard",
     roles: Object.values(UserRoleType),
+    group: "Overview",
   },
   {
     title: "User Management",
@@ -79,6 +80,18 @@ export const protectedRoutes: ProtectedRoute[] = [
     title: "Progress",
     href: "/dashboard/progress",
     roles: [UserRoleType.STUDENT, UserRoleType.PARENT],
+    group: "Learner Portal",
+  },
+  {
+    title: "Certificates",
+    href: "/dashboard/certificates",
+    roles: [
+      UserRoleType.SUPER_ADMIN,
+      UserRoleType.ADMIN_STAFF,
+      UserRoleType.INSTRUCTOR,
+      UserRoleType.PARENT,
+      UserRoleType.STUDENT,
+    ],
     group: "Learner Portal",
   },
   {

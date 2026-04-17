@@ -1,24 +1,43 @@
-import { NextResponse } from 'next/server';
-import { resend, DEFAULT_FROM, ADMIN_EMAIL } from '@/lib/resend';
-import { getOnboardingEmailHtml } from '@/lib/emails/onboard-template';
+import { NextResponse } from "next/server";
+import { resend, DEFAULT_FROM, ADMIN_EMAIL } from "@/lib/resend";
+import { getOnboardingEmailHtml } from "@/lib/emails/onboard-template";
+import { checkRateLimit } from "@/lib/security/rate-limit";
+import { z } from "zod";
+
+const onboardSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(2),
+  setupUrl: z.string().url().optional(),
+});
 
 export async function POST(req: Request) {
   try {
-    const { email, name } = await req.json();
+    const forwardedFor = req.headers.get("x-forwarded-for") || "unknown";
+    const rateLimit = checkRateLimit(`onboard:${forwardedFor}`, 5, 60_000);
 
-    if (!email || !name) {
-      return NextResponse.json({ error: 'Email and name are required' }, { status: 400 });
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
-    // 1. Send Onboarding Email to Student
+    if (req.headers.get("x-internal-key") !== process.env.INTERNAL_API_KEY) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const parsed = onboardSchema.safeParse(await req.json());
+
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Email and name are required" }, { status: 400 });
+    }
+
+    const { email, name, setupUrl } = parsed.data;
+
     const studentEmailResponse = await resend.emails.send({
       from: DEFAULT_FROM,
       to: [email],
-      subject: 'WELCOME TO THE MISSION // Cyber4Every1',
-      html: getOnboardingEmailHtml(name),
+      subject: "WELCOME TO THE MISSION // Cyber4Every1",
+      html: getOnboardingEmailHtml(name, { setupUrl }),
     });
 
-    // 2. Notify Admin
     const adminNotificationResponse = await resend.emails.send({
       from: DEFAULT_FROM,
       to: [ADMIN_EMAIL],
@@ -31,11 +50,10 @@ export async function POST(req: Request) {
       data: {
         student: studentEmailResponse,
         admin: adminNotificationResponse,
-      }
+      },
     });
-
-  } catch (error: any) {
-    console.error('🔥 [Onboarding API] Error:', error);
-    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
+  } catch (error) {
+    console.error("[Onboarding API] Error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

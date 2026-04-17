@@ -1,4 +1,17 @@
-export function getOnboardingEmailHtml(studentName: string) {
+type OnboardingEmailOptions = {
+  setupUrl?: string | null;
+  dashboardUrl?: string | null;
+};
+
+export function getOnboardingEmailHtml(studentName: string, options: OnboardingEmailOptions = {}) {
+  const dashboardUrl = options.dashboardUrl ?? "https://cyber4every1.com/dashboard";
+  const setupUrl = options.setupUrl ?? null;
+  const actionUrl = setupUrl || dashboardUrl;
+  const actionLabel = setupUrl ? "Set Up Password" : "Access Dashboard";
+  const introCopy = setupUrl
+    ? "Your enrollment is confirmed. Before you enter the dashboard, please create your password using the secure link below."
+    : "You have successfully enrolled in the <strong>Cyber4Every1 Bootcamp</strong>. Your journey into the heart of digital defense and technological mastery begins now.";
+
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -86,9 +99,9 @@ export function getOnboardingEmailHtml(studentName: string) {
         <div class="content">
           <p class="accent">// INITIALIZING_STUDENT_DATA</p>
           <h1>Welcome, Agent ${studentName}</h1>
-          <p>You have successfully enrolled in the <strong>Cyber4Every1 Bootcamp</strong>. Your journey into the heart of digital defense and technological mastery begins now.</p>
-          <p>Our systems have prepared your initial training modules. Access your dashboard below to begin your first mission.</p>
-          <a href="https://cyber4every1.com/dashboard" class="cta-button">Access Dashboard</a>
+          <p>${introCopy}</p>
+          <p>Our systems have prepared your initial training modules. Use the secure action below to continue your first mission.</p>
+          <a href="${actionUrl}" class="cta-button">${actionLabel}</a>
           <p style="margin-top: 40px; font-size: 14px;">If you have any questions, contact our support terminal at <span class="accent">info@cyber4every1.com</span></p>
         </div>
         <div class="footer">
