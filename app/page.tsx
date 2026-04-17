@@ -11,6 +11,7 @@ import { RegisterCTA } from "@/components/register-cta";
 import { FAQSection } from "@/components/faq-section";
 import AnimatedTestimonialsDemo from "@/components/animated-testimonials";
 import AnimatedWaveFooter from "@/components/animated-wave-footer";
+import { GalleryPreview } from "@/components/gallery-preview";
 
 export default function LandingPage() {
   return (
@@ -32,6 +33,8 @@ export default function LandingPage() {
       <InstructorProfile />
       
       <AnimatedTestimonialsDemo />
+
+      <GalleryPreview />
       
       <FAQSection />
 

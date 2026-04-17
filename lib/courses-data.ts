@@ -1,3 +1,5 @@
+import { communityGallerySources } from "@/lib/gallery-data";
+
 export interface Course {
   id: string;
   title: string;
@@ -39,13 +41,13 @@ export const courses: Course[] = [
     rating: 4.9,
     reviews: "1.2k",
     price: "$199.00",
-    image: "/cybersecurity-training-diverse-group.jpg",
+    image: communityGallerySources[0],
     description: "The ultimate starting point for digital defenders. Learn to spot threats, secure your network, and understand how hackers think.",
     curriculum: [
       { week: "01", title: "Cyber Mindset", description: "Thinking like a defender.", items: ["Threat Landscape", "Password Security", "2FA Hub"] }
     ],
     outcomes: ["Defend against phishing", "Secure home networks", "Understand basic encryption"],
-    gallery: ["/gallery/hacker.png"]
+    gallery: [communityGallerySources[0], communityGallerySources[2], "/gallery/hacker.png"]
   },
   {
     id: "HW_02",
@@ -61,13 +63,13 @@ export const courses: Course[] = [
     rating: 4.8,
     reviews: "850",
     price: "$149.00",
-    image: "/family-using-laptop-safely-at-home-cybersecurity.jpg",
+    image: communityGallerySources[1],
     description: "Take the lid off and see what's inside. From CPUs to high-speed RAM, understand the physical components of modern tech.",
     curriculum: [
       { week: "01", title: "The Motherboard", description: "The central nervous system.", items: ["CPU Sockets", "RAM Channels", "Bios Setup"] }
     ],
     outcomes: ["Identify internal parts", "Build a baseline PC", "Troubleshoot hardware failures"],
-    gallery: ["/gallery/hardware.png"]
+    gallery: [communityGallerySources[1], communityGallerySources[4], "/gallery/servers.png"]
   },
   {
     id: "NET_03",
@@ -83,13 +85,13 @@ export const courses: Course[] = [
     rating: 4.7,
     reviews: "920",
     price: "$179.00",
-    image: "/students-learning-computer-safety-in-classroom.jpg",
+    image: communityGallerySources[2],
     description: "Follow the data. Learn how the internet connects billions of devices using routers, switches, and the magic of TCP/IP.",
     curriculum: [
       { week: "01", title: "IP Fundamentals", description: "Addressing the world.", items: ["IPv4 vs IPv6", "Subnetting Basics", "Gateway Logic"] }
     ],
     outcomes: ["Configure home routers", "Understand DNS layers", "Build local meshes"],
-    gallery: ["/gallery/network.png"]
+    gallery: [communityGallerySources[2], communityGallerySources[6], "/gallery/data.png"]
   },
   {
     id: "AI_04",
@@ -105,13 +107,13 @@ export const courses: Course[] = [
     rating: 5.0,
     reviews: "2.5k",
     price: "$129.00",
-    image: "/business-team-cybersecurity-training-office.jpg",
+    image: communityGallerySources[3],
     description: "Beyond the hype. Discover how LLMs, generative art, and neural networks are changing the world right now.",
     curriculum: [
       { week: "01", title: "Neural Basics", description: "How machines learn.", items: ["Prompt Engineering", "Dataset Logic", "Future Specs"] }
     ],
     outcomes: ["Master prompt engineering", "Understand AI ethical risks", "Utilize AI for productivity"],
-    gallery: ["/gallery/ai.png"]
+    gallery: [communityGallerySources[3], communityGallerySources[7], "/gallery/data.png"]
   },
   {
     id: "WEB_05",
@@ -127,13 +129,13 @@ export const courses: Course[] = [
     rating: 4.9,
     reviews: "3.1k",
     price: "$99.00",
-    image: "/diverse-group-of-people-learning-cybersecurity-tog.jpg",
+    image: communityGallerySources[5],
     description: "Code your own reality. Learn HTML, CSS, and Javascript to build responsive, stunning websites from scratch.",
     curriculum: [
       { week: "01", title: "HTML Skeleton", description: "Structuring the web.", items: ["Semantic Tags", "SEO Basics", "Accessibility"] }
     ],
     outcomes: ["Build a personal portfolio", "Host a live website", "Master CSS Grid & Flex"],
-    gallery: ["/gallery/web.png"]
+    gallery: [communityGallerySources[5], communityGallerySources[1], "/gallery/servers.png"]
   },
   {
     id: "GD_06",
@@ -149,12 +151,12 @@ export const courses: Course[] = [
     rating: 4.8,
     reviews: "640",
     price: "$149.00",
-    image: "/community-group-learning-digital-safety-together.jpg",
+    image: communityGallerySources[7],
     description: "Design meet Machine. Learn branding principles while workflow-boosting with AI generation tools like Midjourney and Canva.",
     curriculum: [
       { week: "01", title: "Visual Balance", description: "The laws of design.", items: ["Color Theory", "AI Generation", "Logo Systems"] }
     ],
     outcomes: ["Create modern branding", "Generate high-end AI art", "Master design fundamentals"],
-    gallery: ["/gallery/design.png"]
+    gallery: [communityGallerySources[7], communityGallerySources[6], "/gallery/hacker.png"]
   }
 ];
