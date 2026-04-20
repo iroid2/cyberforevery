@@ -1,11 +1,10 @@
+import React from "react";
+import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { AppSidebar } from "@/components/app-sidebar";
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar";
-import { normalizeUserRole } from "@/lib/config/routes";
-import { redirect } from "next/navigation";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+
+export const dynamic = "force-dynamic";
 
 export default async function DashboardLayout({
   children,
@@ -14,26 +13,23 @@ export default async function DashboardLayout({
 }) {
   const session = await auth();
 
-  if (!session) {
+  if (!session?.user) {
     redirect("/login");
   }
 
-  // Construct user object safely with fallbacks
-  const user = {
-    name: session.user?.name || "Member",
-    email: session.user?.email || "",
-    avatar: session.user?.image || "",
-    role: normalizeUserRole((session.user as any)?.role),
-  };
-
   return (
-    <div className="[font-family:Arial,sans-serif] bg-[#f7f9fb] text-[#191c1e] min-h-screen">
-      <SidebarProvider>
-        <AppSidebar user={user} />
-        <SidebarInset>
-          {children}
-        </SidebarInset>
-      </SidebarProvider>
-    </div>
+    <SidebarProvider>
+      <AppSidebar
+        user={{
+          name: session.user.name ?? "cyber4every1 user",
+          email: session.user.email ?? "workspace@cyber4every1.com",
+          avatar: session.user.image ?? undefined,
+          role: (session.user.role as any) ?? "GUEST",
+        }}
+      />
+      <SidebarInset className="min-h-svh bg-background">
+        {children}
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

@@ -38,11 +38,11 @@ export function NavMain({
   return (
     <SidebarGroup className="gap-4">
       <div className="px-2 pb-2">
-        <h2 className="text-lg font-bold text-sidebar-foreground">Operations Hub</h2>
-        <p className="text-sm font-medium text-sidebar-foreground/60">Learner lifecycle management</p>
+        <h2 className="text-lg font-bold text-sidebar-foreground">Cyber Ops Hub</h2>
+        <p className="text-sm font-medium text-sidebar-foreground/60">Cohorts, labs, learners, and outcomes</p>
       </div>
       <SidebarGroupLabel className="px-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-sidebar-foreground/55">
-        Platform
+        Mission Control
       </SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (

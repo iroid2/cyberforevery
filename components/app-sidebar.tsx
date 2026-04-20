@@ -27,7 +27,7 @@ const teams = [
   {
     name: "cyber4every1",
     logo: GalleryVerticalEnd,
-    plan: "Role workspace",
+    plan: "Bootcamp workspace",
   },
 ]
 
@@ -83,7 +83,7 @@ export function AppSidebar({
             </div>
             <div className="min-w-0">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-sidebar-foreground/60">
-                Active role
+                Active workspace
               </p>
               <p className="truncate text-sm font-semibold text-sidebar-foreground">
                 {normalizedRole.replaceAll("_", " ")}

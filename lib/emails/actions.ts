@@ -1,4 +1,4 @@
-import { resend, DEFAULT_FROM, ADMIN_EMAIL } from "@/lib/resend";
+import { resend, DEFAULT_FROM, ADMIN_EMAILS } from "@/lib/resend";
 import { getOnboardingEmailHtml } from "@/lib/emails/onboard-template";
 
 type EmailResult = {
@@ -66,7 +66,7 @@ export async function sendAdminEnrollmentNotification(data: Record<string, unkno
 
   return sendEmailWithLogging("Admin enrollment notification", {
     from: DEFAULT_FROM,
-    to: [ADMIN_EMAIL],
+    to: ADMIN_EMAILS,
     subject: `[NEW_INTEL] Enrollment Received: ${data.studentFirstName ?? "Student"} ${data.studentLastName ?? ""}`.trim(),
     html: `
       <div style="background-color: #050505; color: #ffffff; padding: 40px; font-family: 'Segoe UI', sans-serif; border: 1px solid #333;">

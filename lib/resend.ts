@@ -21,4 +21,15 @@ export const resend = new Resend(resendApiKey);
 
 export const DEFAULT_FROM =
   resendFrom || "Cyber4Every1 Onboarding <info@cyber4every1.com>";
-export const ADMIN_EMAIL = resendAdmin || "iradtu22@gmail.com";
+
+export const ADMIN_EMAILS = Array.from(
+  new Set(
+    (resendAdmin
+      ? resendAdmin.split(",")
+      : ["iradtu22@gmail.com", "ivanzziwa206@gmail.com"])
+      .map((email) => email.trim())
+      .filter(Boolean),
+  ),
+);
+
+export const ADMIN_EMAIL = ADMIN_EMAILS[0] || "iradtu22@gmail.com";

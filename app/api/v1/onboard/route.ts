@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { resend, DEFAULT_FROM, ADMIN_EMAIL } from "@/lib/resend";
+import { resend, DEFAULT_FROM, ADMIN_EMAILS } from "@/lib/resend";
 import { getOnboardingEmailHtml } from "@/lib/emails/onboard-template";
 import { checkRateLimit } from "@/lib/security/rate-limit";
 import { z } from "zod";
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
     const adminNotificationResponse = await resend.emails.send({
       from: DEFAULT_FROM,
-      to: [ADMIN_EMAIL],
+      to: ADMIN_EMAILS,
       subject: `NEW ENROLLMENT: ${name}`,
       text: `An onboarding email was just sent to ${name} (${email}). System Status: Normal.`,
     });

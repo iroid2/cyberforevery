@@ -1,103 +1,193 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { AnimatedThemeToggler } from "./ui/animated-theme-toggler";
+import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
+
+const primaryLinks = [
+  { label: "Curriculum", href: "/course" },
+  { label: "Bootcamp", href: "/bootcamp" },
+  { label: "Mentors", href: "/about" },
+  { label: "Pricing", href: "/checkout" },
+  { label: "Enroll", href: "/enroll" },
+  { label: "Gallery", href: "/gallery" },
+];
+
+const secondaryLinks = [
+  { label: "Login", href: "/login" },
+  { label: "Register", href: "/register" },
+];
+
+const mobileLinks = [
+  ...primaryLinks,
+  ...secondaryLinks,
+  { label: "Get in Touch", href: "/contact" },
+];
+
+const DESKTOP_BREAKPOINT = 920;
 
 export function TopNavBar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [viewportWidth, setViewportWidth] = useState<number>(0);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const pathname = usePathname();
+  const { data: session } = useSession();
 
-  const navLinks = [
-    { name: "Curriculum", href: "#curriculum" },
-    { name: "Bootcamp", href: "/bootcamp" },
-    { name: "Mentors", href: "#mentors" },
-    { name: "Pricing", href: "#pricing" },
-  ];
+  useEffect(() => {
+    const updateViewportWidth = () => {
+      setViewportWidth(window.innerWidth);
+    };
+
+    updateViewportWidth();
+    window.addEventListener("resize", updateViewportWidth);
+
+    return () => window.removeEventListener("resize", updateViewportWidth);
+  }, []);
+
+  useEffect(() => {
+    if (viewportWidth >= DESKTOP_BREAKPOINT && isOpen) {
+      setIsOpen(false);
+    }
+  }, [isOpen, viewportWidth]);
+
+  const isDesktop = viewportWidth >= DESKTOP_BREAKPOINT;
+  const isLoggedIn = !!session?.user;
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname?.startsWith(href);
+
+  const userInitials = session?.user?.name
+    ? session.user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : session?.user?.email?.[0].toUpperCase() || "U";
 
   return (
-    <nav className="fixed left-0 right-0 top-0 z-50 mx-auto mt-6 w-[92%] max-w-7xl px-2">
-      <div className="flex items-center justify-between rounded-full border border-white/5 bg-neutral-900/70 px-6 py-3 shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl md:px-8">
-        <Link
-          href="/"
-          className="shrink-0 font-['Space_Grotesk'] text-xl font-black italic tracking-tighter text-white md:text-2xl"
-        >
-          cyber4every1
-        </Link>
-
-        <div className="hidden items-center gap-8 font-['Space_Grotesk'] text-sm font-bold uppercase tracking-tight md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href}
-              className={`transition-all duration-300 ${
-                link.name === "Curriculum"
-                  ? "flex items-center gap-2 text-[#BFFF00] before:h-1.5 before:w-1.5 before:rounded-full before:bg-[#BFFF00] before:content-['']"
-                  : "text-neutral-400 hover:text-[#BFFF00]"
-              }`}
-            >
-              {link.name}
-            </Link>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-2 md:gap-4">
-          <div className="hidden items-center gap-2 sm:flex md:gap-4">
-            <AnimatedThemeToggler className="rounded-full border border-white/10 p-2 text-neutral-300 transition hover:border-[#BFFF00]/50 hover:text-[#BFFF00]" />
-
-            <button className="hidden px-4 py-2 font-['Space_Grotesk'] text-xs font-bold uppercase tracking-tight text-neutral-400 transition hover:text-white md:block">
-              Login
-            </button>
-
-            <Link
-              href="/enroll"
-              className="rounded-full bg-[#BFFF00] px-4 py-2.5 font-['Inter'] text-xs font-bold tracking-tight text-[#263500] transition-all duration-200 hover:shadow-[0_0_15px_rgba(191,255,0,0.4)] active:scale-95 md:px-6"
-            >
-              Apply Now
-            </Link>
-          </div>
-
-          <button
-            className="ml-2 rounded-full border border-white/10 p-2 text-neutral-300 transition hover:border-[#BFFF00]/50 hover:text-[#BFFF00] md:hidden"
-            onClick={() => setIsOpen(!isOpen)}
+    <header className="fixed left-0 right-0 top-0 z-50 mx-auto mt-8 w-[95%] max-w-6xl px-4 sm:px-6">
+      <div className={`rounded-2xl border border-white/8 bg-black/80 px-4 py-3 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.4)] backdrop-blur-2xl sm:px-6 ${!isDesktop && isOpen ? "rounded-3xl" : "sm:rounded-full"}`}>
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4">
+          <Link
+            href="/"
+            className="group flex items-center gap-2 transition-transform active:scale-95"
+            onClick={() => setIsOpen(false)}
           >
-            <span className="material-symbols-outlined text-2xl">
-              {isOpen ? "close" : "bolt"}
-            </span>
-          </button>
-        </div>
-      </div>
-
-      {isOpen && (
-        <div className="mx-2 mt-4 animate-in slide-in-from-top-4 rounded-[2rem] border border-white/10 bg-neutral-900/95 p-6 shadow-2xl backdrop-blur-xl duration-300 md:hidden">
-          <div className="flex flex-col gap-6 text-center font-['Space_Grotesk'] text-xs font-black uppercase tracking-widest">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="border-b border-white/10 pb-2 text-neutral-300 hover:text-[#BFFF00]"
-                onClick={() => setIsOpen(false)}
-              >
-                {link.name}
-              </Link>
-            ))}
-            <div className="flex flex-col gap-6 pt-2">
-              <div className="flex justify-center border-b border-white/10 pb-4">
-                <AnimatedThemeToggler className="rounded-full border border-white/10 p-2 text-neutral-300 transition hover:border-[#BFFF00]/50 hover:text-[#BFFF00]" />
-              </div>
-              <button className="text-xs font-black uppercase text-neutral-300 hover:text-[#BFFF00]">
-                Login
-              </button>
-              <Link
-                href="/enroll"
-                className="rounded-full bg-[#BFFF00] py-4 text-xs font-bold uppercase tracking-widest text-[#263500] shadow-[0_10px_20px_rgba(191,255,0,0.2)]"
-                onClick={() => setIsOpen(false)}
-              >
-                Apply Now
-              </Link>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+              <span className="material-symbols-outlined text-[20px]">
+                shield
+              </span>
             </div>
+            <span className="font-headline text-xl font-extrabold tracking-tighter text-white">
+              cyber4every1
+            </span>
+          </Link>
+
+          {isDesktop ? (
+            <nav className="flex items-center justify-center gap-3 lg:gap-6">
+              {primaryLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className={`relative font-headline text-sm font-bold uppercase tracking-widest transition-all duration-300 active:scale-95 ${
+                    isActive(link.href)
+                      ? "text-primary after:absolute after:-bottom-1 after:left-1/2 after:h-1 after:w-1 after:-translate-x-1/2 after:rounded-full after:bg-primary after:content-['']"
+                      : "text-white/70 hover:scale-105 hover:text-primary"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              {isLoggedIn ? (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-primary font-headline text-xs font-bold text-primary-foreground transition-all duration-300 hover:scale-105"
+                  >
+                    {userInitials}
+                  </button>
+                  {showUserMenu && (
+                    <div className="absolute right-0 mt-2 w-48 rounded-2xl border border-white/10 bg-black/90 py-2 shadow-xl backdrop-blur-2xl">
+                      <div className="border-b border-white/10 px-4 py-2">
+                        <p className="font-headline text-xs font-bold text-white">{session.user?.name || session.user?.email}</p>
+                      </div>
+                      <Link href="/profile" className="block px-4 py-2 font-headline text-xs text-white/70 hover:bg-white/5 hover:text-white">
+                        Profile
+                      </Link>
+                      <button
+                        onClick={() => signOut()}
+                        className="w-full px-4 py-2 text-left font-headline text-xs text-white/70 hover:bg-white/5 hover:text-white"
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                secondaryLinks.map((link) => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className="rounded-full border border-white/20 px-4 py-2 font-headline text-[11px] font-bold uppercase tracking-widest text-white transition-all duration-300 hover:scale-105 hover:bg-white/10 active:scale-95"
+                  >
+                    {link.label}
+                  </Link>
+                ))
+              )}
+            </nav>
+          ) : (
+            <div />
+          )}
+
+          <div className="flex items-center justify-end gap-3 sm:gap-4">
+            {!isDesktop ? (
+              <Link
+                href="/register"
+                className="rounded-full bg-primary px-4 py-2.5 font-headline text-[11px] font-bold uppercase tracking-widest text-primary-foreground shadow-[0_0_20px_rgba(191,255,0,0.3)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(191,255,0,0.5)] active:scale-95 sm:px-6 sm:text-xs"
+              >
+                Register
+              </Link>
+            ) : null}
+
+            {!isDesktop ? (
+              <button
+                type="button"
+                className="flex items-center justify-center p-1 text-white"
+                onClick={() => setIsOpen((value) => !value)}
+                aria-label="Toggle navigation menu"
+              >
+                <span className="material-symbols-outlined">
+                  {isOpen ? "close" : "menu"}
+                </span>
+              </button>
+            ) : null}
           </div>
         </div>
-      )}
-    </nav>
+
+        {!isDesktop && isOpen ? (
+          <div className="mt-4 border-t border-white/10 pt-4">
+            <nav className="flex flex-col gap-3">
+              {mobileLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className={`rounded-2xl border px-4 py-3 font-headline text-xs font-bold uppercase tracking-widest transition ${
+                    isActive(link.href)
+                      ? "border-primary/35 bg-primary/10 text-primary"
+                      : "border-white/10 text-white/75 hover:border-primary/30 hover:text-primary"
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        ) : null}
+      </div>
+    </header>
   );
 }

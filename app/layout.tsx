@@ -1,26 +1,27 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { GeistSans } from "geist/font/sans"
-import { GeistMono } from "geist/font/mono"
-import { Analytics } from "@vercel/analytics/next"
-import { Suspense } from "react"
-import "./globals.css"
+import type React from "react";
+import type { Metadata } from "next";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
+import { Analytics } from "@vercel/analytics/next";
+import { Suspense } from "react";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "cyber4every1 - Coming Soon",
   description:
     "Cybersecurity education for everyone. Removing age barriers and making digital safety accessible to all.",
   generator: "v0.app",
-}
+};
 
-import { ThemeProvider } from "@/components/theme-provider"
-import { TooltipProvider } from "@/components/ui/tooltip"
-import { Toaster } from "sonner"
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "sonner";
+import { TopNavBar } from "@/components/top-nav-bar";
+import { SessionProvider } from "@/components/session-provider";
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -34,20 +35,19 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
+      <body
+        className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}
+        suppressHydrationWarning
+      >
+        <SessionProvider>
           <TooltipProvider>
+            {/* <TopNavBar /> */}
             <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
             <Toaster position="top-center" richColors />
             <Analytics />
           </TooltipProvider>
-        </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
-  )
+  );
 }
