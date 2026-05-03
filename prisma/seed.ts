@@ -16,24 +16,11 @@ const prisma = new PrismaClient();
 const DEFAULT_PASSWORD = "ChangeMe123!";
 
 const staffUsers = [
-  { name: "Platform Director", email: "admin@cyber.com", role: UserRole.SUPER_ADMIN },
-  { name: "Ivan Instructor", email: "ivan@cyber.com", role: UserRole.INSTRUCTOR },
-  { name: "Nia Instructor", email: "nia@cyber.com", role: UserRole.INSTRUCTOR },
-  { name: "Marco Instructor", email: "marco@cyber.com", role: UserRole.INSTRUCTOR },
-  { name: "Staff Member", email: "staff@cyber.com", role: UserRole.ADMIN_STAFF },
-  { name: "Cyber Admin", email: "iradtu22@gmail.com", role: UserRole.SUPER_ADMIN },
-] as const;
-
-const familyUsers = [
-  { name: "Grace Guardian", email: "grace.parent@cyber.com", role: UserRole.PARENT },
-  { name: "Samuel Guardian", email: "samuel.parent@cyber.com", role: UserRole.PARENT },
-  { name: "Esther Guardian", email: "esther.parent@cyber.com", role: UserRole.PARENT },
-  { name: "Daniel Guardian", email: "daniel.parent@cyber.com", role: UserRole.PARENT },
-  { name: "Noah Kato", email: "noah.student@cyber.com", role: UserRole.STUDENT },
-  { name: "Zara Nankya", email: "zara.student@cyber.com", role: UserRole.STUDENT },
-  { name: "Liam Ssenyonjo", email: "liam.student@cyber.com", role: UserRole.STUDENT },
-  { name: "Ethan Tumusiime", email: "ethan.student@cyber.com", role: UserRole.STUDENT },
-  { name: "Aisha Namata", email: "aisha.student@cyber.com", role: UserRole.STUDENT },
+  { name: "Platform Admin", email: "admin@cyber.com", role: UserRole.ADMIN },
+  { name: "Ivan Tutor", email: "ivan@cyber.com", role: UserRole.TUTOR },
+  { name: "Nia Tutor", email: "nia@cyber.com", role: UserRole.TUTOR },
+  { name: "Marco Tutor", email: "marco@cyber.com", role: UserRole.TUTOR },
+  { name: "Cyber Admin", email: "iradtu22@gmail.com", role: UserRole.ADMIN },
 ] as const;
 
 const seedCourses = [
@@ -63,13 +50,11 @@ type SeedUser = {
 async function main() {
   console.log("[Seed] Building learner lifecycle dataset...");
 
-  const users = await syncUsers([...staffUsers, ...familyUsers]);
+  const users = await syncUsers(staffUsers);
   const courses = await syncCourses();
 
   await cleanupSeedDomain({
     courseSlugs: seedCourses.map((course) => course.slug),
-    parentEmails: familyUsers.filter((user) => user.role === UserRole.PARENT).map((user) => user.email),
-    studentEmails: familyUsers.filter((user) => user.role === UserRole.STUDENT).map((user) => user.email),
   });
 
   const activeCyberCohort = await prisma.cohort.create({
@@ -110,7 +95,6 @@ async function main() {
       grade: "P7",
       school: "Bright Future Primary",
       gender: "Female",
-      parentId: users["grace.parent@cyber.com"].id,
       additionalInfo: {
         scenario: "pending-onboarding",
         goal: "Explore web design and digital storytelling.",
@@ -126,8 +110,6 @@ async function main() {
       grade: "S1",
       school: "Kampala Learning Hub",
       gender: "Male",
-      parentId: users["grace.parent@cyber.com"].id,
-      userId: users["noah.student@cyber.com"].id,
       additionalInfo: {
         scenario: "onboarding-in-progress",
         goal: "Build confidence in digital safety and cyber basics.",
@@ -143,8 +125,6 @@ async function main() {
       grade: "S2",
       school: "Victory Secondary School",
       gender: "Female",
-      parentId: users["samuel.parent@cyber.com"].id,
-      userId: users["zara.student@cyber.com"].id,
       additionalInfo: {
         scenario: "active-on-track",
         goal: "Prepare for school tech club competitions.",
@@ -160,8 +140,6 @@ async function main() {
       grade: "S3",
       school: "Horizon College",
       gender: "Male",
-      parentId: users["esther.parent@cyber.com"].id,
-      userId: users["liam.student@cyber.com"].id,
       additionalInfo: {
         scenario: "at-risk",
         goal: "Improve practical cyber defense skills.",
@@ -177,8 +155,6 @@ async function main() {
       grade: "S4",
       school: "Future Leaders Academy",
       gender: "Male",
-      parentId: users["daniel.parent@cyber.com"].id,
-      userId: users["ethan.student@cyber.com"].id,
       additionalInfo: {
         scenario: "completion-ready",
         goal: "Create AI projects for entrepreneurship.",
@@ -194,8 +170,6 @@ async function main() {
       grade: "S3",
       school: "Future Leaders Academy",
       gender: "Female",
-      parentId: users["daniel.parent@cyber.com"].id,
-      userId: users["aisha.student@cyber.com"].id,
       additionalInfo: {
         scenario: "certified-alumni",
         goal: "Use AI tools responsibly for design and research.",
@@ -244,7 +218,7 @@ async function main() {
       stripeCheckoutSessionId: "seed_checkout_noah",
       stripePaymentIntentId: "seed_pi_noah",
       amount: 14900,
-      receiptEmail: "grace.parent@cyber.com",
+      receiptEmail: "noah@cyber.com",
     },
   });
 
@@ -272,7 +246,7 @@ async function main() {
       stripeCheckoutSessionId: "seed_checkout_zara",
       stripePaymentIntentId: "seed_pi_zara",
       amount: 14900,
-      receiptEmail: "samuel.parent@cyber.com",
+      receiptEmail: "zara@cyber.com",
     },
   });
 
@@ -300,7 +274,7 @@ async function main() {
       stripeCheckoutSessionId: "seed_checkout_liam",
       stripePaymentIntentId: "seed_pi_liam",
       amount: 14900,
-      receiptEmail: "esther.parent@cyber.com",
+      receiptEmail: "liam@cyber.com",
     },
   });
 
@@ -328,7 +302,7 @@ async function main() {
       stripeCheckoutSessionId: "seed_checkout_ethan",
       stripePaymentIntentId: "seed_pi_ethan",
       amount: 18900,
-      receiptEmail: "daniel.parent@cyber.com",
+      receiptEmail: "ethan@cyber.com",
     },
   });
 
@@ -356,7 +330,7 @@ async function main() {
       stripeCheckoutSessionId: "seed_checkout_aisha",
       stripePaymentIntentId: "seed_pi_aisha",
       amount: 18900,
-      receiptEmail: "daniel.parent@cyber.com",
+      receiptEmail: "aisha@cyber.com",
     },
   });
 
@@ -618,12 +592,8 @@ async function syncCourses() {
 
 async function cleanupSeedDomain({
   courseSlugs,
-  parentEmails,
-  studentEmails,
 }: {
   courseSlugs: string[];
-  parentEmails: string[];
-  studentEmails: string[];
 }) {
   const courses = await prisma.course.findMany({
     where: {
@@ -636,31 +606,7 @@ async function cleanupSeedDomain({
     },
   });
 
-  const parents = await prisma.user.findMany({
-    where: {
-      email: {
-        in: parentEmails,
-      },
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  const studentUsers = await prisma.user.findMany({
-    where: {
-      email: {
-        in: studentEmails,
-      },
-    },
-    select: {
-      id: true,
-    },
-  });
-
   const courseIds = courses.map((course) => course.id);
-  const parentIds = parents.map((parent) => parent.id);
-  const studentUserIds = studentUsers.map((user) => user.id);
 
   const cohorts = await prisma.cohort.findMany({
     where: {
@@ -673,46 +619,17 @@ async function cleanupSeedDomain({
     },
   });
 
-  const students = await prisma.student.findMany({
-    where: {
-      OR: [
-        {
-          parentId: {
-            in: parentIds,
-          },
-        },
-        {
-          userId: {
-            in: studentUserIds,
-          },
-        },
-      ],
-    },
-    select: {
-      id: true,
-    },
-  });
-
   const cohortIds = cohorts.map((cohort) => cohort.id);
-  const studentIds = students.map((student) => student.id);
 
   const enrollments = await prisma.enrollment.findMany({
     where: {
-      OR: [
-        {
-          cohortId: {
-            in: cohortIds,
-          },
-        },
-        {
-          studentId: {
-            in: studentIds,
-          },
-        },
-      ],
+      cohortId: {
+        in: cohortIds,
+      },
     },
     select: {
       id: true,
+      studentId: true,
     },
   });
 
@@ -739,23 +656,15 @@ async function cleanupSeedDomain({
   });
 
   const enrollmentIds = enrollments.map((enrollment) => enrollment.id);
+  const studentIds = enrollments.map((enrollment) => enrollment.studentId);
   const sessionIds = sessions.map((session) => session.id);
   const assignmentIds = assignments.map((assignment) => assignment.id);
 
   await prisma.certificate.deleteMany({
     where: {
-      OR: [
-        {
-          enrollmentId: {
-            in: enrollmentIds,
-          },
-        },
-        {
-          studentId: {
-            in: studentIds,
-          },
-        },
-      ],
+      enrollmentId: {
+        in: enrollmentIds,
+      },
     },
   });
 

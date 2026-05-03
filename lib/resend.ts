@@ -17,7 +17,7 @@ if (!resendFrom) {
   );
 }
 
-export const resend = new Resend(resendApiKey);
+export const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 export const DEFAULT_FROM =
   resendFrom || "Cyber4Every1 Onboarding <info@cyber4every1.com>";

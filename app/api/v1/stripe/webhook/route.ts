@@ -7,6 +7,11 @@ import { sendPaymentConfirmationEmail } from "@/lib/emails/actions";
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(req: Request) {
+  if (!stripe) {
+    console.error("[Webhook] Stripe not configured");
+    return NextResponse.json({ error: "Stripe not configured" }, { status: 500 });
+  }
+
   const body = await req.text();
   const signature = req.headers.get("stripe-signature");
 

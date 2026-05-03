@@ -1,15 +1,21 @@
 const requiredEnv = [
   "DATABASE_URL",
-  "AUTH_SECRET",
   "STRIPE_SECRET_KEY",
   "STRIPE_WEBHOOK_SECRET",
   "RESEND_API_KEY",
   "INTERNAL_API_KEY",
   "UPLOADTHING_TOKEN",
-] as const;
+] as string[];
 
 export function getMissingRequiredEnv() {
-  return requiredEnv.filter((key) => !process.env[key]);
+  const missing = requiredEnv.filter((key) => !process.env[key]);
+  const hasAuthSecret = Boolean(process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET);
+
+  if (!hasAuthSecret) {
+    missing.push("NEXTAUTH_SECRET");
+  }
+
+  return missing;
 }
 
 export function assertServerEnv() {

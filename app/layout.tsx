@@ -43,7 +43,7 @@ export default function RootLayout({
           <TooltipProvider>
             {/* <TopNavBar /> */}
             <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
-            <Toaster position="top-center" richColors />
+            <Toaster position="top-right" richColors />
             <Analytics />
           </TooltipProvider>
         </SessionProvider>

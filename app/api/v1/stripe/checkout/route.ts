@@ -17,6 +17,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    if (!stripe) {
+      console.error("[Stripe] Stripe not configured");
+      return NextResponse.json({ error: "Stripe not configured" }, { status: 500 });
+    }
+
     const rateLimit = checkRateLimit(`checkout:${session.user.id}`, 10, 60_000);
     if (!rateLimit.allowed) {
       return NextResponse.json({ error: "Too many requests" }, { status: 429 });

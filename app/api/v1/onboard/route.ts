@@ -31,19 +31,26 @@ export async function POST(req: Request) {
 
     const { email, name, setupUrl } = parsed.data;
 
-    const studentEmailResponse = await resend.emails.send({
-      from: DEFAULT_FROM,
-      to: [email],
-      subject: "WELCOME TO THE MISSION // Cyber4Every1",
-      html: getOnboardingEmailHtml(name, { setupUrl }),
-    });
+    let studentEmailResponse = null;
+    let adminNotificationResponse = null;
 
-    const adminNotificationResponse = await resend.emails.send({
-      from: DEFAULT_FROM,
-      to: ADMIN_EMAILS,
-      subject: `NEW ENROLLMENT: ${name}`,
-      text: `An onboarding email was just sent to ${name} (${email}). System Status: Normal.`,
-    });
+    if (resend) {
+      studentEmailResponse = await resend.emails.send({
+        from: DEFAULT_FROM,
+        to: [email],
+        subject: "WELCOME TO THE MISSION // Cyber4Every1",
+        html: getOnboardingEmailHtml(name, { setupUrl }),
+      });
+
+      adminNotificationResponse = await resend.emails.send({
+        from: DEFAULT_FROM,
+        to: ADMIN_EMAILS,
+        subject: `NEW ENROLLMENT: ${name}`,
+        text: `An onboarding email was just sent to ${name} (${email}). System Status: Normal.`,
+      });
+    } else {
+      console.warn("[Onboarding API] Resend not configured, skipping email sends.");
+    }
 
     return NextResponse.json({
       success: true,

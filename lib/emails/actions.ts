@@ -28,6 +28,11 @@ async function sendEmailWithLogging(
   label: string,
   payload: Parameters<typeof resend.emails.send>[0]
 ): Promise<EmailResult> {
+  if (!resend) {
+    console.warn(`[Emails] ${label} skipped: Resend not configured.`);
+    return { success: false, error: "Email service not configured" };
+  }
+
   try {
     const response = await resend.emails.send(payload);
     const providerError = response.error?.message ?? null;

@@ -6,10 +6,9 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 
 const primaryLinks = [
-  { label: "Curriculum", href: "/course" },
   { label: "Bootcamp", href: "/bootcamp" },
   { label: "Mentors", href: "/about" },
-  { label: "Pricing", href: "/checkout" },
+  { label: "attend", href: "/attend" },
   { label: "Enroll", href: "/enroll" },
   { label: "Gallery", href: "/gallery" },
 ];
@@ -68,7 +67,9 @@ export function TopNavBar() {
 
   return (
     <header className="fixed left-0 right-0 top-0 z-50 mx-auto mt-8 w-[95%] max-w-6xl px-4 sm:px-6">
-      <div className={`rounded-2xl border border-white/8 bg-black/80 px-4 py-3 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.4)] backdrop-blur-2xl sm:px-6 ${!isDesktop && isOpen ? "rounded-3xl" : "sm:rounded-full"}`}>
+      <div
+        className={`rounded-2xl border border-white/8 bg-black/80 px-4 py-3 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.4)] backdrop-blur-2xl sm:px-6 ${!isDesktop && isOpen ? "rounded-3xl" : "sm:rounded-full"}`}
+      >
         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4">
           <Link
             href="/"
@@ -112,9 +113,14 @@ export function TopNavBar() {
                   {showUserMenu && (
                     <div className="absolute right-0 mt-2 w-48 rounded-2xl border border-white/10 bg-black/90 py-2 shadow-xl backdrop-blur-2xl">
                       <div className="border-b border-white/10 px-4 py-2">
-                        <p className="font-headline text-xs font-bold text-white">{session.user?.name || session.user?.email}</p>
+                        <p className="font-headline text-xs font-bold text-white">
+                          {session.user?.name || session.user?.email}
+                        </p>
                       </div>
-                      <Link href="/profile" className="block px-4 py-2 font-headline text-xs text-white/70 hover:bg-white/5 hover:text-white">
+                      <Link
+                        href="/profile"
+                        className="block px-4 py-2 font-headline text-xs text-white/70 hover:bg-white/5 hover:text-white"
+                      >
                         Profile
                       </Link>
                       <button

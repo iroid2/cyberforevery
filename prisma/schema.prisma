@@ -1,5 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
+  output          = "../lib/generated/prisma"
   previewFeatures = ["driverAdapters"]
 }
 
@@ -11,11 +12,12 @@ datasource db {
 
 enum UserRole {
   SUPER_ADMIN
-  INSTRUCTOR
+  ADMIN
   ADMIN_STAFF
+  INSTRUCTOR
   PARENT
   STUDENT
-  GUEST
+  TUTOR
 }
 
 enum EnrollmentStatus {
@@ -75,16 +77,17 @@ model User {
   email               String?                @unique
   emailVerified       DateTime?
   image               String?
-  role                UserRole               @default(GUEST)
+  role                UserRole               @default(TUTOR)
   password            String?
   accounts            Account[]
   sessions            Session[]
-  parentOf            Student[]              @relation("ParentStudents")
   students            Student[]              @relation("StudentToUser")
   instructedCohorts   Cohort[]               @relation("InstructorCohorts")
   createdAssignments  Assignment[]           @relation("AssignmentCreator")
   reviewedSubmissions AssignmentSubmission[] @relation("SubmissionReviewer")
   issuedCertificates Certificate[]          @relation("CertificateIssuer")
+  tutorCourses        TutorCourse[]          @relation("TutorCourses")
+  legacyCourses       LegacyCourse[]         @relation("LegacyTutorCourses")
   createdAt           DateTime               @default(now())
   updatedAt           DateTime               @updatedAt
 }
@@ -99,8 +102,6 @@ model Student {
   grade          String?
   school         String?
   additionalInfo Json?
-  parentId       String
-  parent         User                   @relation("ParentStudents", fields: [parentId], references: [id])
   userId         String?                @unique
   user           User?                  @relation("StudentToUser", fields: [userId], references: [id])
   enrollments    Enrollment[]
@@ -281,6 +282,176 @@ model Certificate {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 }
+
+// ─── TUTOR COURSE PLATFORM ──────────────────────────────────────────────────
+
+model TutorCourse {
+  id        String          @id @default(cuid())
+  title     String
+  subject   String
+  isLive    Boolean         @default(false)
+  tutorId   String
+  tutor     User            @relation("TutorCourses", fields: [tutorId], references: [id])
+  students  CourseStudent[]
+  lessons   Lesson[]
+  questions Question[]
+  submissions Submission[]
+  sessionQuestions SessionQuestion[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+// Live tutoring sessions with integrated quizzes
+// Legacy course/lesson models
+model LegacyCourse {
+  id        String      @id @default(cuid())
+  title     String
+  subject   String
+  tutorId   String
+  tutor     User        @relation("LegacyTutorCourses", fields: [tutorId], references: [id])
+  lessons   LegacyLesson[]
+  questions LegacyQuestion[]
+  students  LegacyCourseStudent[]
+  isLive    Boolean     @default(false)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model LegacyLesson {
+  id              String      @id @default(cuid())
+  title           String
+  content         String      @db.Text
+  studyNotes      String?     @db.Text
+  presentationUrl String?
+  presentationKey String?
+  presentationName String?
+  presentationType String?
+  presentationSize Int?
+  order           Int         @default(0)
+  courseId        String
+  course          LegacyCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model LegacyQuestion {
+  id           String      @id @default(cuid())
+  text         String
+  options      String[]
+  correctIndex Int
+  order        Int         @default(0)
+  courseId     String
+  course       LegacyCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  answers      LegacyAnswer[]
+  createdAt    DateTime    @default(now())
+}
+
+model LegacyCourseStudent {
+  id         String       @id @default(cuid())
+  name       String
+  courseId   String
+  course     LegacyCourse  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  submission LegacySubmission?
+  joinedAt   DateTime     @default(now())
+}
+
+model LegacySubmission {
+  id             String        @id @default(cuid())
+  studentId      String        @unique
+  student        LegacyCourseStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  courseId       String
+  score          Int
+  totalQuestions Int
+  submittedAt    DateTime      @default(now())
+  answers        LegacyAnswer[]
+}
+
+model LegacyAnswer {
+  id            String     @id @default(cuid())
+  submissionId  String
+  submission    LegacySubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  questionId    String
+  question      LegacyQuestion   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedIndex Int
+  isCorrect     Boolean
+}
+
+model Lesson {
+  id        String      @id @default(cuid())
+  title     String
+  content   String      @db.Text
+  studyNotes String?    @db.Text
+  presentationUrl String?
+  presentationKey String?
+  presentationName String?
+  presentationType String?
+  presentationSize Int?
+  order     Int         @default(0)
+  courseId  String
+  course    TutorCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Question {
+  id           String      @id @default(cuid())
+  text         String
+  options      String[]
+  correctIndex Int
+  order        Int         @default(0)
+  courseId     String
+  course       TutorCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  answers      Answer[]
+  createdAt    DateTime    @default(now())
+}
+
+model CourseStudent {
+  id         String       @id @default(cuid())
+  name       String
+  courseId   String
+  course     TutorCourse  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  submission Submission?
+  sessionQuestions SessionQuestion[]
+  joinedAt   DateTime     @default(now())
+}
+
+model Submission {
+  id             String        @id @default(cuid())
+  studentId      String        @unique
+  student        CourseStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  courseId       String
+  course         TutorCourse   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  score          Int
+  totalQuestions Int
+  submittedAt    DateTime      @default(now())
+  answers        Answer[]
+}
+
+model Answer {
+  id            String     @id @default(cuid())
+  submissionId  String
+  submission    Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  questionId    String
+  question      Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedIndex Int
+  isCorrect     Boolean
+}
+
+model SessionQuestion {
+  id         String       @id @default(cuid())
+  courseId   String
+  course     TutorCourse  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  studentId  String
+  student    CourseStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  text       String       @db.Text
+  resolved   Boolean      @default(false)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@index([courseId, createdAt])
+}
+
+// ─── NEXTAUTH ────────────────────────────────────────────────────────────────
 
 model Account {
   id                String  @id @default(cuid())
