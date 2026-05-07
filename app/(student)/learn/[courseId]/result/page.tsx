@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getStudentResult } from "@/app/actions/student";
+import { getCertificateRequestBySubmissionId } from "@/app/actions/certificates";
+import { CertificatePromptModal } from "@/components/CertificatePromptModal";
 import { CheckCircle, XCircle, Trophy, ArrowLeft, GraduationCap } from "lucide-react";
+import { formatDurationLabel } from "@/lib/duration";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -23,15 +27,66 @@ export default async function ResultPage({
   const { sid } = await searchParams;
   if (!sid) notFound();
 
-  const result = await getStudentResult(sid, courseId);
+  const [result, certRequest] = await Promise.all([
+    getStudentResult(sid, courseId),
+    getCertificateRequestBySubmissionId(sid),
+  ]);
+
   if (!result) notFound();
+
+  const hasCertificate = !!certRequest;
 
   const pct = result.totalQuestions > 0
     ? Math.round((result.score / result.totalQuestions) * 100)
     : 0;
   const { label, color } = getLabel(pct);
   const reviewAnswers = result.answers.filter((ans) => !ans.isCorrect);
+  const timeSpentLabel =
+    result.timeSpentSeconds != null
+      ? formatDurationLabel(result.timeSpentSeconds)
+      : "Not recorded";
 
+  // If no certificate request yet, show prompt modal and hide score
+  if (!hasCertificate) {
+    return (
+      <div className="min-h-screen bg-slate-50">
+        <header className="border-b border-slate-200 bg-white px-6 py-4 shadow-sm">
+          <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-emerald-600">
+                <GraduationCap className="h-4 w-4 text-white" />
+              </div>
+              <p className="font-semibold text-slate-900">Quiz Results</p>
+            </div>
+            <Link
+              href="/attend"
+              className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to sessions
+            </Link>
+          </div>
+        </header>
+
+        <main className="mx-auto max-w-3xl px-6 py-10">
+          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+              <Trophy className="h-8 w-8 text-emerald-600" />
+            </div>
+            <p className="text-2xl font-bold text-slate-900">Quiz Submitted!</p>
+            <p className="mt-2 text-sm text-slate-500">
+              You scored {result.score} out of {result.totalQuestions} ({pct}%).
+            </p>
+          </div>
+
+          {/* Certificate prompt modal */}
+          <CertificatePromptModal submissionId={sid} />
+        </main>
+      </div>
+    );
+  }
+
+  // Full results page (certificate already requested)
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white px-6 py-4 shadow-sm">
@@ -62,6 +117,9 @@ export default async function ResultPage({
           <p className={`mt-1 text-lg font-semibold ${color}`}>{label}</p>
           <p className="mt-2 text-sm text-slate-500">
             {result.student.name} scored {result.score} out of {result.totalQuestions}
+          </p>
+          <p className="mt-3 inline-flex rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">
+            Time spent in session: {timeSpentLabel}
           </p>
         </div>
 

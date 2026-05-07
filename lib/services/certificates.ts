@@ -5,7 +5,7 @@ import {
   EnrollmentStatus,
   LearnerRiskLevel,
   OnboardingStatus,
-} from "@prisma/client";
+} from "@/lib/generated/prisma";
 import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
 

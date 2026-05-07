@@ -1,25 +1,19 @@
 import Link from "next/link";
-import { getTutorCourses } from "@/app/actions/courses";
+import { getTutorCourses, deleteCourse } from "@/app/actions/courses";
 import { BookOpen, Plus, Radio, Users, HelpCircle, Eye, Trash2 } from "lucide-react";
-import { toggleCourseLive, deleteCourse } from "@/app/actions/courses";
 
 export const dynamic = "force-dynamic";
 
-function LiveToggle({ courseId, isLive }: { courseId: string; isLive: boolean }) {
-  const action = toggleCourseLive.bind(null, courseId);
-  return (
-    <form action={action}>
-      <button
-        type="submit"
-        className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
-          isLive
-            ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-        }`}
-      >
-        {isLive ? "● Live" : "○ Inactive"}
-      </button>
-    </form>
+function StatusBadge({ isLive }: { isLive: boolean }) {
+  return isLive ? (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700">
+      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+      Live
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+      Inactive
+    </span>
   );
 }
 
@@ -94,7 +88,7 @@ export default async function CoursesPage() {
                       <p className="text-xs text-slate-400">{course.subject}</p>
                     </td>
                     <td className="px-5 py-4">
-                      <LiveToggle courseId={course.id} isLive={course.isLive} />
+                      <StatusBadge isLive={course.isLive} />
                     </td>
                     <td className="px-5 py-4 text-center text-slate-600">
                       {course._count.lessons}

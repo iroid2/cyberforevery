@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getCourseResults } from "@/app/actions/courses";
-import { ArrowLeft, Users, TrendingUp, CheckCircle, XCircle } from "lucide-react";
+import { ArrowLeft, Users, TrendingUp, CheckCircle, XCircle, Clock3 } from "lucide-react";
+import { formatDurationLabel } from "@/lib/duration";
 
 export const dynamic = "force-dynamic";
 
@@ -15,56 +16,66 @@ export default async function CourseResultsPage({
   if (!course) notFound();
 
   const submitted = course.students.filter((s) => s.submission);
-  const avgScore = submitted.length > 0
-    ? Math.round(
-        submitted.reduce((sum, s) => sum + (s.submission!.score / s.submission!.totalQuestions) * 100, 0) /
-          submitted.length
-      )
-    : null;
+  const avgScore =
+    submitted.length > 0
+      ? Math.round(
+          submitted.reduce(
+            (sum, s) => sum + (s.submission!.score / s.submission!.totalQuestions) * 100,
+            0,
+          ) / submitted.length,
+        )
+      : null;
 
-  const passRate = submitted.length > 0
-    ? Math.round(
-        (submitted.filter((s) => s.submission!.score / s.submission!.totalQuestions >= 0.6).length /
-          submitted.length) * 100
-      )
-    : null;
+  const passRate =
+    submitted.length > 0
+      ? Math.round(
+          (submitted.filter((s) => s.submission!.score / s.submission!.totalQuestions >= 0.6).length /
+            submitted.length) * 100,
+        )
+      : null;
 
-  // Per-question stats
+  const timedSubmissions = submitted.filter((student) => student.submission?.timeSpentSeconds != null);
+  const avgTimeSpent =
+    timedSubmissions.length > 0
+      ? timedSubmissions.reduce((sum, student) => sum + (student.submission?.timeSpentSeconds ?? 0), 0) /
+        timedSubmissions.length
+      : null;
+
   const questionStats = course.questions.map((q) => {
     const total = submitted.filter((s) =>
-      s.submission?.answers.some((a) => a.questionId === q.id)
+      s.submission?.answers.some((a) => a.questionId === q.id),
     ).length;
     const correct = submitted.filter((s) =>
-      s.submission?.answers.find((a) => a.questionId === q.id && a.isCorrect)
+      s.submission?.answers.find((a) => a.questionId === q.id && a.isCorrect),
     ).length;
     return { ...q, total, correct };
   });
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-20 border-b border-slate-200 bg-white px-6 py-4 shadow-sm">
         <div className="flex items-center gap-4">
           <Link
             href={`/dashboard/courses/${id}`}
-            className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+            className="flex items-center gap-1.5 text-sm text-slate-500 transition-colors hover:text-slate-700"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to course
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-slate-900">{course.title} — Results</h1>
+            <h1 className="text-xl font-bold text-slate-900">{course.title} - Results</h1>
             <p className="text-sm text-slate-400">{course.subject}</p>
           </div>
         </div>
       </header>
 
-      <div className="flex-1 p-6 space-y-6 max-w-5xl">
-        {/* Summary stats */}
-        <div className="grid gap-4 sm:grid-cols-3">
+      <div className="flex-1 space-y-6 p-6 max-w-5xl">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { label: "Total Joined", value: course.students.length, icon: Users, color: "bg-slate-700" },
             { label: "Avg Score", value: avgScore !== null ? `${avgScore}%` : "—", icon: TrendingUp, color: "bg-emerald-600" },
-            { label: "Pass Rate (≥60%)", value: passRate !== null ? `${passRate}%` : "—", icon: CheckCircle, color: "bg-indigo-600" },
+            { label: "Pass Rate (>=60%)", value: passRate !== null ? `${passRate}%` : "—", icon: CheckCircle, color: "bg-indigo-600" },
+            { label: "Avg Time Spent", value: avgTimeSpent !== null ? formatDurationLabel(Math.round(avgTimeSpent)) : "—", icon: Clock3, color: "bg-rose-600" },
           ].map(({ label, value, icon: Icon, color }) => (
             <div key={label} className="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${color}`}>
@@ -78,7 +89,6 @@ export default async function CourseResultsPage({
           ))}
         </div>
 
-        {/* Per-student table */}
         <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
           <div className="border-b border-slate-100 px-5 py-4">
             <h2 className="font-semibold text-slate-900">Student Scores</h2>
@@ -92,6 +102,7 @@ export default async function CourseResultsPage({
                   <th className="px-5 py-3 text-left">Name</th>
                   <th className="px-5 py-3 text-center">Score</th>
                   <th className="px-5 py-3 text-center">Result</th>
+                  <th className="px-5 py-3 text-center">Time Spent</th>
                   <th className="px-5 py-3 text-right">Joined</th>
                 </tr>
               </thead>
@@ -118,6 +129,9 @@ export default async function CourseResultsPage({
                           <span className="text-xs text-slate-400">Not submitted</span>
                         )}
                       </td>
+                      <td className="px-5 py-3 text-center text-xs font-medium text-slate-500">
+                        {sub?.timeSpentSeconds != null ? formatDurationLabel(sub.timeSpentSeconds) : "—"}
+                      </td>
                       <td className="px-5 py-3 text-right text-xs text-slate-400">
                         {new Date(student.joinedAt).toLocaleDateString()}
                       </td>
@@ -129,7 +143,6 @@ export default async function CourseResultsPage({
           )}
         </div>
 
-        {/* Per-question analysis */}
         {questionStats.length > 0 && (
           <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
             <div className="border-b border-slate-100 px-5 py-4">
@@ -141,15 +154,15 @@ export default async function CourseResultsPage({
                 return (
                   <div key={q.id} className="flex items-center gap-4 px-5 py-4">
                     <span className="shrink-0 text-sm font-bold text-slate-400">Q{idx + 1}</span>
-                    <p className="flex-1 text-sm text-slate-700 truncate">{q.text}</p>
-                    <div className="flex items-center gap-3 shrink-0">
+                    <p className="flex-1 truncate text-sm text-slate-700">{q.text}</p>
+                    <div className="flex shrink-0 items-center gap-3">
                       <div className="h-2 w-24 overflow-hidden rounded-full bg-slate-100">
                         <div
                           className={`h-full rounded-full ${pct >= 60 ? "bg-emerald-500" : "bg-red-400"}`}
                           style={{ width: `${pct}%` }}
                         />
                       </div>
-                      <span className={`text-xs font-semibold w-10 text-right ${pct >= 60 ? "text-emerald-600" : "text-red-500"}`}>
+                      <span className={`w-10 text-right text-xs font-semibold ${pct >= 60 ? "text-emerald-600" : "text-red-500"}`}>
                         {q.total > 0 ? `${pct}%` : "—"}
                       </span>
                     </div>

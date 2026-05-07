@@ -1629,7 +1629,7 @@ function QuizStep({ quiz, setQuiz }) {
 // ─────────────────────────────────────────────────────────────────────────────
 //  STEP 4 — Review & Publish
 // ─────────────────────────────────────────────────────────────────────────────
-function PublishStep({ courseData, lessons, quiz, onPublish, saving }) {
+function PublishStep({ courseData, lessons, quiz, onPublish, saving, publishError }) {
   const issues = [];
   if (!courseData.title) issues.push("Add a course title");
   if (!courseData.description) issues.push("Add a course description");
@@ -1997,6 +1997,22 @@ export default function CourseCreatorPage() {
   });
 
   const handlePublish = async () => {
+    // Guard — same checks as PublishStep (lesson titles auto-fill)
+    const blockingIssues: string[] = [];
+    if (!courseData.title) blockingIssues.push("Add a course title");
+    if (!courseData.subject) blockingIssues.push("Select a subject category");
+    if (lessons.length === 0) blockingIssues.push("Add at least one lesson");
+    if (quiz.questions.some((q) => !q.text || q.options.some((o) => !o)))
+      blockingIssues.push("Complete all quiz question fields");
+    if (quiz.questions.some((q) => q.correctIndex < 0))
+      blockingIssues.push("Pick a correct answer for every question");
+
+    if (blockingIssues.length > 0) {
+      setPublishError(blockingIssues.join(" · "));
+      setStep(3);
+      return;
+    }
+
     setSaving(true);
     setPublishError("");
     try {
@@ -2226,6 +2242,7 @@ export default function CourseCreatorPage() {
             quiz={quiz}
             onPublish={handlePublish}
             saving={saving}
+            publishError={publishError}
           />
         )}
 

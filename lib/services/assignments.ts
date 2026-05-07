@@ -1,4 +1,4 @@
-import { AssignmentStatus, AssignmentSubmissionStatus, UserRole } from "@prisma/client";
+import { AssignmentStatus, AssignmentSubmissionStatus, UserRole } from "@/lib/generated/prisma";
 import { prisma } from "@/lib/prisma";
 
 export async function getStudentAssignmentData(userId: string) {

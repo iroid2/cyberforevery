@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@/lib/generated/prisma";
 import { sendOnboardingFlow } from "@/lib/emails/actions";
 import { hashPassword } from "@/lib/security/password";
 import { registerParentSchema } from "@/lib/validation/auth";

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
-import { PaymentRecordStatus, PaymentStatus } from "@prisma/client";
+import { PaymentRecordStatus, PaymentStatus } from "@/lib/generated/prisma";
 import { sendPaymentConfirmationEmail } from "@/lib/emails/actions";
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;

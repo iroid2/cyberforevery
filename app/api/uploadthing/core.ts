@@ -3,7 +3,7 @@ import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { AssignmentSubmissionStatus, UserRole } from "@prisma/client";
+import { AssignmentSubmissionStatus, UserRole } from "@/lib/generated/prisma";
 
 const f = createUploadthing();
 
@@ -86,6 +86,26 @@ export const ourFileRouter = {
         fileUrl: file.ufsUrl,
       };
     }),
+  courseImageUpload: f({ image: { maxFileSize: "8MB", maxFileCount: 1 } })
+    .input(z.object({ courseId: z.string().cuid() }))
+    .middleware(async ({ input }) => {
+      const session = await auth();
+      if (!session?.user?.id) throw new UploadThingError("Unauthorized");
+      const role = (session.user as { role?: UserRole }).role;
+      const allowedRoles: string[] = [UserRole.TUTOR, UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.INSTRUCTOR, UserRole.ADMIN_STAFF];
+      if (!role || !allowedRoles.includes(role)) {
+        throw new UploadThingError("Unauthorized");
+      }
+      return { userId: session.user.id, courseId: input.courseId };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      await prisma.tutorCourse.updateMany({
+        where: { id: metadata.courseId, tutorId: metadata.userId },
+        data: { coverImage: file.ufsUrl },
+      });
+      return { fileUrl: file.ufsUrl };
+    }),
+
   presentationUpload: f({
     pdf: { maxFileSize: "32MB", maxFileCount: 1 },
     image: { maxFileSize: "16MB", maxFileCount: 1 },
@@ -102,13 +122,8 @@ export const ourFileRouter = {
       const session = await auth();
       const userRole = (session?.user as { role?: UserRole } | undefined)?.role;
 
-      if (
-        !session?.user ||
-        !session.user.id ||
-        ![UserRole.TUTOR, UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.INSTRUCTOR, UserRole.ADMIN_STAFF].includes(
-          userRole as UserRole,
-        )
-      ) {
+      const allowedRoles: string[] = [UserRole.TUTOR, UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.INSTRUCTOR, UserRole.ADMIN_STAFF];
+      if (!session?.user || !session.user.id || !userRole || !allowedRoles.includes(userRole)) {
         throw new UploadThingError("Unauthorized");
       }
 
@@ -118,23 +133,7 @@ export const ourFileRouter = {
         ...input,
       };
     })
-    .onUploadComplete(async ({ metadata, file }) => {
-      if (metadata.lessonId) {
-        await prisma.lesson.update({
-          where: { id: metadata.lessonId },
-          data: {
-            presentationUrl: file.ufsUrl,
-            presentationKey: file.key,
-            presentationName: file.name,
-            presentationType: file.type,
-            presentationSize: file.size,
-            studyNotes: metadata.title
-              ? `Uploaded for ${metadata.title}`
-              : null,
-          },
-        });
-      }
-
+    .onUploadComplete(async ({ file }) => {
       return {
         fileUrl: file.ufsUrl,
         fileKey: file.key,

@@ -1,4 +1,4 @@
-import { EnrollmentStatus, OnboardingStatus, PaymentStatus, UserRole } from "@prisma/client";
+import { EnrollmentStatus, OnboardingStatus, PaymentStatus, UserRole } from "@/lib/generated/prisma";
 import { prisma } from "@/lib/prisma";
 import { getEnrollmentCompletionSnapshot } from "@/lib/services/certificates";
 

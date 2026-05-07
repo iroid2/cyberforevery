@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { AssignmentSubmissionStatus, AssignmentStatus, UserRole } from "@prisma/client";
+import { AssignmentSubmissionStatus, AssignmentStatus, UserRole } from "@/lib/generated/prisma";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 

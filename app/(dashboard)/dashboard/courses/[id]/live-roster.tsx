@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { CheckCircle2, Clock3, RefreshCw, Users } from "lucide-react";
 
@@ -112,9 +113,10 @@ export function LiveRoster({
           {students.map((student) => {
             const hasSubmitted = Boolean(student.submission);
             return (
-              <div
+              <Link
                 key={student.id}
-                className="flex items-start justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4"
+                href={`/dashboard/courses/${courseId}/students/${student.id}`}
+                className="flex items-start justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 transition-colors hover:border-emerald-200 hover:bg-emerald-50/40"
               >
                 <div className="min-w-0">
                   <p className="font-semibold text-slate-900">{student.name}</p>
@@ -137,7 +139,7 @@ export function LiveRoster({
                   )}
                   {hasSubmitted ? "Submitted" : "In class"}
                 </span>
-              </div>
+              </Link>
             );
           })}
         </div>

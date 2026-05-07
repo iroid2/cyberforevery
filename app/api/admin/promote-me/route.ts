@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@/lib/generated/prisma";
 import { auth } from "@/auth";
 import { issuePasswordSetupToken } from "@/lib/account-setup";
 import { sendAdminPromotionEmail } from "@/lib/emails/actions";

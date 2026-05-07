@@ -80,47 +80,35 @@ export async function createCourseBundle(payload: {
     throw new Error("Course title and subject are required");
   }
 
-  const course = await prisma.$transaction(async (tx) => {
-    const createdCourse = await tx.tutorCourse.create({
+  // Sequential inserts over HTTP — avoids the WebSocket transaction that
+  // breaks with bufferutil on serverless (poolQueryViaFetch only covers
+  // pool.query(), not pool.connect()-based interactive transactions).
+  const course = await prisma.tutorCourse.create({
+    data: { title, subject, tutorId, isLive: false },
+  });
+
+  for (const [index, lesson] of (payload.lessons ?? []).entries()) {
+    await prisma.lesson.create({
       data: {
-        title,
-        subject,
-        tutorId,
-        isLive: false,
+        courseId: course.id,
+        title: lesson.title.trim() || `Lesson ${index + 1}`,
+        content: lesson.description?.trim() || "",
+        order: index + 1,
       },
     });
+  }
 
-    for (const [index, lesson] of (payload.lessons ?? []).entries()) {
-      await tx.lesson.create({
-        data: {
-          courseId: createdCourse.id,
-          title: lesson.title.trim() || `Lesson ${index + 1}`,
-          content: lesson.description?.trim() || "",
-          studyNotes: lesson.description?.trim() || null,
-          presentationUrl: lesson.fileUrl ?? null,
-          presentationKey: lesson.fileKey ?? null,
-          presentationName: lesson.fileName ?? null,
-          presentationType: lesson.fileType ?? null,
-          presentationSize: lesson.fileSize ?? null,
-          order: index + 1,
-        },
-      });
-    }
-
-    for (const [index, question] of (payload.quiz?.questions ?? []).entries()) {
-      await tx.question.create({
-        data: {
-          courseId: createdCourse.id,
-          text: question.text.trim(),
-          options: question.options,
-          correctIndex: question.correctIndex,
-          order: index + 1,
-        },
-      });
-    }
-
-    return createdCourse;
-  });
+  for (const [index, question] of (payload.quiz?.questions ?? []).entries()) {
+    await prisma.question.create({
+      data: {
+        courseId: course.id,
+        text: question.text.trim(),
+        options: question.options,
+        correctIndex: question.correctIndex,
+        order: index + 1,
+      },
+    });
+  }
 
   revalidatePath("/dashboard/courses");
   revalidatePath(`/dashboard/courses/${course.id}`);
@@ -155,6 +143,7 @@ export async function toggleCourseLive(courseId: string) {
 
   revalidatePath(`/dashboard/courses/${courseId}`);
   revalidatePath("/dashboard/courses");
+  revalidatePath("/dashboard/sessions");
 }
 
 export async function deleteCourse(courseId: string) {
@@ -172,15 +161,13 @@ export async function addLesson(courseId: string, formData: FormData) {
   const content = String(formData.get("content") ?? "").trim();
   if (!title || !content) throw new Error("Title and content are required");
 
-  await prisma.$transaction(async (tx) => {
-    const last = await tx.lesson.findFirst({
-      where: { courseId },
-      orderBy: { order: "desc" },
-      select: { order: true },
-    });
-    await tx.lesson.create({
-      data: { title, content, courseId, order: (last?.order ?? 0) + 1 },
-    });
+  const lastLesson = await prisma.lesson.findFirst({
+    where: { courseId },
+    orderBy: { order: "desc" },
+    select: { order: true },
+  });
+  await prisma.lesson.create({
+    data: { title, content, courseId, order: (lastLesson?.order ?? 0) + 1 },
   });
 
   revalidatePath(`/dashboard/courses/${courseId}`);
@@ -205,6 +192,40 @@ export async function deleteLesson(lessonId: string, courseId: string) {
   revalidatePath(`/dashboard/courses/${courseId}`);
 }
 
+export async function updateLessonPresentation(
+  lessonId: string,
+  courseId: string,
+  data: { url: string; key: string; name: string; type: string; size: number }
+) {
+  await requireTutor();
+  await prisma.lesson.update({
+    where: { id: lessonId },
+    data: {
+      presentationUrl: data.url,
+      presentationKey: data.key,
+      presentationName: data.name,
+      presentationType: data.type,
+      presentationSize: data.size,
+    },
+  });
+  revalidatePath(`/dashboard/courses/${courseId}`);
+}
+
+export async function removeLessonPresentation(lessonId: string, courseId: string) {
+  await requireTutor();
+  await prisma.lesson.update({
+    where: { id: lessonId },
+    data: {
+      presentationUrl: null,
+      presentationKey: null,
+      presentationName: null,
+      presentationType: null,
+      presentationSize: null,
+    },
+  });
+  revalidatePath(`/dashboard/courses/${courseId}`);
+}
+
 // ─── QUESTIONS ───────────────────────────────────────────────────────────────
 
 export async function addQuestion(courseId: string, formData: FormData) {
@@ -220,21 +241,19 @@ export async function addQuestion(courseId: string, formData: FormData) {
     throw new Error("All fields are required");
   }
 
-  await prisma.$transaction(async (tx) => {
-    const last = await tx.question.findFirst({
-      where: { courseId },
-      orderBy: { order: "desc" },
-      select: { order: true },
-    });
-    await tx.question.create({
-      data: {
-        text,
-        options: [optionA, optionB, optionC, optionD],
-        correctIndex,
-        courseId,
-        order: (last?.order ?? 0) + 1,
-      },
-    });
+  const lastQuestion = await prisma.question.findFirst({
+    where: { courseId },
+    orderBy: { order: "desc" },
+    select: { order: true },
+  });
+  await prisma.question.create({
+    data: {
+      text,
+      options: [optionA, optionB, optionC, optionD],
+      correctIndex,
+      courseId,
+      order: (lastQuestion?.order ?? 0) + 1,
+    },
   });
 
   revalidatePath(`/dashboard/courses/${courseId}`);
@@ -279,7 +298,7 @@ export async function getCourseForManage(courseId: string) {
       },
       students: {
         orderBy: { joinedAt: "desc" },
-        include: { submission: true },
+        // submission removed - submissions now tied to session instances
       },
       _count: { select: { students: true } },
     },

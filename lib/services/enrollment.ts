@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { EnrollmentStatus, PaymentStatus, Prisma, UserRole } from "@prisma/client";
+import { EnrollmentStatus, PaymentStatus, Prisma, UserRole } from "@/lib/generated/prisma";
 import { sendAdminEnrollmentNotification, sendOnboardingFlow } from "@/lib/emails/actions";
 import { issuePasswordSetupToken } from "@/lib/account-setup";
 import { enrollmentSchema, type EnrollmentInput } from "@/lib/validation/enrollment";

@@ -10,6 +10,7 @@ import {
   PlusSquare,
   FileQuestion,
   Shield,
+  Radio,
 } from "lucide-react";
 
 export enum UserRoleType {
@@ -43,6 +44,16 @@ export const routes: Route[] = [
     group: "Overview",
   },
 
+  // ─── LIVE SESSIONS ──────────────────────────────────────────
+  {
+    title: "Live Sessions",
+    href: "/dashboard/sessions",
+    icon: Radio,
+    roles: [UserRoleType.TUTOR],
+    group: "Courses",
+    isNew: true,
+  },
+
   // ─── COURSE MANAGEMENT ──────────────────────────────────────
   {
     title: "My Courses",
@@ -51,9 +62,9 @@ export const routes: Route[] = [
     roles: [UserRoleType.TUTOR],
     group: "Courses",
     subLinks: [
-      { title: "Create New Course", href: "/dashboard/courses/new" },
-      { title: "Live Courses", href: "/dashboard/courses?filter=live" },
-      { title: "Inactive Courses", href: "/dashboard/courses?filter=inactive" },
+      { title: "Course List", href: "/dashboard/courses" },
+      { title: "All Sessions", href: "/dashboard/sessions" },
+      { title: "Create Course", href: "/dashboard/courses/new" },
     ],
   },
   {

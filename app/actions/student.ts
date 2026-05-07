@@ -35,6 +35,19 @@ export async function joinCourse(courseId: string, formData: FormData) {
     data: { name, courseId },
   });
 
+  // Record attendance for the active session (if any)
+  const activeSession = await prisma.sessionInstance.findFirst({
+    where: { courseId, status: "LIVE" },
+  });
+
+  if (activeSession) {
+    await prisma.sessionInstanceAttendance.upsert({
+      where: { sessionId_studentId: { sessionId: activeSession.id, studentId: student.id } },
+      update: { attended: true },
+      create: { sessionId: activeSession.id, studentId: student.id, attended: true },
+    });
+  }
+
   const jar = await cookies();
   jar.set(`student_${courseId}`, student.id, {
     httpOnly: true,
@@ -47,50 +60,110 @@ export async function joinCourse(courseId: string, formData: FormData) {
 }
 
 export async function getCourseForLearn(courseId: string, studentId: string) {
-  const [course, student] = await Promise.all([
-    prisma.tutorCourse.findFirst({
-      where: { id: courseId, isLive: true },
-      include: {
-        lessons: { orderBy: { order: "asc" } },
-        questions: {
-          orderBy: { order: "asc" },
-          select: {
-            id: true,
-            text: true,
-            options: true,
-            order: true,
-          },
-        },
-        sessionQuestions: {
-          orderBy: { createdAt: "desc" },
-          take: 12,
-          select: {
-            id: true,
-            text: true,
-            resolved: true,
-            createdAt: true,
-            student: { select: { name: true } },
-          },
+  // Sequential queries — concurrent pool.query() calls can race on Neon HTTP pooler
+  const course = await prisma.tutorCourse.findFirst({
+    where: { id: courseId, isLive: true },
+    include: {
+      lessons: { orderBy: { order: "asc" } },
+      questions: {
+        orderBy: { order: "asc" },
+        select: {
+          id: true,
+          text: true,
+          options: true,
+          order: true,
         },
       },
-    }),
-    prisma.courseStudent.findFirst({
-      where: { id: studentId, courseId },
-      include: { submission: true },
-    }),
-  ]);
+      sessionQuestions: {
+        orderBy: { createdAt: "desc" },
+        take: 12,
+        select: {
+          id: true,
+          text: true,
+          resolved: true,
+          createdAt: true,
+          student: { select: { name: true } },
+        },
+      },
+    },
+  });
+
+  const student = await prisma.courseStudent.findFirst({
+    where: { id: studentId, courseId },
+  });
+
+  // Record attendance if there's an active LIVE session and not yet attended
+  if (course && student) {
+    const activeSession = await prisma.sessionInstance.findFirst({
+      where: { courseId, status: "LIVE" },
+    });
+
+    if (activeSession) {
+      await prisma.sessionInstanceAttendance.upsert({
+        where: {
+          sessionId_studentId: {
+            sessionId: activeSession.id,
+            studentId: student.id,
+          },
+        },
+        update: { attended: true },
+        create: {
+          sessionId: activeSession.id,
+          studentId: student.id,
+          attended: true,
+        },
+      });
+    }
+  }
+
   return { course, student };
 }
 
 export async function submitQuiz(
   courseId: string,
   studentId: string,
-  answers: Record<string, number>
+  answers: Record<string, number>,
+  timeSpentSeconds?: number,
+  sessionInstanceId?: string
 ) {
-  const existing = await prisma.submission.findUnique({
-    where: { studentId },
-  });
-  if (existing) return existing.id;
+  // Prevent duplicate submissions for the same session
+  if (sessionInstanceId) {
+    const existing = await prisma.submission.findFirst({
+      where: { studentId, sessionInstanceId },
+    });
+    if (existing) {
+      // Optionally update timeSpentSeconds if missing
+      if (
+        typeof timeSpentSeconds === "number" &&
+        Number.isFinite(timeSpentSeconds) &&
+        existing.timeSpentSeconds == null
+      ) {
+        await prisma.submission.update({
+          where: { id: existing.id },
+          data: { timeSpentSeconds: Math.max(0, Math.floor(timeSpentSeconds)) },
+        });
+      }
+      return existing.id;
+    }
+  } else {
+    // Legacy fallback: one submission per student total
+    const existing = await prisma.submission.findUnique({
+      where: { studentId },
+    });
+    if (existing) {
+      if (
+        typeof timeSpentSeconds === "number" &&
+        Number.isFinite(timeSpentSeconds) &&
+        existing.timeSpentSeconds == null
+      ) {
+        await prisma.submission.update({
+          where: { id: existing.id },
+          data: { timeSpentSeconds: Math.max(0, Math.floor(timeSpentSeconds)) },
+        });
+      }
+      return existing.id;
+    }
+  }
 
   const questions = await prisma.question.findMany({
     where: { courseId },
@@ -109,26 +182,52 @@ export async function submitQuiz(
     data: {
       studentId,
       courseId,
+      sessionInstanceId: sessionInstanceId ?? null,
       score,
       totalQuestions: questions.length,
-      answers: { create: answerRows },
+      timeSpentSeconds:
+        typeof timeSpentSeconds === "number" && Number.isFinite(timeSpentSeconds)
+          ? Math.max(0, Math.floor(timeSpentSeconds))
+          : null,
     },
   });
+
+  // Create answer records
+  for (const row of answerRows) {
+    await prisma.answer.create({
+      data: {
+        submissionId: submission.id,
+        questionId: row.questionId,
+        selectedIndex: row.selectedIndex,
+        isCorrect: row.isCorrect,
+      },
+    });
+  }
 
   return submission.id;
 }
 
 export async function getStudentResult(submissionId: string, courseId: string) {
-  return prisma.submission.findFirst({
+  const result = await prisma.submission.findFirst({
     where: { id: submissionId, courseId },
     include: {
       student: { select: { name: true } },
       answers: {
         include: {
-          question: { select: { text: true, options: true, correctIndex: true } },
+          // Fetch order field so we can sort in JS — avoids relational orderBy
+          // which can trigger a complex query path on Neon serverless.
+          question: {
+            select: { text: true, options: true, correctIndex: true, order: true },
+          },
         },
-        orderBy: { question: { order: "asc" } },
       },
     },
   });
+
+  if (!result) return null;
+
+  // Sort by question.order in JavaScript instead of SQL JOIN-order
+  result.answers.sort((a, b) => a.question.order - b.question.order);
+
+  return result;
 }

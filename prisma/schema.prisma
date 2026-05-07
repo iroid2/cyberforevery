@@ -285,20 +285,84 @@ model Certificate {
 
 // ─── TUTOR COURSE PLATFORM ──────────────────────────────────────────────────
 
+enum SessionStatus {
+  SCHEDULED
+  LIVE
+  COMPLETED
+}
+
+enum CertificateRequestStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
 model TutorCourse {
-  id        String          @id @default(cuid())
-  title     String
-  subject   String
-  isLive    Boolean         @default(false)
-  tutorId   String
-  tutor     User            @relation("TutorCourses", fields: [tutorId], references: [id])
-  students  CourseStudent[]
-  lessons   Lesson[]
-  questions Question[]
+  id         String          @id @default(cuid())
+  title      String
+  subject    String
+  coverImage String?
+  isLive     Boolean         @default(false)
+  tutorId    String
+  tutor      User            @relation("TutorCourses", fields: [tutorId], references: [id])
+  students   CourseStudent[]
+  lessons    Lesson[]
+  questions  Question[]
   submissions Submission[]
   sessionQuestions SessionQuestion[]
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+  sessions    SessionInstance[]
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+}
+
+model SessionInstance {
+  id              String            @id @default(cuid())
+  courseId        String
+  course          TutorCourse       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  date            DateTime
+  startTime       DateTime?
+  endTime         DateTime?
+  durationSeconds Int?              @default(0)
+  status          SessionStatus     @default(SCHEDULED)
+  remarks         String?           @db.Text
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  attendance      SessionInstanceAttendance[]
+  submissions     Submission[]
+
+  @@unique([courseId, date])
+  @@index([date])
+  @@index([status])
+}
+
+model SessionInstanceAttendance {
+  id         String           @id @default(cuid())
+  sessionId  String
+  studentId  String
+  session    SessionInstance  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  student    CourseStudent    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  attended   Boolean          @default(false)
+  remarks    String?          @db.Text
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@unique([sessionId, studentId])
+}
+
+model CertificateRequest {
+  id               String                @id @default(cuid())
+  submissionId     String                @unique
+  submission       Submission            @relation(fields: [submissionId], references: [id])
+  studentId        String
+  student          CourseStudent         @relation(fields: [studentId], references: [id])
+  sessionId        String
+  courseId         String
+  email            String
+  verificationCode String                @unique
+  status           CertificateRequestStatus @default(PENDING)
+  sentAt           DateTime?
+  createdAt        DateTime              @default(now())
 }
 
 // Live tutoring sessions with integrated quizzes
@@ -410,21 +474,29 @@ model CourseStudent {
   name       String
   courseId   String
   course     TutorCourse  @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  submission Submission?
+  attendance SessionInstanceAttendance[]
+  submissions Submission[]
+  certificates CertificateRequest[]
   sessionQuestions SessionQuestion[]
   joinedAt   DateTime     @default(now())
 }
 
 model Submission {
-  id             String        @id @default(cuid())
-  studentId      String        @unique
-  student        CourseStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  courseId       String
-  course         TutorCourse   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  score          Int
-  totalQuestions Int
-  submittedAt    DateTime      @default(now())
-  answers        Answer[]
+  id               String            @id @default(cuid())
+  studentId        String
+  student          CourseStudent     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  courseId         String
+  course           TutorCourse       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  sessionInstanceId String?
+  sessionInstance   SessionInstance? @relation(fields: [sessionInstanceId], references: [id])
+  score            Int
+  totalQuestions   Int
+  timeSpentSeconds Int?
+  submittedAt      DateTime          @default(now())
+  answers          Answer[]
+  certificateRequest CertificateRequest?
+
+  @@unique([studentId, sessionInstanceId])
 }
 
 model Answer {
