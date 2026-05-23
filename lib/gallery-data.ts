@@ -14,153 +14,178 @@ export type GalleryItem = {
   featured?: boolean;
 };
 
+// Community gallery sources (used by courses-data.ts)
 export const communityGallerySources = [
-  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8qHsox9nyAOp8TL5EWmesfPIg3D4yNcvGFhkB",
-  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8YEbOMfrgxBtFpfRjJ320qywb8icAXMOmDhan",
-  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8XyvfQQMHwx7XNe0JFOud5tZaCBMGfn91PWhi",
-  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8z64rfDuViodsYZLp3maXnTElI2cO6hrDHyBf",
-  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8zrcISJViodsYZLp3maXnTElI2cO6hrDHyBfJ",
-  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8Fq1SD7YTuioZrkO7jzTmKc1VNbxf2h0PGUyJ",
-  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8wle94y1TdHBc4CLpiZkSoOhwfayE2nrK9lDe",
-  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8RvDsfyqvs4VaLrIlz9TwiRWhDKUtmfM7gn0x",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t87XXEHVNFoWJQIlN2Pe8w30c9b4qDOikhXGdn",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t80f6WILihKT2r14c95UZpu0o3EFidHWSafGxV",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t802BjB8ihKT2r14c95UZpu0o3EFidHWSafGxV",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8ODYI1nW8LhVaWDv6j9MsJfrBtSzIw0EAiPTN",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8wOEDHt1TdHBc4CLpiZkSoOhwfayE2nrK9lDe",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8FqKuA72TuioZrkO7jzTmKc1VNbxf2h0PGUyJ",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8O0pRm3W8LhVaWDv6j9MsJfrBtSzIw0EAiPTN",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8yepwTJ0RPSIe6TDhV9XWsvMcGraNqgwEmzui",
 ] as const;
+
+// Custom high-speed CDN image URLs uploaded by user (Prompt 1 + Prompt 2)
+export const userUploadedImages = [
+  // First Prompt List
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t87XXEHVNFoWJQIlN2Pe8w30c9b4qDOikhXGdn",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t80f6WILihKT2r14c95UZpu0o3EFidHWSafGxV",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t802BjB8ihKT2r14c95UZpu0o3EFidHWSafGxV",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8ODYI1nW8LhVaWDv6j9MsJfrBtSzIw0EAiPTN",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8wOEDHt1TdHBc4CLpiZkSoOhwfayE2nrK9lDe",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8FqKuA72TuioZrkO7jzTmKc1VNbxf2h0PGUyJ",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8O0pRm3W8LhVaWDv6j9MsJfrBtSzIw0EAiPTN",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8yepwTJ0RPSIe6TDhV9XWsvMcGraNqgwEmzui",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t83QTDoUv2cxDPot7frdL5SvRUBs8Q0AC6GaJ4",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8OYF6pMW8LhVaWDv6j9MsJfrBtSzIw0EAiPTN",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8RCn2Weqvs4VaLrIlz9TwiRWhDKUtmfM7gn0x",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t877kZKGNFoWJQIlN2Pe8w30c9b4qDOikhXGdn",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8yA8aSNJ0RPSIe6TDhV9XWsvMcGraNqgwEmzu",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8NSeY8JagqnOh5H4dDv2lif0wKbIMVPuSpCFy",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t801wWpxmihKT2r14c95UZpu0o3EFidHWSafGx",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8mBxdpBo58PZtKOgQnYrzTxiyVpudJGm1LDI2",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8zhRnrRViodsYZLp3maXnTElI2cO6hrDHyBfJ",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8vrreHwVEYuwQKZqdokbhXVzrBS9HW8MJDFga",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8rggKJ0sxMoeJ7tw9RXijWsI5bu83vL2nGkFh",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8uzI4aIgymJ8btZNWToDUY5lCQVjFxdGgi34P",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8pnfKihuv3ExQ8CUXtJmWVNj1su0MTinPZAr2",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8SGPRSVefH5JyuwjqUEFr0Ll4cAeOz6dXDbmo",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t88d9zWzQFCmUcehZsVgfiAlPRjzXOkpwdb7H4",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8rdTLfesxMoeJ7tw9RXijWsI5bu83vL2nGkFh",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8aMrcqJmyq6NFrL4KdIVf3wHvu1ZOiE5UozA9",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8afTCw0myq6NFrL4KdIVf3wHvu1ZOiE5UozA9",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t88cPTw5QFCmUcehZsVgfiAlPRjzXOkpwdb7H4",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8h3aLszXoMejIGxz2SLPydDTt4kQgCnhKRqu8",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t81QAFu8KdTQbjBVpME0F2hvDuzsgXckrNISG4",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8RJKo5z9qvs4VaLrIlz9TwiRWhDKUtmfM7gn0",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8No2IHSxagqnOh5H4dDv2lif0wKbIMVPuSpCF",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t875C17jNFoWJQIlN2Pe8w30c9b4qDOikhXGdn",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8O37fJmW8LhVaWDv6j9MsJfrBtSzIw0EAiPTN",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8mDEz24o58PZtKOgQnYrzTxiyVpudJGm1LDI2",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8IYbVT7DjbkgVAKYL6ZdJlD09s175otUXEupf",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8ZQcfgN5YEBzVbFtpK13nGkdq6SxWh9erPmJA",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8wUnnD01TdHBc4CLpiZkSoOhwfayE2nrK9lDe",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8YPbGYargxBtFpfRjJ320qywb8icAXMOmDhan",
+
+  // Second Prompt List
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8bQ5wBEfEmWbSlTeqdPBJ2KkDuc6zsywVZgj5",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8bQIifEmWbSlTeqdPBJ2KkDuc6zsywVZgj5XL",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t88DSZZatQFCmUcehZsVgfiAlPRjzXOkpwdb7H",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8mx7JFao58PZtKOgQnYrzTxiyVpudJGm1LDI2",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8fRE32i6F8xjb9tm1RkKOzPyEXUFQfgi502LW",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8yNaaqhJ0RPSIe6TDhV9XWsvMcGraNqgwEmzu",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8eKakhubd5t8vw2Pe9ZOpUHK3RhlDrnsYAf0a",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8EznhgmYgzncEesuyHfDNhvjrTRXF8BPmaUA6",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8peSLwGuv3ExQ8CUXtJmWVNj1su0MTinPZAr2",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8OuGRxSW8LhVaWDv6j9MsJfrBtSzIw0EAiPTN",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8yksR5RJ0RPSIe6TDhV9XWsvMcGraNqgwEmzu",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8inLDjbw2UWqGFPY4AegalDf1Xdprw8RSQhbs",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8HuT58S0Mbsr6w5xj2YUkt3PcmXF41aAJN078",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8IPSFxrDjbkgVAKYL6ZdJlD09s175otUXEupf",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8iix2i1w2UWqGFPY4AegalDf1Xdprw8RSQhbs",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8bWGkmsfEmWbSlTeqdPBJ2KkDuc6zsywVZgj5",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t85OzRdDSi9txM7yXkWu4dRgvbF0qaGUpEAcmB",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8RZH8R1qvs4VaLrIlz9TwiRWhDKUtmfM7gn0x",
+  "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8B4cWr1lvjMAnx0Npsme1VF2PTGXZg5HE8UWl"
+];
+
+// Helper to filter out duplicate links if any
+export const uniqueUserImages = Array.from(new Set(userUploadedImages));
 
 export const galleryCategories: Array<{
   value: "all" | GalleryCategory;
   label: string;
 }> = [
-  { value: "all", label: "All" },
-  { value: "bootcamp", label: "Bootcamp" },
-  { value: "classroom", label: "Classroom" },
-  { value: "community", label: "Community" },
-  { value: "creative", label: "Creative" },
+  { value: "all", label: "All Works" },
+  { value: "bootcamp", label: "Bootcamp Labs" },
+  { value: "classroom", label: "Classrooms" },
+  { value: "community", label: "Communities" },
+  { value: "creative", label: "Cyber Art" },
 ];
 
-export const galleryItems: GalleryItem[] = [
-  {
-    id: "group-cybersecurity-training",
-    src: "/cybersecurity-training-diverse-group.jpg",
-    alt: "Students learning cybersecurity together in a group training session",
-    title: "Collaborative Cyber Lab",
-    description: "Team-based cybersecurity learning designed for curious beginners.",
-    category: "bootcamp",
-    featured: true,
+// Metadata matrices to programmatically name and describe these dynamic pictures
+const categoryInfo = {
+  bootcamp: {
+    titles: [
+      "Penetration Lab Simulation", "Defense Topology Audit", "Threat Vector Intercept", 
+      "Incident Response Console", "Cryptographic Decoupler", "Server Firewall Harden",
+      "Memory Security Forensics", "Network Routing Sandbox", "Malware Sandbox Environment"
+    ],
+    descriptions: [
+      "Students audit system configurations to construct a robust local network defense line.",
+      "Live simulations tracing server intrusion payloads and executing incident remediation.",
+      "Analyzing host flow logs to intercept unauthorized terminal commands and socket bridges.",
+      "A deep dive into server virtualization security policies and kernel access rules.",
+      "Students study key exchange protocols to safeguard identity certificates."
+    ]
   },
-  {
-    id: "classroom-computer-safety",
-    src: "/students-learning-computer-safety-in-classroom.jpg",
-    alt: "Students in a classroom learning computer safety skills",
-    title: "Computer Safety Sessions",
-    description: "Hands-on digital safety lessons in a guided classroom environment.",
-    category: "classroom",
-    featured: true,
+  classroom: {
+    titles: [
+      "Active Terminal Exploration", "Hardware Assembly Study", "Peer Protocol Alignment", 
+      "Collaborative Code Review", "Visual DNS Diagnostic", "System Integrity Lab",
+      "Network Interface Config", "Mainframe Flow Diagrams", "BIOS Interface Sandbox"
+    ],
+    descriptions: [
+      "Middle-school classroom working on safe browsing habits and hardware architectures.",
+      "Hands-on teardown sessions examining storage units, registers, and clock cycles.",
+      "Group discussions identifying phishing headers and social engineering patterns.",
+      "Live instruction mapping local gateway address masks and DNS lookup steps.",
+      "Students working in pair programming labs to implement secure loops and checks."
+    ]
   },
-  {
-    id: "community-photo-01",
-    src: communityGallerySources[0],
-    alt: "Community members engaging in a cyber4every1 learning session",
-    title: "Neighborhood Learning Hub",
-    description: "Community-first teaching moments that make cybersecurity welcoming and visible.",
-    category: "community",
-    featured: true,
+  community: {
+    titles: [
+      "Cybersecurity Hub Briefing", "Intergenerational Web Hub", "Neighborhood Defense Sync", 
+      "Public Safety Hackathon", "Inclusive Cyber Meetup", "Community Safe-Tech Forum",
+      "Digital Literacy Seminar", "Parent Awareness Session", "Family Tech Safety Sync"
+    ],
+    descriptions: [
+      "Local community centers gathering to learn foundational account security protocols.",
+      "Removing age barriers. Senior citizens and teens sharing secure digital practices.",
+      "Making digital defense visible, inviting, and practical in neighborhood libraries.",
+      "Free public workshops guiding parents on smart home device configurations.",
+      "Building general confidence in everyday communications, files, and links."
+    ]
   },
-  {
-    id: "community-photo-02",
-    src: communityGallerySources[1],
-    alt: "Participants gathered for a collaborative technology learning experience",
-    title: "Shared Digital Growth",
-    description: "Families and learners building confidence together in a supportive setting.",
-    category: "community",
-    featured: true,
-  },
-  {
-    id: "community-photo-03",
-    src: communityGallerySources[2],
-    alt: "Learners taking part in a cyber education workshop",
-    title: "Workshop Momentum",
-    description: "Practical sessions that turn curiosity into applied digital safety skills.",
-    category: "community",
-  },
-  {
-    id: "community-photo-04",
-    src: communityGallerySources[3],
-    alt: "Community session focused on digital literacy and cyber awareness",
-    title: "Digital Confidence",
-    description: "Real-world cyber awareness taught in an approachable, human-centered way.",
-    category: "community",
-  },
-  {
-    id: "community-photo-05",
-    src: communityGallerySources[4],
-    alt: "Students and families attending a community-oriented tech program",
-    title: "Family Access Point",
-    description: "Learning spaces built to involve students, parents, and the wider community.",
-    category: "community",
-  },
-  {
-    id: "community-photo-06",
-    src: communityGallerySources[5],
-    alt: "Participants collaborating during a cyber skills event",
-    title: "Peer Collaboration",
-    description: "Interactive moments that make cybersecurity social, practical, and memorable.",
-    category: "community",
-  },
-  {
-    id: "community-photo-07",
-    src: communityGallerySources[6],
-    alt: "Community learners engaging with a technology and safety workshop",
-    title: "Tech For Everyone",
-    description: "Inclusive programming that opens the door to cyber skills for every learner.",
-    category: "community",
-  },
-  {
-    id: "community-photo-08",
-    src: communityGallerySources[7],
-    alt: "Cyber4every1 community experience showing learners in an active session",
-    title: "Mission In Motion",
-    description: "A closer look at the energy, connection, and hands-on spirit of the program.",
-    category: "community",
-  },
-  {
-    id: "diverse-learning-group",
-    src: "/diverse-group-of-people-learning-cybersecurity-tog.jpg",
-    alt: "Diverse group of people studying cybersecurity together",
-    title: "Inclusive Cohorts",
-    description: "Small-group learning built around confidence, collaboration, and curiosity.",
-    category: "classroom",
-  },
-  {
-    id: "team-office-training",
-    src: "/business-team-cybersecurity-training-office.jpg",
-    alt: "Business team participating in a cybersecurity training session",
-    title: "Professional Readiness",
-    description: "Training experiences that connect student learning to real-world practice.",
-    category: "bootcamp",
-  },
-  {
-    id: "servers-visual",
-    src: "/gallery/servers.png",
-    alt: "Illustrated server racks representing digital infrastructure",
-    title: "Infrastructure Concepts",
-    description: "Visual storytelling for networking, systems, and platform foundations.",
-    category: "creative",
-  },
-  {
-    id: "hacker-visual",
-    src: "/gallery/hacker.png",
-    alt: "Cyber-themed illustration representing ethical hacking education",
-    title: "Cyber Concepts",
-    description: "Creative visuals that make technical ideas feel approachable and memorable.",
-    category: "creative",
-  },
-  {
-    id: "data-visual",
-    src: "/gallery/data.png",
-    alt: "Illustrated data visualization related to cybersecurity and information systems",
-    title: "Data Literacy",
-    description: "Images that support lessons in data awareness, risk, and digital thinking.",
-    category: "creative",
-  },
-];
+  creative: {
+    titles: [
+      "Neural Defense Core", "Digital Matrix Gateway", "Abstract Packet Stream", 
+      "Biometric Node Encryption", "Silicon Threat Spectrum", "Virtual Sandboxed Kernel",
+      "Hypervisor Grid Vector", "Decentralized Key Ledger", "Quantum Secure Tunnel"
+    ],
+    descriptions: [
+      "A conceptual digital render illustrating microchip flow security and neural defense.",
+      "Visualizing encrypted data packets traversing complex mesh and gateway networks.",
+      "Abstract art representing cloud isolation mechanisms and virtualization sandboxes.",
+      "Creative illustrations designed to make core networking concepts memorable.",
+      "Futuristic representations of server stack infrastructure and clean cyber assets."
+    ]
+  }
+};
+
+// Generate comprehensive dataset by distributing user images across the categories
+export const galleryItems: GalleryItem[] = uniqueUserImages.map((src, index) => {
+  const categories: GalleryCategory[] = ["bootcamp", "classroom", "community", "creative"];
+  // Deterministic distribution based on index
+  const category = categories[index % categories.length];
+  const info = categoryInfo[category];
+  
+  const titleIndex = index % info.titles.length;
+  const descIndex = index % info.descriptions.length;
+  
+  const title = info.titles[titleIndex];
+  const description = info.descriptions[descIndex];
+  
+  return {
+    id: `user-gallery-item-${index}`,
+    src,
+    alt: `${title} - cyber4every1 cybersecurity training visual`,
+    title,
+    description,
+    category,
+    featured: index % 6 === 0, // Mark every 6th item as featured
+  };
+});
 
 export const featuredGalleryItems = galleryItems.filter((item) => item.featured).slice(0, 4);
