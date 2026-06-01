@@ -5,101 +5,123 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
 const heroSlides = [
+  // {
+  //   image: "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t87XXEHVNFoWJQIlN2Pe8w30c9b4qDOikhXGdn",
+  //   alt: "Students learning computer safety together in a classroom bootcamp setting",
+  //   tag: "// TRACK_ACTIVE: CYBER_BASICS",
+  //   title: "Cyber Foundations",
+  //   subtitle: "Digital Safety & System Security",
+  //   description: "Students build solid confidence with critical digital safety principles, password protocols, identity protection, and hands-on laboratory setup for absolute beginners.",
+  // },
   {
-    image: "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t87XXEHVNFoWJQIlN2Pe8w30c9b4qDOikhXGdn",
-    alt: "Students learning computer safety together in a classroom bootcamp setting",
-    tag: "// TRACK_ACTIVE: CYBER_BASICS",
-    title: "Cyber Foundations",
-    subtitle: "Digital Safety & System Security",
-    description: "Students build solid confidence with critical digital safety principles, password protocols, identity protection, and hands-on laboratory setup for absolute beginners.",
-  },
-  {
-    image: "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t80f6WILihKT2r14c95UZpu0o3EFidHWSafGxV",
+    image:
+      "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t80f6WILihKT2r14c95UZpu0o3EFidHWSafGxV",
     alt: "Diverse group of students participating in cybersecurity bootcamp training",
     tag: "// TRACK_ACTIVE: TEAM_DEFENSE",
     title: "Collaborative Labs",
     subtitle: "Active Threat Hunting Missions",
-    description: "Hands-on threat hunting and network defense challenges sharpen critical thinking, team-led response operations, and real-world system forensics.",
+    description:
+      "Hands-on threat hunting and network defense challenges sharpen critical thinking, team-led response operations, and real-world system forensics.",
   },
+  // {
+  //   image:
+  //     "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t802BjB8ihKT2r14c95UZpu0o3EFidHWSafGxV",
+  //   alt: "Young builders working together on coding and secure systems development",
+  //   tag: "// TRACK_ACTIVE: FUTURE_BUILDERS",
+  //   title: "Next-Gen Talent",
+  //   subtitle: "Secure Coding & Creative Tech",
+  //   description:
+  //     "Young builders explore the foundations of secure systems, clean code architecture, data privacy, and technical creativity in a single comprehensive path.",
+  // },
   {
-    image: "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t802BjB8ihKT2r14c95UZpu0o3EFidHWSafGxV",
-    alt: "Young builders working together on coding and secure systems development",
-    tag: "// TRACK_ACTIVE: FUTURE_BUILDERS",
-    title: "Next-Gen Talent",
-    subtitle: "Secure Coding & Creative Tech",
-    description: "Young builders explore the foundations of secure systems, clean code architecture, data privacy, and technical creativity in a single comprehensive path.",
-  },
-  {
-    image: "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8ODYI1nW8LhVaWDv6j9MsJfrBtSzIw0EAiPTN",
+    image:
+      "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8ODYI1nW8LhVaWDv6j9MsJfrBtSzIw0EAiPTN",
     alt: "Students learning about artificial intelligence and ethical model usage",
     tag: "// TRACK_ACTIVE: AI_ETHICS",
     title: "AI & Digital Ethics",
     subtitle: "Responsible AI Engineering",
-    description: "Navigate artificial intelligence safely. Master AI prompt engineering, recognize risks like deepfakes and misinformation, and explore future digital ethics guidelines.",
+    description:
+      "Navigate artificial intelligence safely. Master AI prompt engineering, recognize risks like deepfakes and misinformation, and explore future digital ethics guidelines.",
   },
   {
-    image: "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8wOEDHt1TdHBc4CLpiZkSoOhwfayE2nrK9lDe",
+    image:
+      "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8wOEDHt1TdHBc4CLpiZkSoOhwfayE2nrK9lDe",
     alt: "Cybersecurity class studying network packet flows and forensics",
     tag: "// TRACK_ACTIVE: NET_FORENSICS",
     title: "Network Forensics",
     subtitle: "Analyzing Packets & Flow Paths",
-    description: "Dive deep into how the internet works. Analyze IP addresses, domain name resolution protocols, router topologies, and packet traces under active simulation.",
+    description:
+      "Dive deep into how the internet works. Analyze IP addresses, domain name resolution protocols, router topologies, and packet traces under active simulation.",
   },
   {
-    image: "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8FqKuA72TuioZrkO7jzTmKc1VNbxf2h0PGUyJ",
+    image:
+      "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8FqKuA72TuioZrkO7jzTmKc1VNbxf2h0PGUyJ",
     alt: "Kids and families practicing safe technology habits at home",
     tag: "// TRACK_ACTIVE: HOME_PROTOCOL",
     title: "Parent-Led Growth",
     subtitle: "Integrated Tech Safety Habits",
-    description: "Bootcamp learnings extend beyond the classroom with direct parent dashboard progress updates, take-home security checklists, and daily digital safety practices.",
+    description:
+      "Bootcamp learnings extend beyond the classroom with direct parent dashboard progress updates, take-home security checklists, and daily digital safety practices.",
   },
   {
-    image: "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8O0pRm3W8LhVaWDv6j9MsJfrBtSzIw0EAiPTN",
+    image:
+      "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8O0pRm3W8LhVaWDv6j9MsJfrBtSzIw0EAiPTN",
     alt: "Students learning ethical hacking and defensive configurations",
     tag: "// TRACK_ACTIVE: ETHICAL_HACKING",
     title: "Ethical Hacking",
     subtitle: "Defensive Security Protocols",
-    description: "Understand the mindset of hackers. Build strong secure layers, test firewalls, run vulnerability scans, and establish solid access permissions.",
+    description:
+      "Understand the mindset of hackers. Build strong secure layers, test firewalls, run vulnerability scans, and establish solid access permissions.",
   },
   {
-    image: "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8yepwTJ0RPSIe6TDhV9XWsvMcGraNqgwEmzui",
+    image:
+      "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8yepwTJ0RPSIe6TDhV9XWsvMcGraNqgwEmzui",
     alt: "Web development and secure portal workspace",
     tag: "// TRACK_ACTIVE: SECURE_WEB",
     title: "Secure Web Dev",
     subtitle: "Building Protected Platforms",
-    description: "Discover how to code secure web pages. Implement encryption APIs, defend against malicious scripts, and understand structure standards from the ground up.",
+    description:
+      "Discover how to code secure web pages. Implement encryption APIs, defend against malicious scripts, and understand structure standards from the ground up.",
   },
   {
-    image: "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8bQ5wBEfEmWbSlTeqdPBJ2KkDuc6zsywVZgj5",
+    image:
+      "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8bQ5wBEfEmWbSlTeqdPBJ2KkDuc6zsywVZgj5",
     alt: "Students working on server environment hardening configurations",
     tag: "// TRACK_ACTIVE: SERVER_HARDENING",
     title: "Server Hardening",
     subtitle: "System Vulnerability Shields",
-    description: "Construct impenetrable server walls. Harden local systems, audit kernel policies, regulate guest permissions, and simulate active attack logs.",
+    description:
+      "Construct impenetrable server walls. Harden local systems, audit kernel policies, regulate guest permissions, and simulate active attack logs.",
   },
   {
-    image: "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8bQIifEmWbSlTeqdPBJ2KkDuc6zsywVZgj5XL",
+    image:
+      "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8bQIifEmWbSlTeqdPBJ2KkDuc6zsywVZgj5XL",
     alt: "Diverse group of learners aligning network system architectures",
     tag: "// TRACK_ACTIVE: SYS_TOPOLOGY",
     title: "Network Topologies",
     subtitle: "Mapping Cloud Architecture",
-    description: "Design cloud meshes and physical system models. Map subnet addresses, route gateway switches, and study modern server clustering standards.",
+    description:
+      "Design cloud meshes and physical system models. Map subnet addresses, route gateway switches, and study modern server clustering standards.",
   },
   {
-    image: "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t88DSZZatQFCmUcehZsVgfiAlPRjzXOkpwdb7H",
+    image:
+      "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t88DSZZatQFCmUcehZsVgfiAlPRjzXOkpwdb7H",
     alt: "Secure terminal cryptographic decoding sandbox",
     tag: "// TRACK_ACTIVE: CRYPTOGRAPHY",
     title: "Applied Cryptography",
     subtitle: "Symmetric & Asymmetric Keys",
-    description: "Discover the science of secret messages. Code key generation scripts, inspect SSL/TLS handshakes, and decipher cryptographic blocks.",
+    description:
+      "Discover the science of secret messages. Code key generation scripts, inspect SSL/TLS handshakes, and decipher cryptographic blocks.",
   },
   {
-    image: "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8mx7JFao58PZtKOgQnYrzTxiyVpudJGm1LDI2",
+    image:
+      "https://wfe66b5s5b.ufs.sh/f/eFFUio8bd5t8mx7JFao58PZtKOgQnYrzTxiyVpudJGm1LDI2",
     alt: "Bootcamp students building creative applications and games",
     tag: "// TRACK_ACTIVE: SECURE_PLAYGROUND",
     title: "Interactive Coding",
     subtitle: "Creative Sandboxed Apps",
-    description: "Experience absolute coding freedom in isolated software playgrounds. Build dynamic script projects and run them securely under teacher supervision.",
+    description:
+      "Experience absolute coding freedom in isolated software playgrounds. Build dynamic script projects and run them securely under teacher supervision.",
   },
 ];
 
@@ -137,13 +159,12 @@ export function Hero() {
       <div className="pointer-events-none absolute left-[-10%] top-[-8%] h-[35rem] w-[35rem] rounded-full bg-[#7FFF00]/5 blur-[160px]" />
       <div className="pointer-events-none absolute bottom-[-14%] right-[-10%] h-[30rem] w-[30rem] rounded-full bg-[#7FFF00]/3 blur-[160px]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(127,255,0,0.06),transparent_60%)]" />
-      
+
       {/* Tech Grid Overlay */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:24px_24px]" />
 
       <div className="relative z-10 mx-auto w-full max-w-7xl">
         <div className="grid w-full items-center gap-12 lg:grid-cols-12 lg:gap-16">
-          
           {/* Left Column: Animated Content */}
           <div className="space-y-8 lg:col-span-6 flex flex-col justify-center min-h-[500px]">
             <div className="flex items-center gap-3">
@@ -222,7 +243,6 @@ export function Hero() {
             <div className="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-br from-[#7FFF00]/10 via-transparent to-white/5 blur-3xl opacity-80" />
 
             <div className="relative w-full h-full overflow-hidden rounded-[2rem] border border-white/10 bg-[#0E0E0E] shadow-[0_30px_80px_rgba(0,0,0,0.8)] flex flex-col">
-              
               {/* Screen Top Bar */}
               <div className="flex items-center justify-between border-b border-white/5 bg-[#141414] px-6 py-3">
                 <div className="flex items-center gap-2">
@@ -275,7 +295,9 @@ export function Hero() {
 
                 <div className="absolute right-6 top-6 pointer-events-none hidden md:block">
                   <div className="rounded-xl bg-black/60 px-4 py-3 backdrop-blur-md border border-white/5 text-right font-mono text-[9px] leading-relaxed text-white/40">
-                    <span className="text-[#7FFF00] font-bold">SYSTEM_KERN // OK</span>
+                    <span className="text-[#7FFF00] font-bold">
+                      SYSTEM_KERN // OK
+                    </span>
                     <br />
                     PACKETS_RECEIVED: 9,218
                     <br />
@@ -350,12 +372,9 @@ export function Hero() {
                     </button>
                   </div>
                 </div>
-
               </div>
-
             </div>
           </div>
-
         </div>
       </div>
     </section>
