@@ -198,26 +198,40 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
     }
 
+    const errors: string[] = [];
+
     // Send admin notification to all three recipients
-    await resend.emails.send({
+    const adminRes = await resend.emails.send({
       from: FROM_ADDRESS,
       to: ADMIN_EMAILS,
-      replyTo: email,
+      reply_to: email,
       subject: `New Contact: ${subject} — ${firstName} ${lastName}`,
       html: adminEmailHtml({ firstName, lastName, email, subject, message }),
     });
 
+    if (adminRes.error) {
+      errors.push(`Admin notification: ${adminRes.error.message}`);
+    }
+
     // Send confirmation to the person who submitted
-    await resend.emails.send({
+    const confirmRes = await resend.emails.send({
       from: FROM_ADDRESS,
       to: email,
       subject: `We received your message — Cyber4Every1`,
       html: confirmationEmailHtml({ firstName, subject, message }),
     });
 
+    if (confirmRes.error) {
+      errors.push(`Confirmation email: ${confirmRes.error.message}`);
+    }
+
+    if (errors.length > 0) {
+      return NextResponse.json({ error: errors.join(". ") }, { status: 500 });
+    }
+
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("Contact form error:", err);
-    return NextResponse.json({ error: "Failed to send message. Please try again." }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

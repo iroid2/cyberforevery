@@ -123,10 +123,20 @@ export function LandingPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Something went wrong");
       setFormState("success");
-      setForm({ firstName: "", lastName: "", email: "", subject: "Enrolling my child", message: "" });
+      setForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        subject: "Enrolling my child",
+        message: "",
+      });
     } catch (err: unknown) {
       setFormState("error");
-      setErrorMsg(err instanceof Error ? err.message : "Failed to send. Please try again.");
+      setErrorMsg(
+        err instanceof Error
+          ? err.message
+          : "Failed to send. Please try again.",
+      );
     }
   }
 
@@ -538,7 +548,8 @@ export function LandingPage() {
                 </div>
                 <h3 className="text-xl font-black text-white">Message sent!</h3>
                 <p className="max-w-xs text-sm leading-7 text-[#B4CCB4]">
-                  Thanks for reaching out. We&apos;ll reply within 1–2 business days. Check your inbox for a confirmation email.
+                  Thanks for reaching out. We&apos;ll reply within 1–2 business
+                  days. Check your inbox for a confirmation email.
                 </p>
                 <button
                   type="button"
@@ -629,7 +640,7 @@ export function LandingPage() {
 
             <div className="mt-8 space-y-5">
               {[
-                ["Location", "Kampala, Uganda (Programs Worldwide)"],
+                ["Location", "Chicago, IL (Serving globally)"],
                 ["Email", "ivan@cyberforevery.com"],
                 ["Phone / WhatsApp", "+1 (312) 468-3844"],
               ].map(([label, value]) => (

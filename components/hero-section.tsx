@@ -417,9 +417,9 @@ const AnimatedImagePanel = ({
 
 // ─── Stats ────────────────────────────────────────────────────────────────────
 const stats = [
-  { n: "7.5k+", l: "Total Active Students" },
-  { n: "50+", l: "Available Field Programs" },
-  { n: "10+", l: "Awards Won" },
+  { n: "29+", l: "Total Active Students" },
+  { n: "04", l: "Available Field Programs" },
+
   { n: "3+", l: "Years Running" },
 ];
 
@@ -495,7 +495,6 @@ export default function HeroSlider() {
 
           <div className="relative mx-auto max-w-6xl w-full px-4 sm:px-6 md:px-10 py-8 sm:py-12 md:py-20">
             <div className="hero-two-col">
-
               {/* Image panel — top on mobile (order-first), right on desktop (order-last) */}
               <div className="order-first md:order-last flex-none flex justify-center">
                 <AnimatedImagePanel
@@ -559,7 +558,6 @@ export default function HeroSlider() {
                   {slide.note}
                 </p>
               </div>
-
             </div>
           </div>
 
@@ -571,7 +569,9 @@ export default function HeroSlider() {
                 onClick={() => goTo(i)}
                 aria-label={`Go to slide ${i + 1}`}
                 className={`h-1.5 sm:h-2.5 rounded-full border border-[rgba(127,255,0,0.22)] transition-all duration-300 ${
-                  i === current ? "bg-[#7FFF00] w-5 sm:w-7" : "bg-[#203520] w-1.5 sm:w-2.5"
+                  i === current
+                    ? "bg-[#7FFF00] w-5 sm:w-7"
+                    : "bg-[#203520] w-1.5 sm:w-2.5"
                 }`}
               />
             ))}
