@@ -326,9 +326,9 @@ const AnimatedImagePanel = ({
       />
     </svg>
 
-    {/* Orbit ring — centering wrapper stays still, inner div rotates */}
+    {/* Orbit ring — hidden on mobile, shown on sm+ */}
     <div
-      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+      className="hidden sm:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
       style={{ width: "calc(100% + 64px)", aspectRatio: "1" }}
     >
       <div
@@ -350,9 +350,9 @@ const AnimatedImagePanel = ({
       </div>
     </div>
 
-    {/* Spinning star — top right */}
+    {/* Spinning star — hidden on mobile */}
     <div
-      className="absolute -top-4 -right-4 z-20 pointer-events-none w-7 h-7"
+      className="hidden sm:block absolute -top-4 -right-4 z-20 pointer-events-none w-7 h-7"
       style={{ animation: "heroStarSpin 7s linear infinite" }}
     >
       <svg viewBox="0 0 28 28" fill="none" className="w-full h-full">
@@ -373,7 +373,7 @@ const AnimatedImagePanel = ({
       >
         {/* Card with glow pulse */}
         <div
-          className="relative overflow-hidden rounded-4xl w-45 sm:w-60 md:w-75 lg:w-95"
+          className="relative overflow-hidden rounded-4xl w-44 sm:w-60 md:w-75 lg:w-95"
           style={{ animation: "heroGlowPulse 2s ease-in-out infinite" }}
         >
           {/* Outer lime glow border */}
@@ -490,27 +490,39 @@ export default function HeroSlider() {
         <div className="absolute -bottom-48 -left-24 w-100 h-100 rounded-full bg-[radial-gradient(circle,rgba(127,255,0,0.04)_0%,transparent_65%)] pointer-events-none" />
 
         {/* ── SLIDE AREA ── */}
-        <div className="relative min-h-[calc(100vh-70px)] flex flex-col justify-center">
+        <div className="relative min-h-0 sm:min-h-[calc(100vh-70px)] flex flex-col justify-center">
           <SlideDecos index={current} />
 
-          <div className="relative mx-auto max-w-6xl w-full px-6 sm:px-10 py-12 md:py-20">
-            <div className="flex flex-row items-center justify-between gap-8 md:gap-12">
-              {/* Text content — fades on slide change, always on the left */}
+          <div className="relative mx-auto max-w-6xl w-full px-4 sm:px-6 md:px-10 py-8 sm:py-12 md:py-20">
+            <div className="hero-two-col">
+
+              {/* Image panel — top on mobile (order-first), right on desktop (order-last) */}
+              <div className="order-first md:order-last flex-none flex justify-center">
+                <AnimatedImagePanel
+                  src={slide.image.src}
+                  alt={slide.image.alt}
+                  badge={slide.badge}
+                  slideKey={current}
+                  animating={animating}
+                />
+              </div>
+
+              {/* Text content — fades on slide change */}
               <div
-                className="flex flex-col items-start gap-4 md:gap-5 text-left min-w-0 max-w-130"
+                className="order-last md:order-first w-full md:flex-1 flex flex-col items-center md:items-start gap-3 sm:gap-4 md:gap-5 text-center md:text-left md:max-w-130"
                 style={{
                   transition: "opacity 0.35s ease",
                   opacity: animating ? 0 : 1,
                 }}
               >
                 {/* Session tag */}
-                <span className="inline-flex items-center gap-2 font-mono text-[9px] sm:text-[10px] font-medium tracking-[2px] uppercase text-[#7FFF00] bg-[rgba(127,255,0,0.1)] border border-[rgba(127,255,0,0.22)] px-3 sm:px-4 py-1.5 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#7FFF00] animate-pulse" />
-                  {slide.tag}
+                <span className="inline-flex items-center gap-1.5 sm:gap-2 font-mono text-[8px] sm:text-[10px] font-medium tracking-[1.5px] sm:tracking-[2px] uppercase text-[#7FFF00] bg-[rgba(127,255,0,0.1)] border border-[rgba(127,255,0,0.22)] px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full max-w-[85vw] overflow-hidden">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#7FFF00] animate-pulse shrink-0" />
+                  <span className="truncate">{slide.tag}</span>
                 </span>
 
                 {/* Headline */}
-                <h1 className="font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.08] text-[#EEFFEE]">
+                <h1 className="font-black text-[1.65rem] sm:text-4xl md:text-5xl lg:text-6xl leading-[1.08] text-[#EEFFEE]">
                   {slide.headline.map((line, i) => (
                     <span
                       key={i}
@@ -520,23 +532,23 @@ export default function HeroSlider() {
                   ))}
                 </h1>
 
-                {/* Italic sub — hidden on very small screens to save space */}
+                {/* Italic sub */}
                 <p className="hidden sm:block italic text-[#6A8A6A] text-sm max-w-95 leading-relaxed">
                   {slide.sub}
                 </p>
 
                 {/* CTA buttons */}
-                <div className="flex gap-3 flex-wrap justify-start">
+                <div className="flex gap-2 sm:gap-3 flex-wrap justify-center md:justify-start">
                   <a
                     href={slide.ctaPrimary.href}
-                    className="inline-flex items-center gap-2 font-black text-sm text-[#050D05] bg-[#7FFF00] px-7 py-3.5 rounded-full hover:bg-[#A3FF4D] hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(127,255,0,0.3)] transition-all duration-200"
+                    className="inline-flex items-center gap-2 font-black text-xs sm:text-sm text-[#050D05] bg-[#7FFF00] px-5 sm:px-7 py-2.5 sm:py-3.5 rounded-full hover:bg-[#A3FF4D] hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(127,255,0,0.3)] transition-all duration-200"
                   >
                     {slide.ctaPrimary.label}
                     <span>→</span>
                   </a>
                   <a
                     href={slide.ctaSecondary.href}
-                    className="inline-flex items-center gap-2 font-bold text-sm text-[#7FFF00] border border-[rgba(127,255,0,0.22)] px-7 py-3.5 rounded-full hover:bg-[rgba(127,255,0,0.1)] hover:border-[rgba(127,255,0,0.45)] transition-all duration-200"
+                    className="inline-flex items-center gap-2 font-bold text-xs sm:text-sm text-[#7FFF00] border border-[rgba(127,255,0,0.22)] px-5 sm:px-7 py-2.5 sm:py-3.5 rounded-full hover:bg-[rgba(127,255,0,0.1)] hover:border-[rgba(127,255,0,0.45)] transition-all duration-200"
                   >
                     {slide.ctaSecondary.label}
                   </a>
@@ -548,28 +560,18 @@ export default function HeroSlider() {
                 </p>
               </div>
 
-              {/* Image panel — always on the right */}
-              <div className="flex-none flex justify-center">
-                <AnimatedImagePanel
-                  src={slide.image.src}
-                  alt={slide.image.alt}
-                  badge={slide.badge}
-                  slideKey={current}
-                  animating={animating}
-                />
-              </div>
             </div>
           </div>
 
           {/* Slide dots */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2.5 z-10">
+          <div className="absolute bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2.5 z-10">
             {slides.map((_, i) => (
               <button
                 key={i}
                 onClick={() => goTo(i)}
                 aria-label={`Go to slide ${i + 1}`}
-                className={`h-2.5 rounded-full border border-[rgba(127,255,0,0.22)] transition-all duration-300 ${
-                  i === current ? "bg-[#7FFF00] w-7" : "bg-[#203520] w-2.5"
+                className={`h-1.5 sm:h-2.5 rounded-full border border-[rgba(127,255,0,0.22)] transition-all duration-300 ${
+                  i === current ? "bg-[#7FFF00] w-5 sm:w-7" : "bg-[#203520] w-1.5 sm:w-2.5"
                 }`}
               />
             ))}
@@ -579,14 +581,14 @@ export default function HeroSlider() {
           <button
             onClick={() => goTo(current - 1)}
             aria-label="Previous slide"
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-[#1E301E] border border-[rgba(127,255,0,0.22)] text-[#7FFF00] flex items-center justify-center text-lg hover:bg-[#203520] transition-colors"
+            className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#1E301E] border border-[rgba(127,255,0,0.22)] text-[#7FFF00] flex items-center justify-center text-sm sm:text-lg hover:bg-[#203520] transition-colors"
           >
             ←
           </button>
           <button
             onClick={() => goTo(current + 1)}
             aria-label="Next slide"
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-[#1E301E] border border-[rgba(127,255,0,0.22)] text-[#7FFF00] flex items-center justify-center text-lg hover:bg-[#203520] transition-colors"
+            className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#1E301E] border border-[rgba(127,255,0,0.22)] text-[#7FFF00] flex items-center justify-center text-sm sm:text-lg hover:bg-[#203520] transition-colors"
           >
             →
           </button>

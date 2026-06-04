@@ -92,8 +92,43 @@ const highlights = [
   "Outstanding Graduate Teaching Assistant",
 ];
 
+type FormState = "idle" | "loading" | "success" | "error";
+
 export function LandingPage() {
   const [openFaq, setOpenFaq] = useState(0);
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    subject: "Enrolling my child",
+    message: "",
+  });
+  const [formState, setFormState] = useState<FormState>("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  function updateForm(field: keyof typeof form, value: string) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setFormState("loading");
+    setErrorMsg("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Something went wrong");
+      setFormState("success");
+      setForm({ firstName: "", lastName: "", email: "", subject: "Enrolling my child", message: "" });
+    } catch (err: unknown) {
+      setFormState("error");
+      setErrorMsg(err instanceof Error ? err.message : "Failed to send. Please try again.");
+    }
+  }
 
   return (
     <main className="min-h-screen bg-[#050D05] text-[#EEFFEE] selection:bg-[#7FFF00] selection:text-black">
@@ -496,37 +531,88 @@ export function LandingPage() {
               </p>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <input
-                className="rounded-xl border border-white/10 bg-[#0F1F0F] px-4 py-3 text-sm text-white placeholder:text-white/35 focus:border-[#7FFF00] focus:outline-none"
-                placeholder="First name"
-              />
-              <input
-                className="rounded-xl border border-white/10 bg-[#0F1F0F] px-4 py-3 text-sm text-white placeholder:text-white/35 focus:border-[#7FFF00] focus:outline-none"
-                placeholder="Last name"
-              />
-            </div>
-            <input
-              className="mt-4 w-full rounded-xl border border-white/10 bg-[#0F1F0F] px-4 py-3 text-sm text-white placeholder:text-white/35 focus:border-[#7FFF00] focus:outline-none"
-              placeholder="Email address"
-            />
-            <select className="mt-4 w-full rounded-xl border border-white/10 bg-[#0F1F0F] px-4 py-3 text-sm text-white focus:border-[#7FFF00] focus:outline-none">
-              <option>Enrolling my child</option>
-              <option>Bootcamp for my school</option>
-              <option>Partnership / Sponsorship</option>
-              <option>Media / Press</option>
-              <option>Other</option>
-            </select>
-            <textarea
-              className="mt-4 min-h-36 w-full rounded-xl border border-white/10 bg-[#0F1F0F] px-4 py-3 text-sm text-white placeholder:text-white/35 focus:border-[#7FFF00] focus:outline-none"
-              placeholder="Tell us more about your inquiry..."
-            />
-            <button
-              type="button"
-              className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[#7FFF00] px-6 py-4 text-xs font-bold uppercase tracking-[0.2em] text-black transition hover:scale-[1.01]"
-            >
-              Send Message
-            </button>
+            {formState === "success" ? (
+              <div className="flex flex-col items-center gap-4 rounded-2xl border border-[#7FFF00]/25 bg-[#7FFF00]/8 px-6 py-10 text-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#7FFF00]/30 bg-[#7FFF00]/12 text-2xl">
+                  ✅
+                </div>
+                <h3 className="text-xl font-black text-white">Message sent!</h3>
+                <p className="max-w-xs text-sm leading-7 text-[#B4CCB4]">
+                  Thanks for reaching out. We&apos;ll reply within 1–2 business days. Check your inbox for a confirmation email.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setFormState("idle")}
+                  className="mt-2 rounded-full border border-[#7FFF00]/30 px-6 py-2.5 text-xs font-bold uppercase tracking-[0.18em] text-[#7FFF00] transition hover:bg-[#7FFF00]/10"
+                >
+                  Send another message
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} noValidate>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <input
+                    required
+                    value={form.firstName}
+                    onChange={(e) => updateForm("firstName", e.target.value)}
+                    className="rounded-xl border border-white/10 bg-[#0F1F0F] px-4 py-3 text-sm text-white placeholder:text-white/35 focus:border-[#7FFF00] focus:outline-none"
+                    placeholder="First name"
+                  />
+                  <input
+                    required
+                    value={form.lastName}
+                    onChange={(e) => updateForm("lastName", e.target.value)}
+                    className="rounded-xl border border-white/10 bg-[#0F1F0F] px-4 py-3 text-sm text-white placeholder:text-white/35 focus:border-[#7FFF00] focus:outline-none"
+                    placeholder="Last name"
+                  />
+                </div>
+                <input
+                  required
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => updateForm("email", e.target.value)}
+                  className="mt-4 w-full rounded-xl border border-white/10 bg-[#0F1F0F] px-4 py-3 text-sm text-white placeholder:text-white/35 focus:border-[#7FFF00] focus:outline-none"
+                  placeholder="Email address"
+                />
+                <select
+                  value={form.subject}
+                  onChange={(e) => updateForm("subject", e.target.value)}
+                  className="mt-4 w-full rounded-xl border border-white/10 bg-[#0F1F0F] px-4 py-3 text-sm text-white focus:border-[#7FFF00] focus:outline-none"
+                >
+                  <option>Enrolling my child</option>
+                  <option>Bootcamp for my school</option>
+                  <option>Partnership / Sponsorship</option>
+                  <option>Media / Press</option>
+                  <option>Other</option>
+                </select>
+                <textarea
+                  required
+                  value={form.message}
+                  onChange={(e) => updateForm("message", e.target.value)}
+                  className="mt-4 min-h-36 w-full rounded-xl border border-white/10 bg-[#0F1F0F] px-4 py-3 text-sm text-white placeholder:text-white/35 focus:border-[#7FFF00] focus:outline-none"
+                  placeholder="Tell us more about your inquiry..."
+                />
+                {formState === "error" && (
+                  <p className="mt-3 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-xs text-red-400">
+                    ⚠ {errorMsg}
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  disabled={formState === "loading"}
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#7FFF00] px-6 py-4 text-xs font-bold uppercase tracking-[0.2em] text-black transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {formState === "loading" ? (
+                    <>
+                      <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-black/30 border-t-black" />
+                      Sending…
+                    </>
+                  ) : (
+                    "Send Message →"
+                  )}
+                </button>
+              </form>
+            )}
           </div>
 
           <div className="rounded-[1.75rem] border border-white/10 bg-[#1E301E] p-7 md:p-10">

@@ -109,6 +109,21 @@
   }
 }
 
+/* Hero two-column layout — guarantees flex-row at md+ regardless of JIT scan */
+.hero-two-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+@media (min-width: 48rem) {
+  .hero-two-col {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 3rem;
+  }
+}
+
 @layer utilities {
   .hero-gradient {
     background: radial-gradient(circle at 50% 50%, rgba(191, 255, 0, 0.05) 0%, rgba(19, 19, 19, 1) 70%);
