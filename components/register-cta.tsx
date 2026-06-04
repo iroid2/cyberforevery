@@ -22,7 +22,7 @@ export function RegisterCTA() {
           </Link>
         </div>
         <p className="mt-8 text-muted text-sm uppercase tracking-widest font-bold">
-          Enrollment deadline: June 1, 2026
+          Enrollment is open now - limited seats available
         </p>
       </div>
     </section>

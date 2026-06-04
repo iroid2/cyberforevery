@@ -1,5 +1,5 @@
 import type React from "react";
-import { TopNavBar } from "@/components/top-nav-bar";
+import Navbar from "@/components/top-nav-bar";
 
 export default function FrontLayout({
   children,
@@ -8,7 +8,7 @@ export default function FrontLayout({
 }>) {
   return (
     <>
-      <TopNavBar />
+      <Navbar />
       {children}
     </>
   );

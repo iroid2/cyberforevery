@@ -1,199 +1,229 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
 
-const primaryLinks = [
-  { label: "Bootcamp", href: "/bootcamp" },
-  { label: "Mentors", href: "/about" },
-  { label: "attend", href: "/attend" },
-  { label: "Enroll", href: "/enroll" },
-  { label: "Gallery", href: "/gallery" },
+const navLinks = [
+  { label: "Programs", href: "#programs" },
+  { label: "Mission", href: "#mission" },
+  { label: "About", href: "#founder" },
+  { label: "FAQ", href: "#faq" },
+  { label: "Contact", href: "#contact" },
 ];
 
-const secondaryLinks = [
-  { label: "Login", href: "/login" },
-  { label: "Register", href: "/register" },
-];
+const Logo = () => (
+  <Link href="/" className="flex items-center gap-2.5 group">
+    <div className="w-8 h-8 bg-[#7FFF00] rounded-[7px] flex items-center justify-center font-mono font-bold text-[11px] text-[#050D05] tracking-tight flex-shrink-0">
+      C4E
+    </div>
+    <span className="font-black text-[17px] text-[#EEFFEE] leading-none">
+      Cyber<span className="text-[#7FFF00]">4</span>Every1
+      <span className="inline-block w-2 h-2 rounded-full bg-[#7FFF00] ml-0.5 mb-0.5 align-bottom animate-pulse" />
+    </span>
+  </Link>
+);
 
-const mobileLinks = [
-  ...primaryLinks,
-  ...secondaryLinks,
-  { label: "Get in Touch", href: "/contact" },
-];
+const HamburgerIcon = ({ open }: { open: boolean }) => (
+  <span className="flex flex-col justify-center gap-[5px] w-6 h-6">
+    <span
+      className={`block h-[2px] bg-[#7FFF00] rounded-full transition-all duration-300 origin-center ${
+        open ? "rotate-45 translate-y-[7px]" : ""
+      }`}
+    />
+    <span
+      className={`block h-[2px] bg-[#7FFF00] rounded-full transition-all duration-300 ${
+        open ? "opacity-0 scale-x-0" : ""
+      }`}
+    />
+    <span
+      className={`block h-[2px] bg-[#7FFF00] rounded-full transition-all duration-300 origin-center ${
+        open ? "-rotate-45 -translate-y-[7px]" : ""
+      }`}
+    />
+  </span>
+);
 
-const DESKTOP_BREAKPOINT = 920;
-
-export function TopNavBar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [viewportWidth, setViewportWidth] = useState<number>(0);
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const pathname = usePathname();
-  const { data: session } = useSession();
+export default function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
 
   useEffect(() => {
-    const updateViewportWidth = () => {
-      setViewportWidth(window.innerWidth);
-    };
-
-    updateViewportWidth();
-    window.addEventListener("resize", updateViewportWidth);
-
-    return () => window.removeEventListener("resize", updateViewportWidth);
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
-    if (viewportWidth >= DESKTOP_BREAKPOINT && isOpen) {
-      setIsOpen(false);
-    }
-  }, [isOpen, viewportWidth]);
+    const ids = navLinks.map((l) => l.href.replace("#", "")).filter(Boolean);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveSection(entry.target.id);
+        });
+      },
+      { rootMargin: "-40% 0px -55% 0px" },
+    );
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, []);
 
-  const isDesktop = viewportWidth >= DESKTOP_BREAKPOINT;
-  const isLoggedIn = !!session?.user;
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth >= 768) setMenuOpen(false);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
-  const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname?.startsWith(href);
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
 
-  const userInitials = session?.user?.name
-    ? session.user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    : session?.user?.email?.[0].toUpperCase() || "U";
+  const handleLinkClick = () => setMenuOpen(false);
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-50 mx-auto mt-8 w-[95%] max-w-6xl px-4 sm:px-6">
-      <div
-        className={`rounded-2xl border border-white/8 bg-black/80 px-4 py-3 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.4)] backdrop-blur-2xl sm:px-6 ${!isDesktop && isOpen ? "rounded-3xl" : "sm:rounded-full"}`}
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 h-[70px] flex items-center bg-black transition-shadow duration-300 ${
+          scrolled ? "shadow-[0_1px_0_rgba(255,255,255,0.08)]" : ""
+        }`}
       >
-        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4">
-          <Link
-            href="/"
-            className="group flex items-center gap-2 transition-transform active:scale-95"
-            onClick={() => setIsOpen(false)}
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-              <span className="material-symbols-outlined text-[20px]">
-                shield
-              </span>
-            </div>
-            <span className="font-headline text-xl font-extrabold tracking-tighter text-white">
-              cyber4every1
-            </span>
-          </Link>
+        <div className="max-w-6xl mx-auto w-full px-4 md:px-5 flex items-center justify-between">
+          <Logo />
 
-          {isDesktop ? (
-            <nav className="flex items-center justify-center gap-3 lg:gap-6">
-              {primaryLinks.map((link) => (
+          <nav
+            className="max-md:hidden md:flex items-center gap-6 lg:gap-8"
+            aria-label="Main navigation"
+          >
+            {navLinks.map((link) => {
+              const isActive = activeSection === link.href.replace("#", "");
+              return (
                 <Link
-                  key={link.label}
+                  key={link.href}
                   href={link.href}
-                  className={`relative font-headline text-sm font-bold uppercase tracking-widest transition-all duration-300 active:scale-95 ${
-                    isActive(link.href)
-                      ? "text-primary after:absolute after:-bottom-1 after:left-1/2 after:h-1 after:w-1 after:-translate-x-1/2 after:rounded-full after:bg-primary after:content-['']"
-                      : "text-white/70 hover:scale-105 hover:text-primary"
+                  className={`text-sm font-semibold transition-colors duration-200 ${
+                    isActive
+                      ? "text-[#7FFF00]"
+                      : "text-white/60 hover:text-white"
                   }`}
                 >
                   {link.label}
                 </Link>
-              ))}
-              {isLoggedIn ? (
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-primary font-headline text-xs font-bold text-primary-foreground transition-all duration-300 hover:scale-105"
-                  >
-                    {userInitials}
-                  </button>
-                  {showUserMenu && (
-                    <div className="absolute right-0 mt-2 w-48 rounded-2xl border border-white/10 bg-black/90 py-2 shadow-xl backdrop-blur-2xl">
-                      <div className="border-b border-white/10 px-4 py-2">
-                        <p className="font-headline text-xs font-bold text-white">
-                          {session.user?.name || session.user?.email}
-                        </p>
-                      </div>
-                      <Link
-                        href="/profile"
-                        className="block px-4 py-2 font-headline text-xs text-white/70 hover:bg-white/5 hover:text-white"
-                      >
-                        Profile
-                      </Link>
-                      <button
-                        onClick={() => signOut()}
-                        className="w-full px-4 py-2 text-left font-headline text-xs text-white/70 hover:bg-white/5 hover:text-white"
-                      >
-                        Sign Out
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                secondaryLinks.map((link) => (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    className="rounded-full border border-white/20 px-4 py-2 font-headline text-[11px] font-bold uppercase tracking-widest text-white transition-all duration-300 hover:scale-105 hover:bg-white/10 active:scale-95"
-                  >
-                    {link.label}
-                  </Link>
-                ))
-              )}
-            </nav>
-          ) : (
-            <div />
-          )}
+              );
+            })}
+          </nav>
 
-          <div className="flex items-center justify-end gap-3 sm:gap-4">
-            {!isDesktop ? (
-              <Link
-                href="/register"
-                className="rounded-full bg-primary px-4 py-2.5 font-headline text-[11px] font-bold uppercase tracking-widest text-primary-foreground shadow-[0_0_20px_rgba(191,255,0,0.3)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(191,255,0,0.5)] active:scale-95 sm:px-6 sm:text-xs"
+          <div className="flex items-center gap-3">
+            <div className="max-md:hidden md:flex items-center gap-3">
+              <a
+                href="https://youtube.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-xs font-bold text-white/60 hover:text-white transition-colors"
               >
-                Register
-              </Link>
-            ) : null}
-
-            {!isDesktop ? (
-              <button
-                type="button"
-                className="flex items-center justify-center p-1 text-white"
-                onClick={() => setIsOpen((value) => !value)}
-                aria-label="Toggle navigation menu"
-              >
-                <span className="material-symbols-outlined">
-                  {isOpen ? "close" : "menu"}
+                <span className="w-[22px] h-[22px] bg-red-600 rounded-full flex items-center justify-center text-white text-[9px]">
+                  ▶
                 </span>
-              </button>
-            ) : null}
+                YouTube
+              </a>
+              <Link
+                href="#contact"
+                className="font-mono text-[11px] font-semibold tracking-[0.8px] uppercase text-[#050D05] bg-[#7FFF00] px-4 py-2.5 rounded-[7px] hover:bg-[#A3FF4D] transition-colors"
+              >
+                Enroll Now →
+              </Link>
+            </div>
+
+            <button
+              onClick={() => setMenuOpen((v) => !v)}
+              className="flex md:hidden items-center justify-center w-10 h-10 rounded-lg border border-white/10 hover:border-white/20 transition-colors"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-menu"
+            >
+              <HamburgerIcon open={menuOpen} />
+            </button>
           </div>
         </div>
+      </header>
 
-        {!isDesktop && isOpen ? (
-          <div className="mt-4 border-t border-white/10 pt-4">
-            <nav className="flex flex-col gap-3">
-              {mobileLinks.map((link) => (
+      <div
+        id="mobile-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mobile navigation"
+        className={`fixed inset-0 z-40 md:hidden transition-all duration-300 ${
+          menuOpen ? "visible" : "invisible"
+        }`}
+      >
+        <div
+          onClick={() => setMenuOpen(false)}
+          className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ${
+            menuOpen ? "opacity-100" : "opacity-0"
+          }`}
+        />
+
+        <div
+          className={`absolute top-[70px] left-0 right-0 bg-black transition-all duration-300 ${
+            menuOpen ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0"
+          }`}
+        >
+          <nav className="flex flex-col px-5 py-4" aria-label="Mobile navigation">
+            {navLinks.map((link, i) => {
+              const isActive = activeSection === link.href.replace("#", "");
+              return (
                 <Link
-                  key={link.label}
+                  key={link.href}
                   href={link.href}
-                  className={`rounded-2xl border px-4 py-3 font-headline text-xs font-bold uppercase tracking-widest transition ${
-                    isActive(link.href)
-                      ? "border-primary/35 bg-primary/10 text-primary"
-                      : "border-white/10 text-white/75 hover:border-primary/30 hover:text-primary"
-                  }`}
-                  onClick={() => setIsOpen(false)}
+                  onClick={handleLinkClick}
+                  style={{ transitionDelay: menuOpen ? `${i * 40}ms` : "0ms" }}
+                  className={`flex items-center justify-between py-4 border-b border-white/5 text-sm font-bold transition-all duration-200 ${
+                    menuOpen
+                      ? "translate-x-0 opacity-100"
+                      : "-translate-x-3 opacity-0"
+                  } ${isActive ? "text-[#7FFF00]" : "text-white/60 hover:text-white"}`}
                 >
-                  {link.label}
+                  <span>{link.label}</span>
+                  <span className="text-[10px] font-mono tracking-widest text-white/20">
+                    {isActive ? "●" : "→"}
+                  </span>
                 </Link>
-              ))}
-            </nav>
-          </div>
-        ) : null}
+              );
+            })}
+
+            <div className="flex flex-col gap-3 pt-5 pb-2">
+              <a
+                href="https://youtube.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleLinkClick}
+                className="flex items-center justify-center gap-2.5 text-sm font-bold text-white/60 border border-white/10 rounded-xl py-3 hover:text-white hover:border-white/20 transition-colors"
+              >
+                <span className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-white text-[10px]">
+                  ▶
+                </span>
+                Watch on YouTube
+              </a>
+              <Link
+                href="#contact"
+                onClick={handleLinkClick}
+                className="text-center font-mono text-[13px] font-semibold tracking-[0.8px] uppercase text-[#050D05] bg-[#7FFF00] py-3.5 rounded-xl hover:bg-[#A3FF4D] transition-colors"
+              >
+                Enroll Now →
+              </Link>
+            </div>
+          </nav>
+        </div>
       </div>
-    </header>
+
+      <div className="h-[70px]" aria-hidden="true" />
+    </>
   );
 }
+
+export { Navbar as TopNavBar };
