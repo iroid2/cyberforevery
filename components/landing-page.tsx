@@ -6,14 +6,7 @@ import Link from "next/link";
 
 import HeroSlider, { HeroSection } from "@/components/hero-section";
 import { featuredGalleryItems } from "@/lib/gallery-data";
-
-const navLinks = [
-  { href: "#programs", label: "Programs" },
-  { href: "#mission", label: "Mission" },
-  { href: "#founder", label: "About" },
-  { href: "#faq", label: "FAQ" },
-  { href: "#contact", label: "Contact" },
-];
+import { PricingSection } from "@/components/pricing-section";
 
 const programCards = [
   {
@@ -524,7 +517,7 @@ export function LandingPage() {
           </div>
         </div>
       </section>
-
+      <PricingSection />
       <section id="contact" className="bg-[#091209] px-5 py-20 md:px-6">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-2">
           <div className="rounded-[1.75rem] border border-white/10 bg-[#1E301E] p-7 md:p-10">
@@ -708,33 +701,6 @@ export function LandingPage() {
           </div>
         </div>
       </section>
-
-      <footer className="border-t border-white/10 bg-[#050D05] px-5 py-10 md:px-6">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 md:flex-row">
-          <Link href="/" className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#7FFF00] font-mono text-xs font-bold text-black">
-              C4E
-            </span>
-            <span className="text-lg font-black tracking-tight text-white">
-              Cyber<span className="text-[#7FFF00]">4</span>Every1
-            </span>
-          </Link>
-
-          <ul className="flex flex-wrap items-center justify-center gap-5 text-sm text-[#B4CCB4]">
-            {navLinks.map((item) => (
-              <li key={item.href}>
-                <a href={item.href} className="transition hover:text-[#7FFF00]">
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[#6A8A6A]">
-            © 2025 Cyber4Every1 NFP. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </main>
   );
 }

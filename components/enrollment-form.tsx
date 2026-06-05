@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -48,7 +49,12 @@ const formSchema = z.object({
   // Section 7: Plan
   planSelection: z.string().min(1, "Required"),
   promoCode: z.string().optional(),
-  // Section 8: Agreements
+  // Section 8: Payment details
+  cardholderName: z.string().min(2, "Required"),
+  cardNumber: z.string().min(12, "Invalid card number"),
+  cardExpiry: z.string().min(4, "Invalid expiry"),
+  cardCvc: z.string().min(3, "Invalid CVC"),
+  // Section 9: Agreements
   agreeTerms: z.boolean().refine(v => v === true, "Required"),
   agreeRefund: z.boolean().refine(v => v === true, "Required"),
   shareWork: z.boolean().optional(),
@@ -58,30 +64,68 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+const planOptions = [
+  {
+    key: "Basic",
+    title: "Basic Access",
+    price: "$299",
+    description: "Core program with guided labs, digital safety, and beginner cybersecurity training.",
+    features: ["Weekly live sessions", "Interactive lab exercises", "Parental progress updates", "Perfect for first-time learners"],
+  },
+  {
+    key: "Standard",
+    title: "Standard Experience",
+    price: "$499",
+    description: "Standard path with extra mentor support, office hours, and expanded course content.",
+    features: ["Group mentoring sessions", "Project-based learning", "Tech confidence workshops", "Ideal for curious students"],
+  },
+  {
+    key: "Premium",
+    title: "Premium Mentorship",
+    price: "$799",
+    description: "Premium mentorship with 1-on-1 coaching, portfolio-ready projects, and certificate support.",
+    features: ["Personalized coaching", "Capstone project guidance", "Advanced cybersecurity labs", "Designed for ambitious learners"],
+  },
+];
+
 export function EnrollmentForm() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const totalSteps = 8;
+  const [formVisible, setFormVisible] = useState(false);
+  const totalSteps = 9;
+  const searchParams = useSearchParams();
+
+  const defaultPlan = useMemo(() => {
+    const plan = searchParams.get("plan") || "";
+    if (["Basic", "Standard", "Premium"].includes(plan)) {
+      return plan as "Basic" | "Standard" | "Premium";
+    }
+    return "";
+  }, [searchParams]);
 
   const {
     register,
     handleSubmit,
     trigger,
+    watch,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      planSelection: defaultPlan,
       agreeTerms: false,
       agreeRefund: false,
-    }
+    },
   });
 
+  const selectedPlanKey = watch("planSelection") || defaultPlan;
+  const selectedPlan = planOptions.find((plan) => plan.key === selectedPlanKey);
+
   const nextStep = async () => {
-    // Basic greedy validation for next button (we could trigger specific fields)
     const isValid = await trigger();
-    if (isValid || step < 8) { // Allow navigation during dev, but technically we should validate
-       setStep(s => Math.min(s + 1, totalSteps));
+    if (isValid) {
+      setStep(s => Math.min(s + 1, totalSteps));
     }
   };
 
@@ -107,7 +151,7 @@ export function EnrollmentForm() {
 
   if (isSuccess) {
     return (
-      <div className="bg-surface/40 backdrop-blur-xl border border-border rounded-2xl md:rounded-[2rem] p-12 text-center shadow-2xl animate-in fade-in zoom-in duration-500">
+      <div className="bg-surface/40 backdrop-blur-xl border border-border rounded-2xl md:rounded-4xl p-12 text-center shadow-2xl animate-in fade-in zoom-in duration-500">
         <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-8 border-2 border-primary/50">
           <CheckCircle2 className="w-10 h-10 text-primary" />
         </div>
@@ -321,6 +365,27 @@ export function EnrollmentForm() {
         );
       case 8:
         return (
+          <div className="space-y-6">
+            <h3 className="text-xl font-bold font-headline text-foreground uppercase tracking-widest">// PAYMENT_DETAILS</h3>
+            <p className="text-sm leading-7 text-[#B4CCB4]">
+              Enter card details securely below. The next step confirms your agreement before sending the payment request to Stripe.
+            </p>
+            <div className="grid gap-6">
+              <Input label="Name on card" {...register("cardholderName")} error={errors.cardholderName?.message} />
+              <Input label="Card number" {...register("cardNumber")} error={errors.cardNumber?.message} />
+              <div className="grid gap-6 md:grid-cols-2">
+                <Input label="Expiry (MM/YY)" {...register("cardExpiry")} error={errors.cardExpiry?.message} />
+                <Input label="CVC" {...register("cardCvc")} error={errors.cardCvc?.message} />
+              </div>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-[#0F1F0F] p-5 text-sm text-[#B4CCB4]">
+              <p className="font-semibold text-white">Stripe-style checkout</p>
+              <p className="mt-2">We are prepared to pass these card details securely to Stripe. Card data is not stored on this site, and payment processing is handled through Stripe's secure flow.</p>
+            </div>
+          </div>
+        );
+      case 9:
+        return (
           <div className="space-y-10">
             <h3 className="text-lg md:text-xl font-bold font-headline text-foreground uppercase tracking-widest">// FINAL_AGREEMENTS</h3>
             <div className="space-y-6">
@@ -337,55 +402,173 @@ export function EnrollmentForm() {
     }
   };
 
-  return (
-    <div className="bg-surface/40 backdrop-blur-xl border border-border rounded-2xl md:rounded-[2rem] p-6 md:p-12 shadow-2xl">
-      {/* Stepper */}
-      <div className="mb-12 flex justify-between items-center max-w-2xl mx-auto">
-        {Array.from({ length: totalSteps }).map((_, i) => (
-          <div 
-            key={i} 
-            className={`h-1.5 flex-1 mx-1 rounded-full transition-all duration-500 ${
-              i + 1 <= step ? "bg-primary" : "bg-foreground/10"
-            }`}
-          />
-        ))}
-      </div>
+  if (!formVisible) {
+    return (
+      <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
+        <div className="rounded-4xl border border-white/10 bg-[#071007]/90 p-10 shadow-[0_30px_80px_rgba(0,0,0,0.35)]">
+          <div className="space-y-6">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#7FFF00]/30 bg-[#7FFF00]/10 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.35em] text-[#7FFF00]">
+              <span className="h-2 w-2 rounded-full bg-[#7FFF00] animate-pulse" />
+              Enrollment hidden by default
+            </span>
+            <h2 className="text-3xl font-black text-white">Ready when you are.</h2>
+            <p className="max-w-3xl text-sm leading-7 text-[#B4CCB4]">
+              The form stays tucked out of the way until you're ready to enroll. This keeps the page clean, with the program story and payment preview up front.
+            </p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="min-h-[400px]">
-        {renderStep()}
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-3xl border border-white/10 bg-[#0F1F0F] p-6">
+                <p className="text-xs uppercase tracking-[0.3em] text-[#6A8A6A]">Step 1</p>
+                <p className="mt-3 font-black text-white">Reveal the form</p>
+                <p className="mt-2 text-sm text-[#B4CCB4]">Start the registration process when you are ready.</p>
+              </div>
+              <div className="rounded-3xl border border-white/10 bg-[#0F1F0F] p-6">
+                <p className="text-xs uppercase tracking-[0.3em] text-[#6A8A6A]">Step 2</p>
+                <p className="mt-3 font-black text-white">Complete secure payment</p>
+                <p className="mt-2 text-sm text-[#B4CCB4]">A Stripe-style card entry section appears when you continue.</p>
+              </div>
+            </div>
 
-        <div className="mt-12 flex justify-between items-center">
-          <button
-            type="button"
-            onClick={prevStep}
-            disabled={step === 1}
-            className={`px-6 md:px-8 py-3 md:py-4 rounded-full font-bold uppercase tracking-widest transition-all text-xs md:text-base ${
-              step === 1 ? "opacity-0 pointer-events-none" : "bg-foreground/5 text-foreground hover:bg-foreground/10"
-            }`}
-          >
-            Previous
-          </button>
-
-          {step < totalSteps ? (
             <button
               type="button"
-              onClick={nextStep}
-              className="px-8 md:px-12 py-3 md:py-4 bg-primary text-primary-foreground rounded-full font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_20px_rgba(191,255,0,0.3)] text-xs md:text-base"
+              onClick={() => setFormVisible(true)}
+              className="mt-8 inline-flex items-center justify-center rounded-full bg-[#7FFF00] px-10 py-4 text-sm font-black uppercase tracking-[0.18em] text-black shadow-[0_0_30px_rgba(127,255,0,0.3)] transition hover:bg-[#75d400]"
             >
-              Continue
+              Reveal enrollment form
             </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-8 md:px-12 py-3 md:py-4 bg-primary text-primary-foreground rounded-full font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(191,255,0,0.5)] text-xs md:text-base flex items-center gap-3"
-            >
-              {isSubmitting ? "SYNCING..." : "Initialize Enrollment"}
-              {!isSubmitting && <Rocket className="w-4 h-4 md:w-5 md:h-5" />}
-            </button>
-          )}
+          </div>
         </div>
-      </form>
+
+        <aside className="space-y-6 rounded-4xl border border-white/10 bg-[#0A140A] p-8 shadow-[0_30px_80px_rgba(0,0,0,0.35)]">
+          <div className="space-y-3">
+            <div className="text-[10px] font-bold uppercase tracking-[0.35em] text-[#7FFF00]">Form preview</div>
+            <h2 className="text-3xl font-black text-white">Step-by-step registration</h2>
+            <p className="text-sm leading-7 text-[#B4CCB4]">The enrollment form is kept hidden until you are ready to begin. When revealed, it walks you through every critical detail.</p>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-[#09170A] p-6">
+            <p className="text-xs uppercase tracking-[0.3em] text-[#6A8A6A]">Sections included</p>
+            <ul className="mt-4 space-y-3 text-sm text-[#D6E6D6]">
+              <li>• Parent + guardian details</li>
+              <li>• Student profile</li>
+              <li>• Program preference selection</li>
+              <li>• Computer & internet readiness</li>
+              <li>• Emergency contact</li>
+              <li>• Card payment details</li>
+              <li>• Final agreement review</li>
+            </ul>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-[#071007] p-6 text-sm text-[#B4CCB4]">
+            <p className="font-semibold text-white">Secure checkout</p>
+            <p className="mt-3">Credit card details are collected in a Stripe-style section and are ready for secure processing.</p>
+          </div>
+        </aside>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
+      <div className="bg-surface/40 backdrop-blur-xl border border-border rounded-2xl md:rounded-4xl p-6 md:p-12 shadow-2xl">
+        {/* Stepper */}
+        <div className="mb-12 flex justify-between items-center max-w-2xl mx-auto">
+          {Array.from({ length: totalSteps }).map((_, i) => (
+            <div 
+              key={i} 
+              className={`h-1.5 flex-1 mx-1 rounded-full transition-all duration-500 ${
+                i + 1 <= step ? "bg-primary" : "bg-foreground/10"
+              }`} 
+            />
+          ))}
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="min-h-100">
+          {renderStep()}
+
+          <div className="mt-12 flex justify-between items-center flex-wrap gap-4">
+            <button
+              type="button"
+              onClick={prevStep}
+              disabled={step === 1}
+              className={`px-6 md:px-8 py-3 md:py-4 rounded-full font-bold uppercase tracking-widest transition-all text-xs md:text-base ${
+                step === 1 ? "opacity-0 pointer-events-none" : "bg-foreground/5 text-foreground hover:bg-foreground/10"
+              }`}
+            >
+              Previous
+            </button>
+
+            {step < totalSteps ? (
+              <button
+                type="button"
+                onClick={nextStep}
+                className="px-8 md:px-12 py-3 md:py-4 bg-primary text-primary-foreground rounded-full font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_20px_rgba(191,255,0,0.3)] text-xs md:text-base"
+              >
+                Continue
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-8 md:px-12 py-3 md:py-4 bg-primary text-primary-foreground rounded-full font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(191,255,0,0.5)] text-xs md:text-base flex items-center gap-3"
+              >
+                {isSubmitting ? "SYNCING..." : "Initialize Enrollment"}
+                {!isSubmitting && <Rocket className="w-4 h-4 md:w-5 md:h-5" />}
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
+
+      <aside className="space-y-6 rounded-4xl border border-white/10 bg-[#0A140A] p-8 shadow-[0_30px_80px_rgba(0,0,0,0.35)]">
+        <div className="space-y-3">
+          <div className="text-[10px] font-bold uppercase tracking-[0.35em] text-[#7FFF00]">Current Plan</div>
+          <h2 className="text-3xl font-black text-white">{selectedPlan ? selectedPlan.title : "Choose your plan"}</h2>
+          <p className="text-sm leading-7 text-[#B4CCB4]">
+            {selectedPlan ? selectedPlan.description : "Select a plan below to see your package details and secure checkout path."}
+          </p>
+        </div>
+
+        <div className="rounded-3xl border border-white/10 bg-[#09170A] p-6">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-[#6A8A6A]">Package</p>
+              <p className="mt-2 text-xl font-black text-white">{selectedPlan?.price ?? "—"}</p>
+            </div>
+            <span className="inline-flex rounded-full bg-[#7FFF00]/15 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.25em] text-[#7FFF00]">
+              {selectedPlan ? "Ready" : "Pending"}
+            </span>
+          </div>
+
+          <div className="mt-6 space-y-3">
+            {selectedPlan ? selectedPlan.features.map((feature) => (
+              <div key={feature} className="flex items-start gap-3 text-sm text-[#D6E6D6]">
+                <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#7FFF00]/20 text-[#7FFF00] text-xs font-black">✓</span>
+                <span>{feature}</span>
+              </div>
+            )) : (
+              <p className="text-sm text-[#6A8A6A]">Your chosen package will appear here as you select a plan.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-white/10 bg-[#071007] p-6 text-sm text-[#B4CCB4]">
+          <p className="font-semibold text-white">What happens next</p>
+          <ul className="mt-4 space-y-3 text-sm leading-7">
+            <li>1. Complete the enrollment form fields in each section.</li>
+            <li>2. Confirm the selected plan and apply any promo code.</li>
+            <li>3. Finish enrollment and proceed to secure Stripe payment.</li>
+            <li>4. Receive confirmation and access instructions by email.</li>
+          </ul>
+        </div>
+
+        <div className="rounded-3xl border border-white/10 bg-[#071007] p-6">
+          <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[#7FFF00]">Secure checkout</p>
+          <p className="mt-3 text-sm leading-7 text-[#B4CCB4]">
+            We use Stripe for secure payments. No card data is stored on our site, and every payment is encrypted end-to-end.
+          </p>
+        </div>
+      </aside>
     </div>
   );
 }

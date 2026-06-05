@@ -81,7 +81,9 @@ export default function Navbar() {
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [menuOpen]);
 
   const handleLinkClick = () => setMenuOpen(false);
@@ -132,6 +134,12 @@ export default function Navbar() {
                 YouTube
               </a>
               <Link
+                href="/login"
+                className="text-sm font-semibold uppercase tracking-[0.1em] text-white/80 border border-white/10 px-4 py-2.5 rounded-[7px] hover:text-white hover:border-white/20 transition-colors"
+              >
+                Login
+              </Link>
+              <Link
                 href="#contact"
                 className="font-mono text-[11px] font-semibold tracking-[0.8px] uppercase text-[#050D05] bg-[#7FFF00] px-4 py-2.5 rounded-[7px] hover:bg-[#A3FF4D] transition-colors"
               >
@@ -173,7 +181,10 @@ export default function Navbar() {
             menuOpen ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0"
           }`}
         >
-          <nav className="flex flex-col px-5 py-4" aria-label="Mobile navigation">
+          <nav
+            className="flex flex-col px-5 py-4"
+            aria-label="Mobile navigation"
+          >
             {navLinks.map((link, i) => {
               const isActive = activeSection === link.href.replace("#", "");
               return (
@@ -209,6 +220,13 @@ export default function Navbar() {
                 </span>
                 Watch on YouTube
               </a>
+              <Link
+                href="/login"
+                onClick={handleLinkClick}
+                className="text-center text-sm font-semibold uppercase tracking-[0.1em] text-white/80 border border-white/10 rounded-xl py-3 hover:text-white hover:border-white/20 transition-colors"
+              >
+                Login
+              </Link>
               <Link
                 href="#contact"
                 onClick={handleLinkClick}

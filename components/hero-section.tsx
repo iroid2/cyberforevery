@@ -7,45 +7,51 @@ import { featuredGalleryItems } from "@/lib/gallery-data";
 // ─── Slide data ───────────────────────────────────────────────────────────────
 const slides = [
   {
-    tag: "// SESSION_01: INTERNET_SAFETY",
-    headline: ["Better", "Digital Future", "For Your Kids"],
+    tag: "// SERVICE_01: INTERNET_SAFETY",
+    headline: ["Internet", "Safety"],
     accentLine: 1,
-    sub: "Let the child be the director, and the actor in their own digital story.",
-    note: "We don't just lecture — real experiments, workshops and field experiences throughout the journey!",
+    description:
+      "Build safer habits for passwords, phishing awareness, and family-friendly online behavior. Students learn how to recognize scams, protect their identity, and make confident choices online every day.",
+    sub: "Strong digital habits",
+    note: "Password hygiene, phishing checks, account protection, and everyday security habits for families.",
     ctaPrimary: { label: "Get Started", href: "#programs" },
     ctaSecondary: { label: "Explore Curriculum", href: "#programs" },
-    badge: "// STUDENT_AT_WORK",
+    badge: "// INTERNET_SAFETY",
     image: {
-      src: featuredGalleryItems[1]?.src ?? "/gallery/servers.png",
-      alt: featuredGalleryItems[1]?.alt ?? "Child using laptop",
+      src: "/gallery/servers.png",
+      alt: "Internet safety workshop image",
     },
   },
   {
-    tag: "// SESSION_02: THREAT_INTELLIGENCE",
-    headline: ["Identify &", "Neutralize", "Digital Threats"],
+    tag: "// SERVICE_02: ETHICAL_HACKING",
+    headline: ["Ethical", "Hacking"],
     accentLine: 1,
-    sub: "Map real-world attack vectors and build your own threat detection model — no experience needed.",
-    note: "Hands-on sessions where students simulate real hacking scenarios in a safe, guided environment.",
+    description:
+      "Learn attacker thinking through guided exercises and safe lab simulations. This course helps students understand how systems are attacked so they can design stronger defenses and think like a cybersecurity professional.",
+    sub: "Think like an attacker",
+    note: "Hands-on security thinking, basic lab simulations, and the mindset behind defensive cybersecurity.",
     ctaPrimary: { label: "Register Now", href: "#programs" },
     ctaSecondary: { label: "Learn More", href: "#contact" },
-    badge: "// THREAT_ANALYST",
+    badge: "// ETHICAL_HACKING",
     image: {
-      src: featuredGalleryItems[3]?.src ?? "/gallery/abt.png",
-      alt: featuredGalleryItems[3]?.alt ?? "Child coding",
+      src: "/gallery/presentation.png",
+      alt: "Ethical hacking classroom image",
     },
   },
   {
-    tag: "// SESSION_03: AI_AND_CODE",
-    headline: ["Build with", "AI —", "Responsibly"],
+    tag: "// SERVICE_03: AI_AND_CODE",
+    headline: ["AI", "& Code"],
     accentLine: 1,
-    sub: "Explore how AI is weaponized and defended. Create real ML models that detect phishing and malware.",
-    note: "Every student leaves the AI module with a working project they built themselves — from scratch.",
+    description:
+      "Combine AI tools and coding to create practical projects and creative solutions. Students explore responsible AI use, build simple applications, and learn how technology can solve real problems.",
+    sub: "Creative digital building",
+    note: "Safe AI usage, beginner-friendly coding, and practical exercises that prepare students for the future.",
     ctaPrimary: { label: "Join Bootcamp", href: "#programs" },
     ctaSecondary: { label: "Have Questions?", href: "#faq" },
-    badge: "// AI_BUILDER",
+    badge: "// AI_CODE",
     image: {
-      src: featuredGalleryItems[5]?.src ?? "/gallery/data.png",
-      alt: featuredGalleryItems[5]?.alt ?? "Students collaborating",
+      src: "/gallery/data.png",
+      alt: "AI and code workshop image",
     },
   },
 ];
@@ -373,7 +379,7 @@ const AnimatedImagePanel = ({
       >
         {/* Card with glow pulse */}
         <div
-          className="relative overflow-hidden rounded-4xl w-44 sm:w-60 md:w-75 lg:w-95"
+          className="relative overflow-hidden rounded-4xl  sm:w-60 md:w-75 lg:w-95"
           style={{ animation: "heroGlowPulse 2s ease-in-out infinite" }}
         >
           {/* Outer lime glow border */}
@@ -530,6 +536,10 @@ export default function HeroSlider() {
                     />
                   ))}
                 </h1>
+
+                <p className="mt-4 max-w-2xl text-sm text-[#EEFFEE] leading-relaxed sm:text-base">
+                  {slide.description}
+                </p>
 
                 {/* Italic sub */}
                 <p className="hidden sm:block italic text-[#6A8A6A] text-sm max-w-95 leading-relaxed">

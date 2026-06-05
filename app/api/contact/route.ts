@@ -54,7 +54,9 @@ function adminEmailHtml(data: {
                 ["Name", `${data.firstName} ${data.lastName}`],
                 ["Email", data.email],
                 ["Inquiry", data.subject],
-              ].map(([label, value], i) => `
+              ]
+                .map(
+                  ([label, value], i) => `
               <table width="100%" cellpadding="0" cellspacing="0" style="border-bottom:${i < 2 ? "1px solid rgba(255,255,255,0.05)" : "none"}">
                 <tr>
                   <td style="padding:14px 20px;width:100px">
@@ -64,7 +66,9 @@ function adminEmailHtml(data: {
                     <span style="font-size:13px;color:#EEFFEE;font-weight:600">${value}</span>
                   </td>
                 </tr>
-              </table>`).join("")}
+              </table>`,
+                )
+                .join("")}
             </td></tr>
           </table>
 
@@ -152,10 +156,12 @@ function confirmationEmailHtml(data: {
               "Our team reviews every message personally.",
               "We'll reply to this email within 1–2 business days.",
               "For urgent matters, reach us at ivan@cyberforevery.com",
-            ].map(
-              (item) =>
-                `<p style="margin:0 0 8px;font-size:13px;color:#B4CCB4;line-height:1.6">✓ &nbsp;${item}</p>`
-            ).join("")}
+            ]
+              .map(
+                (item) =>
+                  `<p style="margin:0 0 8px;font-size:13px;color:#B4CCB4;line-height:1.6">✓ &nbsp;${item}</p>`,
+              )
+              .join("")}
           </div>
 
           <!-- CTA -->
@@ -174,7 +180,7 @@ function confirmationEmailHtml(data: {
         <tr><td style="padding:20px 36px;border-top:1px solid rgba(255,255,255,0.05);text-align:center">
           <p style="margin:0 0 6px;font-size:12px;color:#6A8A6A">Questions? Reply to this email or contact us at</p>
           <a href="mailto:ivan@cyberforevery.com" style="font-size:12px;color:#7FFF00;text-decoration:none;font-weight:700">ivan@cyberforevery.com</a>
-          <p style="margin:12px 0 0;font-size:10px;color:#3A5A3A">© 2025 Cyber4Every1 NFP. All rights reserved.</p>
+          <p style="margin:12px 0 0;font-size:10px;color:#3A5A3A">© 2026 Cyber4Every1 NFP. All rights reserved.</p>
         </td></tr>
 
       </table>
@@ -190,12 +196,18 @@ export async function POST(req: NextRequest) {
     const { firstName, lastName, email, subject, message } = await req.json();
 
     if (!firstName || !lastName || !email || !message) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 },
+      );
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid email address" },
+        { status: 400 },
+      );
     }
 
     const errors: string[] = [];

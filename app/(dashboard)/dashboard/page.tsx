@@ -93,7 +93,12 @@ async function TutorDashboard({
           },
         },
 
-        submission: true,
+        submissions: {
+          orderBy: {
+            submittedAt: "desc",
+          },
+          take: 1,
+        },
       },
     }),
   ]);
@@ -105,15 +110,14 @@ async function TutorDashboard({
     0,
   );
 
-  const submitted = recentStudents.filter((s) => s.submission);
+  const submitted = recentStudents.filter((s) => s.submissions?.length > 0);
 
   const avgScore =
     submitted.length > 0
       ? Math.round(
           submitted.reduce((sum, s) => {
-            return (
-              sum + (s.submission!.score / s.submission!.totalQuestions) * 100
-            );
+            const sub = s.submissions?.[0];
+            return sum + ((sub?.score ?? 0) / (sub?.totalQuestions ?? 1)) * 100;
           }, 0) / submitted.length,
         )
       : null;
@@ -219,8 +223,7 @@ async function TutorDashboard({
           ) : (
             <div className="divide-y divide-slate-50">
               {recentStudents.map((student) => {
-                const sub = student.submission;
-
+                  const sub = student.submissions?.[0];
                 const pct =
                   sub && sub.totalQuestions > 0
                     ? Math.round((sub.score / sub.totalQuestions) * 100)
@@ -304,7 +307,12 @@ async function AdminDashboard({ name }: { name: string }) {
         take: 8,
 
         include: {
-          submission: true,
+          submissions: {
+            orderBy: {
+              submittedAt: "desc",
+            },
+            take: 1,
+          },
 
           course: {
             select: {
@@ -458,12 +466,10 @@ async function AdminDashboard({ name }: { name: string }) {
             ) : (
               <div className="divide-y divide-slate-50">
                 {recentStudents.map((student) => {
-                  const pct = student.submission
-                    ? Math.round(
-                        (student.submission.score /
-                          student.submission.totalQuestions) *
-                          100,
-                      )
+                  const sub = student.submissions?.[0];
+
+                  const pct = sub
+                    ? Math.round((sub.score / sub.totalQuestions) * 100)
                     : null;
 
                   return (
