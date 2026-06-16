@@ -311,8 +311,7 @@ const AnimatedImagePanel = ({
   <div
     className="relative flex-none"
     style={{
-      transition: "opacity 0.4s ease, transform 0.4s ease",
-      opacity: animating ? 0 : 1,
+      transition: "transform 0.4s ease",
       transform: animating ? "translateX(40px)" : "translateX(0px)",
     }}
   >
@@ -379,7 +378,7 @@ const AnimatedImagePanel = ({
       >
         {/* Card with glow pulse */}
         <div
-          className="relative overflow-hidden rounded-4xl  sm:w-60 md:w-75 lg:w-95"
+          className="relative overflow-hidden rounded-4xl w-[90vw] sm:w-60 md:w-75 lg:w-95"
           style={{ animation: "heroGlowPulse 2s ease-in-out infinite" }}
         >
           {/* Outer lime glow border */}
@@ -396,7 +395,7 @@ const AnimatedImagePanel = ({
               alt={alt}
               fill
               className="object-cover"
-              sizes="(max-width: 640px) 180px, (max-width: 768px) 240px, (max-width: 1024px) 300px, 380px"
+              sizes="(max-width: 640px) 90vw, (max-width: 768px) 240px, (max-width: 1024px) 300px, 380px"
             />
             <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/5 to-black/65" />
 
