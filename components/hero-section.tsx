@@ -425,7 +425,7 @@ const stats = [
   { n: "29+", l: "Total Active Students" },
   { n: "04", l: "Available Field Programs" },
 
-  { n: "3+", l: "Years Running" },
+  { n: "1+", l: "Years Running" },
 ];
 
 // ─── Main Component ───────────────────────────────────────────────────────────
