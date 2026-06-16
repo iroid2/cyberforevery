@@ -75,6 +75,11 @@ export async function processEnrollment(data: EnrollmentData) {
             plan: parsed.planSelection,
             promo: parsed.promoCode,
           },
+          preferences: {
+            shareWork: parsed.shareWork,
+            weeklyProgress: parsed.weeklyProgress,
+            newsletter: parsed.newsletter,
+          },
         },
       },
     });

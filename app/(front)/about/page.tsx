@@ -1,6 +1,5 @@
 import { Shield, Target, Eye, Users, GraduationCap, Heart, Sparkles, Award, BookOpen, Globe } from "lucide-react"
 import { MarqueeBanner } from "@/components/marquee-banner"
-import { Footer } from "@/components/footer"
 import { ContactForm } from "@/components/contact-form"
 
 export default function AboutPage() {
@@ -257,7 +256,6 @@ export default function AboutPage() {
       <ContactForm />
 
       <MarqueeBanner />
-      <Footer />
     </main>
   )
 }

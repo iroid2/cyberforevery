@@ -8,6 +8,7 @@ import * as z from "zod";
 import { enrollStudent } from "@/app/actions/enroll";
 import { toast } from "sonner";
 import { CheckCircle2, Rocket, ArrowRight, ShieldCheck } from "lucide-react";
+import { pricingPlans } from "@/lib/pricing-plans";
 
 const formSchema = z.object({
   // Section 1: Parent
@@ -64,45 +65,23 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-const planOptions = [
-  {
-    key: "Basic",
-    title: "Basic Access",
-    price: "$299",
-    description: "Core program with guided labs, digital safety, and beginner cybersecurity training.",
-    features: ["Weekly live sessions", "Interactive lab exercises", "Parental progress updates", "Perfect for first-time learners"],
-  },
-  {
-    key: "Standard",
-    title: "Standard Experience",
-    price: "$499",
-    description: "Standard path with extra mentor support, office hours, and expanded course content.",
-    features: ["Group mentoring sessions", "Project-based learning", "Tech confidence workshops", "Ideal for curious students"],
-  },
-  {
-    key: "Premium",
-    title: "Premium Mentorship",
-    price: "$799",
-    description: "Premium mentorship with 1-on-1 coaching, portfolio-ready projects, and certificate support.",
-    features: ["Personalized coaching", "Capstone project guidance", "Advanced cybersecurity labs", "Designed for ambitious learners"],
-  },
-];
-
 export function EnrollmentForm() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [formVisible, setFormVisible] = useState(false);
   const totalSteps = 9;
   const searchParams = useSearchParams();
 
   const defaultPlan = useMemo(() => {
     const plan = searchParams.get("plan") || "";
-    if (["Basic", "Standard", "Premium"].includes(plan)) {
-      return plan as "Basic" | "Standard" | "Premium";
+    if (["SmallGroup", "OneOnOne"].includes(plan)) {
+      return plan as "SmallGroup" | "OneOnOne";
     }
     return "";
   }, [searchParams]);
+
+  // Arriving with a plan already chosen (e.g. from the pricing section) skips the reveal step.
+  const [formVisible, setFormVisible] = useState(() => Boolean(defaultPlan));
 
   const {
     register,
@@ -120,7 +99,7 @@ export function EnrollmentForm() {
   });
 
   const selectedPlanKey = watch("planSelection") || defaultPlan;
-  const selectedPlan = planOptions.find((plan) => plan.key === selectedPlanKey);
+  const selectedPlan = pricingPlans.find((plan) => plan.key === selectedPlanKey);
 
   const nextStep = async () => {
     const isValid = await trigger();
@@ -151,42 +130,42 @@ export function EnrollmentForm() {
 
   if (isSuccess) {
     return (
-      <div className="bg-surface/40 backdrop-blur-xl border border-border rounded-2xl md:rounded-4xl p-12 text-center shadow-2xl animate-in fade-in zoom-in duration-500">
-        <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-8 border-2 border-primary/50">
-          <CheckCircle2 className="w-10 h-10 text-primary" />
+      <div className="rounded-2xl md:rounded-4xl border border-white/10 bg-[#102010] p-12 text-center shadow-2xl animate-in fade-in zoom-in duration-500">
+        <div className="w-20 h-20 bg-[#7FFF00]/20 rounded-full flex items-center justify-center mx-auto mb-8 border-2 border-[#7FFF00]/50">
+          <CheckCircle2 className="w-10 h-10 text-[#7FFF00]" />
         </div>
-        <h2 className="text-4xl md:text-5xl font-black text-foreground font-headline uppercase tracking-tighter mb-4">
-          MISSION <span className="text-primary italic">ACCEPTED</span>
+        <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter mb-4">
+          MISSION <span className="text-[#7FFF00] italic">ACCEPTED</span>
         </h2>
-        <p className="text-muted text-lg max-w-xl mx-auto mb-12">
-          Your enrollment dossier has been successfully uploaded to the central Command Terminal. 
+        <p className="text-[#B4CCB4] text-lg max-w-xl mx-auto mb-12">
+          Your enrollment dossier has been successfully uploaded to the central Command Terminal.
           We have dispatched an onboarding pack to your email.
         </p>
 
         <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-12">
-          <div className="p-6 bg-surface/40 border border-border rounded-xl text-left">
+          <div className="p-6 rounded-xl border border-white/10 bg-[#0F1F0F] text-left">
             <div className="flex items-center gap-3 mb-3">
-              <ShieldCheck className="w-5 h-5 text-primary" />
-              <h4 className="font-bold text-foreground text-sm uppercase">Secure Identity</h4>
+              <ShieldCheck className="w-5 h-5 text-[#7FFF00]" />
+              <h4 className="font-bold text-white text-sm uppercase">Secure Identity</h4>
             </div>
-            <p className="text-xs text-muted leading-relaxed italic">
+            <p className="text-xs text-[#B4CCB4] leading-relaxed italic">
               A temporary parent account has been created. Check your email for access credentials and mission briefing.
             </p>
           </div>
-          <div className="p-6 bg-surface/40 border border-border rounded-xl text-left">
+          <div className="p-6 rounded-xl border border-white/10 bg-[#0F1F0F] text-left">
             <div className="flex items-center gap-3 mb-3">
-              <Rocket className="w-5 h-5 text-primary" />
-              <h4 className="font-bold text-foreground text-sm uppercase">Next Objective</h4>
+              <Rocket className="w-5 h-5 text-[#7FFF00]" />
+              <h4 className="font-bold text-white text-sm uppercase">Next Objective</h4>
             </div>
-            <p className="text-xs text-muted leading-relaxed">
+            <p className="text-xs text-[#B4CCB4] leading-relaxed">
               Login to your student portal to complete technical diagnostics and finalize your payment to unlock full access.
             </p>
           </div>
         </div>
 
-        <button 
+        <button
           onClick={() => window.location.href = "/login"}
-          className="group px-12 py-5 bg-primary text-primary-foreground rounded-full font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(191,255,0,0.5)] flex items-center gap-3 mx-auto"
+          className="group px-12 py-5 bg-[#7FFF00] text-black rounded-full font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(127,255,0,0.5)] flex items-center gap-3 mx-auto"
         >
           Access Command Center
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -200,7 +179,7 @@ export function EnrollmentForm() {
       case 1:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-bold font-headline text-foreground uppercase tracking-widest">// PARENT_GUARDIAN_INFO</h3>
+            <h3 className="text-xl font-bold font-headline text-white uppercase tracking-widest">// PARENT_GUARDIAN_INFO</h3>
             <div className="grid md:grid-cols-2 gap-6">
               <Input label="Full Name" {...register("parentFullName")} error={errors.parentFullName?.message} />
               <Input label="Email Address" type="email" {...register("parentEmail")} error={errors.parentEmail?.message} />
@@ -225,7 +204,7 @@ export function EnrollmentForm() {
       case 2:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-bold font-headline text-foreground uppercase tracking-widest">// STUDENT_INFO</h3>
+            <h3 className="text-xl font-bold font-headline text-white uppercase tracking-widest">// STUDENT_INFO</h3>
             <div className="grid md:grid-cols-2 gap-6">
               <Input label="First Name" {...register("studentFirstName")} />
               <Input label="Last Name" {...register("studentLastName")} />
@@ -254,7 +233,7 @@ export function EnrollmentForm() {
       case 3:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-bold font-headline text-foreground uppercase tracking-widest">// PROGRAM_PREFERENCES</h3>
+            <h3 className="text-xl font-bold font-headline text-white uppercase tracking-widest">// PROGRAM_PREFERENCES</h3>
             <div className="grid md:grid-cols-2 gap-6">
               <Select label="Bootcamp Track" {...register("bootcampTrack")}>
                 <option value="">Select...</option>
@@ -286,7 +265,7 @@ export function EnrollmentForm() {
       case 4:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-bold font-headline text-foreground uppercase tracking-widest">// TECH_ACCESS</h3>
+            <h3 className="text-xl font-bold font-headline text-white uppercase tracking-widest">// TECH_ACCESS</h3>
             <div className="grid md:grid-cols-2 gap-6">
               <Select label="Has personal computer?" {...register("hasComputer")}>
                 <option value="">Select...</option>
@@ -318,7 +297,7 @@ export function EnrollmentForm() {
       case 5:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-bold font-headline text-foreground uppercase tracking-widest">// EMERGENCY_&_NEEDS</h3>
+            <h3 className="text-xl font-bold font-headline text-white uppercase tracking-widest">// EMERGENCY_&_NEEDS</h3>
             <div className="grid md:grid-cols-2 gap-6">
               <Input label="Emergency Contact Name" {...register("emergencyName")} />
               <Input label="Emergency Phone" {...register("emergencyPhone")} />
@@ -333,7 +312,7 @@ export function EnrollmentForm() {
       case 6:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-bold font-headline text-foreground uppercase tracking-widest">// GOALS_&_EXPECTATIONS</h3>
+            <h3 className="text-xl font-bold font-headline text-white uppercase tracking-widest">// GOALS_&_EXPECTATIONS</h3>
             <TextArea label="Why does your student want to join?" {...register("studentGoal")} />
             <TextArea label="What do you hope they get out of this?" {...register("parentExpectation")} />
             <Select label="How did you hear about us?" {...register("referralSource")}>
@@ -351,13 +330,12 @@ export function EnrollmentForm() {
       case 7:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-bold font-headline text-foreground uppercase tracking-widest">// PLAN_SELECTION</h3>
+            <h3 className="text-xl font-bold font-headline text-white uppercase tracking-widest">// PLAN_SELECTION</h3>
             <div className="grid gap-6">
               <Select label="Select your plan" {...register("planSelection")}>
                 <option value="">Select...</option>
-                <option value="Basic">Basic - Core Access</option>
-                <option value="Standard">Standard - Includes Office Hours</option>
-                <option value="Premium">Premium - 1-on-1 Mentorship</option>
+                <option value="SmallGroup">Small Group - $150</option>
+                <option value="OneOnOne">1-on-1 - $200</option>
               </Select>
               <Input label="Promo / Discount Code" {...register("promoCode")} />
             </div>
@@ -366,7 +344,7 @@ export function EnrollmentForm() {
       case 8:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-bold font-headline text-foreground uppercase tracking-widest">// PAYMENT_DETAILS</h3>
+            <h3 className="text-xl font-bold font-headline text-white uppercase tracking-widest">// PAYMENT_DETAILS</h3>
             <p className="text-sm leading-7 text-[#B4CCB4]">
               Enter card details securely below. The next step confirms your agreement before sending the payment request to Stripe.
             </p>
@@ -387,13 +365,27 @@ export function EnrollmentForm() {
       case 9:
         return (
           <div className="space-y-10">
-            <h3 className="text-lg md:text-xl font-bold font-headline text-foreground uppercase tracking-widest">// FINAL_AGREEMENTS</h3>
+            <h3 className="text-lg md:text-xl font-bold font-headline text-white uppercase tracking-widest">// FINAL_AGREEMENTS</h3>
             <div className="space-y-6">
               <Checkbox label="I agree to the cyber4every1 Terms & Conditions" {...register("agreeTerms")} />
               <Checkbox label="I agree to the Refund Policy" {...register("agreeRefund")} />
               <Checkbox label="Permission to share student work for education" {...register("shareWork")} />
               <Checkbox label="Receive weekly progress emails" {...register("weeklyProgress")} />
-              <Checkbox label="Add me to the parent newsletter" {...register("newsletter")} />
+            </div>
+
+            <div className="rounded-3xl border border-[#7FFF00]/30 bg-[#7FFF00]/5 p-6">
+              <div className="flex items-start gap-4">
+                <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#7FFF00]/15 text-lg">
+                  📬
+                </span>
+                <div className="flex-1 space-y-2">
+                  <p className="font-bold text-white">Stay in the loop</p>
+                  <p className="text-sm leading-relaxed text-[#B4CCB4]">
+                    Get occasional emails about new program tracks, cohort openings, and family resources. No spam, unsubscribe anytime.
+                  </p>
+                  <Checkbox label="Add me to the parent newsletter" {...register("newsletter")} />
+                </div>
+              </div>
             </div>
           </div>
         );
@@ -470,15 +462,15 @@ export function EnrollmentForm() {
 
   return (
     <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
-      <div className="bg-surface/40 backdrop-blur-xl border border-border rounded-2xl md:rounded-4xl p-6 md:p-12 shadow-2xl">
+      <div className="rounded-2xl border border-white/10 bg-[#102010] p-6 shadow-2xl md:rounded-4xl md:p-12">
         {/* Stepper */}
         <div className="mb-12 flex justify-between items-center max-w-2xl mx-auto">
           {Array.from({ length: totalSteps }).map((_, i) => (
-            <div 
-              key={i} 
+            <div
+              key={i}
               className={`h-1.5 flex-1 mx-1 rounded-full transition-all duration-500 ${
-                i + 1 <= step ? "bg-primary" : "bg-foreground/10"
-              }`} 
+                i + 1 <= step ? "bg-[#7FFF00]" : "bg-white/10"
+              }`}
             />
           ))}
         </div>
@@ -492,7 +484,7 @@ export function EnrollmentForm() {
               onClick={prevStep}
               disabled={step === 1}
               className={`px-6 md:px-8 py-3 md:py-4 rounded-full font-bold uppercase tracking-widest transition-all text-xs md:text-base ${
-                step === 1 ? "opacity-0 pointer-events-none" : "bg-foreground/5 text-foreground hover:bg-foreground/10"
+                step === 1 ? "opacity-0 pointer-events-none" : "bg-white/5 text-white hover:bg-white/10"
               }`}
             >
               Previous
@@ -502,7 +494,7 @@ export function EnrollmentForm() {
               <button
                 type="button"
                 onClick={nextStep}
-                className="px-8 md:px-12 py-3 md:py-4 bg-primary text-primary-foreground rounded-full font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_20px_rgba(191,255,0,0.3)] text-xs md:text-base"
+                className="px-8 md:px-12 py-3 md:py-4 bg-[#7FFF00] text-black rounded-full font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_20px_rgba(127,255,0,0.3)] text-xs md:text-base"
               >
                 Continue
               </button>
@@ -510,7 +502,7 @@ export function EnrollmentForm() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-8 md:px-12 py-3 md:py-4 bg-primary text-primary-foreground rounded-full font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(191,255,0,0.5)] text-xs md:text-base flex items-center gap-3"
+                className="px-8 md:px-12 py-3 md:py-4 bg-[#7FFF00] text-black rounded-full font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(127,255,0,0.5)] text-xs md:text-base flex items-center gap-3"
               >
                 {isSubmitting ? "SYNCING..." : "Initialize Enrollment"}
                 {!isSubmitting && <Rocket className="w-4 h-4 md:w-5 md:h-5" />}
@@ -541,7 +533,7 @@ export function EnrollmentForm() {
           </div>
 
           <div className="mt-6 space-y-3">
-            {selectedPlan ? selectedPlan.features.map((feature) => (
+            {selectedPlan ? selectedPlan.highlights.map((feature) => (
               <div key={feature} className="flex items-start gap-3 text-sm text-[#D6E6D6]">
                 <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#7FFF00]/20 text-[#7FFF00] text-xs font-black">✓</span>
                 <span>{feature}</span>
@@ -576,13 +568,13 @@ export function EnrollmentForm() {
 // Subcomponents for cleaner code
 const Input = React.forwardRef<HTMLInputElement, any>(({ label, error, ...props }, ref) => (
   <div className="group/input">
-    <label className="block text-[10px] font-bold text-muted uppercase tracking-[0.2em] mb-2 group-focus-within/input:text-primary transition-colors">
+    <label className="block text-[10px] font-bold text-[#6A8A6A] uppercase tracking-[0.2em] mb-2 group-focus-within/input:text-[#7FFF00] transition-colors">
       {label}
     </label>
     <input 
       ref={ref}
       {...props}
-      className="w-full bg-transparent border-0 border-b border-border px-0 py-3 text-foreground placeholder:text-foreground/20 focus:ring-0 focus:border-primary transition-all duration-300 font-headline tracking-wide"
+      className="w-full bg-transparent border-0 border-b border-white/15 px-0 py-3 text-white placeholder:text-white/20 focus:ring-0 focus:border-[#7FFF00] transition-all duration-300 font-headline tracking-wide"
     />
     {error && <p className="text-[10px] text-red-500 mt-1 uppercase tracking-wider">{error}</p>}
   </div>
@@ -591,13 +583,13 @@ Input.displayName = "Input";
 
 const Select = React.forwardRef<HTMLSelectElement, any>(({ label, error, children, ...props }, ref) => (
   <div className="group/input">
-    <label className="block text-[10px] font-bold text-muted uppercase tracking-[0.2em] mb-2 group-focus-within/input:text-primary transition-colors">
+    <label className="block text-[10px] font-bold text-[#6A8A6A] uppercase tracking-[0.2em] mb-2 group-focus-within/input:text-[#7FFF00] transition-colors">
       {label}
     </label>
     <select 
       ref={ref}
       {...props}
-      className="w-full bg-transparent border-0 border-b border-border px-0 py-3 text-foreground focus:ring-0 focus:border-primary transition-all duration-300 font-headline"
+      className="w-full bg-transparent border-0 border-b border-white/15 px-0 py-3 text-white focus:ring-0 focus:border-[#7FFF00] transition-all duration-300 font-headline [&>option]:bg-[#102010] [&>option]:text-white"
     >
       {children}
     </select>
@@ -608,14 +600,14 @@ Select.displayName = "Select";
 
 const TextArea = React.forwardRef<HTMLTextAreaElement, any>(({ label, error, ...props }, ref) => (
   <div className="group/input">
-    <label className="block text-[10px] font-bold text-muted uppercase tracking-[0.2em] mb-2 group-focus-within/input:text-primary transition-colors">
+    <label className="block text-[10px] font-bold text-[#6A8A6A] uppercase tracking-[0.2em] mb-2 group-focus-within/input:text-[#7FFF00] transition-colors">
       {label}
     </label>
     <textarea 
       ref={ref}
       {...props}
       rows={3}
-      className="w-full bg-transparent border-0 border-b border-border px-0 py-3 text-foreground placeholder:text-foreground/20 focus:ring-0 focus:border-primary transition-all duration-300 font-headline resize-none"
+      className="w-full bg-transparent border-0 border-b border-white/15 px-0 py-3 text-white placeholder:text-white/20 focus:ring-0 focus:border-[#7FFF00] transition-all duration-300 font-headline resize-none"
     />
     {error && <p className="text-[10px] text-red-500 mt-1 uppercase tracking-wider">{error}</p>}
   </div>
@@ -629,13 +621,13 @@ const Checkbox = React.forwardRef<HTMLInputElement, any>(({ label, ...props }, r
         type="checkbox" 
         ref={ref}
         {...props}
-        className="peer appearance-none w-5 h-5 rounded border-2 border-border bg-transparent checked:bg-primary checked:border-primary transition-all" 
+        className="peer appearance-none w-5 h-5 rounded border-2 border-white/20 bg-transparent checked:bg-[#7FFF00] checked:border-[#7FFF00] transition-all"
       />
-      <span className="material-symbols-outlined text-primary-foreground text-xs absolute opacity-0 peer-checked:opacity-100 transition-opacity">
+      <span className="material-symbols-outlined text-black text-xs absolute opacity-0 peer-checked:opacity-100 transition-opacity">
         check
       </span>
     </div>
-    <span className="text-sm text-muted group-hover:text-foreground transition-colors">{label}</span>
+    <span className="text-sm text-[#B4CCB4] group-hover:text-white transition-colors">{label}</span>
   </label>
 ));
 Checkbox.displayName = "Checkbox";

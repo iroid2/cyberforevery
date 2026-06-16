@@ -1,58 +1,87 @@
 "use client";
 
-import React, { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { TopNavBar } from "@/components/top-nav-bar";
 import { EnrollmentForm } from "@/components/enrollment-form";
-import { MainFooter } from "@/components/main-footer";
+import { getPricingPlan, packageIncludes } from "@/lib/pricing-plans";
 
 export default function EnrollPage() {
-  const [showForm, setShowForm] = useState(false);
+  const searchParams = useSearchParams();
+  const plan = getPricingPlan(searchParams.get("plan"));
 
   return (
-    <div className="h-screen overflow-hidden bg-[#050D05] text-foreground font-body">
+    <div className="h-auto min-h-screen bg-[#050D05] text-white font-body">
       <TopNavBar />
 
-      <main className="relative h-[calc(100vh-88px)] px-6 md:px-8">
+      <main className="relative px-6 md:px-8">
         <div className="absolute inset-x-0 top-0 h-1/2 bg-linear-to-b from-[#0F1F0F]/80 to-transparent" />
-        <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-between py-8">
-          <div className="grid flex-1 gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+        <div className="relative mx-auto max-w-7xl py-12 md:py-16">
+          <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div className="space-y-8">
               <div className="inline-flex items-center gap-3 rounded-full border border-[#7FFF00]/30 bg-[#7FFF00]/10 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.35em] text-[#7FFF00]">
                 <span className="h-2 w-2 rounded-full bg-[#7FFF00] animate-pulse" />
                 Enrollment & Payment
               </div>
-              <h1 className="text-5xl font-black leading-tight text-white md:text-6xl">
-                A polished enrollment experience that fits in one screen.
-              </h1>
-              <p className="max-w-3xl text-sm leading-8 text-[#B4CCB4] md:text-base">
-                Review the program, confirm the package, and open the secure checkout form only when you’re ready. The page stays within the viewport, and the registration flow appears in a focused overlay.
-              </p>
+
+              {plan ? (
+                <>
+                  <h1 className="text-5xl font-black leading-tight text-white md:text-6xl">
+                    You&apos;re enrolling in{" "}
+                    <span className="text-[#7FFF00]">{plan.title}</span>.
+                  </h1>
+                  <p className="max-w-3xl text-sm leading-8 text-[#B4CCB4] md:text-base">
+                    {plan.description} Confirm the details below, then complete the secure
+                    checkout form to lock in your seat.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h1 className="text-5xl font-black leading-tight text-white md:text-6xl">
+                    A polished enrollment experience, start to finish.
+                  </h1>
+                  <p className="max-w-3xl text-sm leading-8 text-[#B4CCB4] md:text-base">
+                    Pick a plan, review the program, and complete secure checkout when you&apos;re ready.
+                  </p>
+                </>
+              )}
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="rounded-4xl border border-white/10 bg-[#0F1F0F] p-6">
-                  <p className="text-[10px] uppercase tracking-[0.3em] text-[#6A8A6A]">Ready in one view</p>
-                  <p className="mt-3 text-xl font-black text-white">No long scroll</p>
-                  <p className="mt-2 text-sm text-[#B4CCB4]">Everything important is visible without exceeding the screen.</p>
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-[#6A8A6A]">
+                    {plan ? "Selected plan" : "Choose your plan"}
+                  </p>
+                  <p className="mt-3 text-xl font-black text-white">
+                    {plan ? `${plan.title} — ${plan.price}` : "Small Group or 1-on-1"}
+                  </p>
+                  <p className="mt-2 text-sm text-[#B4CCB4]">
+                    {plan
+                      ? plan.highlights[0]
+                      : "Head back to pricing to pick the option that fits your child best."}
+                  </p>
                 </div>
                 <div className="rounded-4xl border border-white/10 bg-[#0F1F0F] p-6">
                   <p className="text-[10px] uppercase tracking-[0.3em] text-[#6A8A6A]">Secure payment</p>
                   <p className="mt-3 text-xl font-black text-[#7FFF00]">Stripe-ready checkout</p>
-                  <p className="mt-2 text-sm text-[#B4CCB4]">Card details are collected securely in the overlay and not stored on our site.</p>
+                  <p className="mt-2 text-sm text-[#B4CCB4]">Card details are collected securely and are not stored on our site.</p>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-4">
-                <button
-                  type="button"
-                  onClick={() => setShowForm(true)}
+                <a
+                  href="#enroll-form"
                   className="inline-flex items-center justify-center rounded-full bg-[#7FFF00] px-8 py-4 text-sm font-black uppercase tracking-[0.18em] text-black shadow-[0_0_30px_rgba(127,255,0,0.3)] transition hover:bg-[#75d400]"
                 >
                   Start enrollment
-                </button>
-                <a href="#summary" className="inline-flex items-center justify-center rounded-full border border-white/10 bg-transparent px-8 py-4 text-sm font-bold uppercase tracking-[0.18em] text-white transition hover:border-[#7FFF00]/50 hover:text-[#7FFF00]">
-                  Program summary
                 </a>
+                {!plan && (
+                  <a
+                    href="/#pricing"
+                    className="inline-flex items-center justify-center rounded-full border border-white/10 bg-transparent px-8 py-4 text-sm font-bold uppercase tracking-[0.18em] text-white transition hover:border-[#7FFF00]/50 hover:text-[#7FFF00]"
+                  >
+                    Compare plans
+                  </a>
+                )}
               </div>
             </div>
 
@@ -62,9 +91,9 @@ export default function EnrollPage() {
               </div>
               <div className="mt-5 grid gap-3 grid-cols-2">
                 {[
-                  { label: "Plan", value: "Standard" },
-                  { label: "Duration", value: "8 weeks" },
-                  { label: "Price", value: "$499" },
+                  { label: "Plan", value: plan ? plan.title : "Small Group or 1-on-1" },
+                  { label: "Duration", value: "6 weeks" },
+                  { label: "Price", value: plan ? `${plan.price}${plan.cadence}` : "$150 – $200" },
                   { label: "Checkout", value: "Stripe secure" },
                 ].map((item) => (
                   <div key={item.label} className="rounded-3xl border border-white/10 bg-[#0F1F0F] p-4">
@@ -76,55 +105,34 @@ export default function EnrollPage() {
             </div>
           </div>
 
-          <section id="summary" className="grid gap-4 sm:grid-cols-3">
-            {[
-              {
-                title: "Clear process",
-                text: "One-screen page, one click to enroll, one secure checkout overlay.",
-              },
-              {
-                title: "Family-first UX",
-                text: "Parents see a concise summary without endless scroll.",
-              },
-              {
-                title: "Secure payment",
-                text: "Stripe-ready card entry appears only inside the modal.",
-              },
-            ].map((item) => (
-              <div key={item.title} className="rounded-4xl border border-white/10 bg-[#0F1F0F] p-6">
-                <h3 className="text-lg font-black text-white">{item.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-[#B4CCB4]">{item.text}</p>
-              </div>
-            ))}
+          <section className="mt-14 rounded-4xl border border-white/10 bg-[#0F1F0F] p-8">
+            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#7FFF00]">
+              Every plan includes
+            </div>
+            <ul className="mt-5 grid gap-3 text-sm text-[#D6E6D6] sm:grid-cols-2 lg:grid-cols-3">
+              {packageIncludes.map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <span className="mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#7FFF00]/20 text-[#7FFF00] text-xs font-black">
+                    ✓
+                  </span>
+                  <span className="text-[#B4CCB4]">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section id="enroll-form" className="mt-14 scroll-mt-24">
+            <div className="mb-8 rounded-4xl border border-white/10 bg-[#0A140A] p-6">
+              <p className="text-[10px] uppercase tracking-[0.35em] text-[#7FFF00]">Secure enrollment</p>
+              <h2 className="mt-3 text-3xl font-black text-white">Complete your registration.</h2>
+              <p className="mt-4 text-sm leading-7 text-[#B4CCB4]">
+                Fill in the details below. Card data is never stored on this site — it&apos;s passed securely through Stripe.
+              </p>
+            </div>
+            <EnrollmentForm />
           </section>
         </div>
       </main>
-
-      <MainFooter />
-
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-6 pt-24 backdrop-blur-sm">
-          <div className="relative w-full max-w-5xl overflow-hidden rounded-4xl border border-white/10 bg-[#071007]/95 shadow-2xl">
-            <button
-              type="button"
-              onClick={() => setShowForm(false)}
-              className="absolute right-4 top-4 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-[#0F1F0F] text-white transition hover:bg-[#1F2B1F]"
-            >
-              ✕
-            </button>
-            <div className="max-h-[calc(100vh-4rem)] overflow-y-auto p-8">
-              <div className="mb-8 rounded-4xl border border-white/10 bg-[#0A140A] p-6">
-                <p className="text-[10px] uppercase tracking-[0.35em] text-[#7FFF00]">Secure enrollment</p>
-                <h2 className="mt-3 text-3xl font-black text-white">Complete registration in a focused overlay.</h2>
-                <p className="mt-4 text-sm leading-7 text-[#B4CCB4]">
-                  This form is intentionally isolated from the page. It scrolls inside the overlay and never forces the page itself to exceed the viewport.
-                </p>
-              </div>
-              <EnrollmentForm />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

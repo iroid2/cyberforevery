@@ -3,11 +3,10 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { checkRateLimit } from "@/lib/security/rate-limit";
+import { getPricingPlan } from "@/lib/pricing-plans";
 
 function getPlanAmount(plan: string) {
-  if (plan === "Standard") return 29900;
-  if (plan === "Premium") return 49900;
-  return 19900;
+  return getPricingPlan(plan)?.priceCents ?? getPricingPlan("SmallGroup")!.priceCents;
 }
 
 export async function POST(req: Request) {
@@ -54,7 +53,7 @@ export async function POST(req: Request) {
     }
 
     const additionalInfo = enrollment.student.additionalInfo as any;
-    const plan = additionalInfo?.selection?.plan || "Basic";
+    const plan = additionalInfo?.selection?.plan || "SmallGroup";
     const amount = getPlanAmount(plan);
     const origin = req.headers.get("origin") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 

@@ -34,6 +34,9 @@ export const enrollmentSchema = z.object({
   referralSource: z.string().trim().min(1),
   planSelection: z.string().trim().min(1),
   promoCode: z.string().trim().optional(),
+  shareWork: z.boolean().optional().default(false),
+  weeklyProgress: z.boolean().optional().default(false),
+  newsletter: z.boolean().optional().default(false),
 });
 
 export type EnrollmentInput = z.infer<typeof enrollmentSchema>;

@@ -10,25 +10,25 @@ import { PricingSection } from "@/components/pricing-section";
 
 const programCards = [
   {
-    icon: "🛡️",
-    title: "Internet Safety",
-    subtitle: "Strong digital habits",
+    icon: "🧠",
+    title: "Digital Wisdom Lab",
+    subtitle: "Smart, safe online habits",
     description:
-      "Password hygiene, phishing checks, account protection, and everyday security habits for families.",
-  },
-  {
-    icon: "💥",
-    title: "Ethical Hacking",
-    subtitle: "Think like an attacker",
-    description:
-      "Hands-on security thinking, basic lab simulations, and the mindset behind defensive cybersecurity.",
+      "Internet safety, scam and AI basics, spotting fake news, and using tech for good.",
   },
   {
     icon: "🤖",
-    title: "AI & Code",
-    subtitle: "Creative digital building",
+    title: "AI Builders Lab",
+    subtitle: "Creative AI literacy",
     description:
-      "Safe AI usage, beginner-friendly coding, and practical exercises that prepare students for the future.",
+      "AI literacy and prompting, creativity and truth, and hands-on AI project design.",
+  },
+  {
+    icon: "🛡️",
+    title: "Introduction to Cybersecurity",
+    subtitle: "Beginner-friendly defense",
+    description:
+      "Cybersecurity concepts, digital defense, online threats, safe browsing, and beginner hands-on security skills.",
   },
 ];
 
