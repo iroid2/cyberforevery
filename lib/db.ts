@@ -28,8 +28,27 @@ function createPrismaClient() {
   return new PrismaClient({ adapter } as never);
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+let client: PrismaClient | undefined;
 
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
+// Lazily constructed so importing this module (e.g. while Next.js collects
+// page data at build time) never opens a DB connection or throws on a
+// missing DATABASE_URL — that only happens on first real use at runtime.
+function getPrismaClient(): PrismaClient {
+  if (globalForPrisma.prisma) return globalForPrisma.prisma;
+  if (client) return client;
+
+  client = createPrismaClient();
+
+  if (process.env.NODE_ENV !== "production") {
+    globalForPrisma.prisma = client;
+  }
+
+  return client;
 }
+
+export const prisma = new Proxy({} as PrismaClient, {
+  get(_target, prop, receiver) {
+    const value = Reflect.get(getPrismaClient() as object, prop, receiver);
+    return typeof value === "function" ? value.bind(getPrismaClient()) : value;
+  },
+});
