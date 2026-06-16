@@ -378,7 +378,7 @@ const AnimatedImagePanel = ({
       >
         {/* Card with glow pulse */}
         <div
-          className="relative overflow-hidden rounded-4xl w-[90vw] sm:w-60 md:w-75 lg:w-95"
+          className="relative overflow-hidden rounded-4xl w-[78vw] sm:w-60 md:w-75 lg:w-95"
           style={{ animation: "heroGlowPulse 2s ease-in-out infinite" }}
         >
           {/* Outer lime glow border */}
@@ -395,7 +395,7 @@ const AnimatedImagePanel = ({
               alt={alt}
               fill
               className="object-cover"
-              sizes="(max-width: 640px) 90vw, (max-width: 768px) 240px, (max-width: 1024px) 300px, 380px"
+              sizes="(max-width: 640px) 78vw, (max-width: 768px) 240px, (max-width: 1024px) 300px, 380px"
             />
             <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/5 to-black/65" />
 
@@ -500,8 +500,8 @@ export default function HeroSlider() {
 
           <div className="relative mx-auto max-w-6xl w-full px-4 sm:px-6 md:px-10 py-8 sm:py-12 md:py-20">
             <div className="hero-two-col">
-              {/* Image panel — top on mobile (order-first), right on desktop (order-last) */}
-              <div className="order-first md:order-last flex-none flex justify-center">
+              {/* Image panel — comes after text on mobile, right on desktop */}
+              <div className="order-last flex-none flex justify-center">
                 <AnimatedImagePanel
                   src={slide.image.src}
                   alt={slide.image.alt}
@@ -513,7 +513,7 @@ export default function HeroSlider() {
 
               {/* Text content — fades on slide change */}
               <div
-                className="order-last md:order-first w-full md:flex-1 flex flex-col items-center md:items-start gap-3 sm:gap-4 md:gap-5 text-center md:text-left md:max-w-130"
+                className="order-first w-full md:flex-1 flex flex-col items-center md:items-start gap-3 sm:gap-4 md:gap-5 text-center md:text-left md:max-w-130"
                 style={{
                   transition: "opacity 0.35s ease",
                   opacity: animating ? 0 : 1,
